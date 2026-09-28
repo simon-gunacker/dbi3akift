@@ -3,23 +3,31 @@ from names_generator import generate_name
 import numpy as np
 
 
-import statements, get_variance as gv
+import statements as s
 
-def db():
-    with connect(statements.database) as conn:
-        curs = conn.cursor()
-        conn.execute(statements.table)
-        stats = statements.generate_names(
-            curs, statements.insert, False
+def db(
+    database: str, execute_insert: bool = True, create_index: bool = False
+    ) -> None:
+    dataset_count = 500000
+    with connect(database) as con:
+        con.execute(s.table)
+        if create_index:
+            con.execute(s.index)
+        s.fill_db(
+            con, s.insert, dataset_count, execute_insert
             )
-        mean = np.mean(stats)
-        print(stats)
-        print(np.std(stats), mean)
-        conn.commit()
-
+        curs = con.cursor()
+        res = curs.execute(s.select_duplicate_names).fetchall()
+        res = sorted(list(map(lambda x: x[0], res)))
+        # print(round(sum(res)/len(res), 1))
+        print(f"Varianz: {round(np.var(res), 2)} "
+              f"- Standardabweichung: {round(np.std(res), 2)}")
+        con.commit()
 
 def main():
-    db()
+    db(s.database, execute_insert=False)
+    db(s.db_indexed, execute_insert=False, create_index=True)
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     main()
