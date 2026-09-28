@@ -113,11 +113,12 @@ def get_repeat(conn, first_name_dict: list):
     list_first_name = []
     repeat = 0
     result = 0
-    n = len(list_first_name)
     for name in first_name_dict:
         list_first_name.append(name["first_name"])
+    
+    n = len(list_first_name)
 
-    for i in range(len(list_first_name)):
+    for i in range(1, len(list_first_name)):
         if list_first_name[i] == list_first_name[i - 1]:
             repeat += 1
 
