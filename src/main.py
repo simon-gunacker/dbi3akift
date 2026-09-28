@@ -1,14 +1,25 @@
 from sqlite3 import connect
 from names_generator import generate_name
-
-import sql, get_variance as gv
-
-# with connect(sql.database) as conn:
+import numpy as np
 
 
-print(generate_name(style='capital'))
+import statements, get_variance as gv
 
-with connect(sql.database) as conn:
-    curs = conn.cursor()
-    curs.execute(sql.table)
-    gv.generate_names(curs, sql.insert)
+def db():
+    with connect(statements.database) as conn:
+        curs = conn.cursor()
+        conn.execute(statements.table)
+        stats = statements.generate_names(
+            curs, statements.insert, False
+            )
+        mean = np.mean(stats)
+        print(stats)
+        print(np.std(stats), mean)
+        conn.commit()
+
+
+def main():
+    db()
+
+if __name__ =="__main__":
+    main()
