@@ -48,6 +48,13 @@ def insert_person(conn, first_name: str, last_name: str):
     conn.commit()
 
 
+def get_all_persons(conn):
+    sql = "SELECT * FROM persons"
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 if __name__ == "__main__":
     fake = Faker("de_AT")
 
