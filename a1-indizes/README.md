@@ -1,14 +1,26 @@
 # Indizes
 
-- Schreibe ein python-Skript, das eine Tabelle `personen(id, vorname, nachname)` mit vielen (mind. 500k) Datensätzen befüllt. Verwende dazu eine geeignete Bibliothek, um sinnvolle Zufallsdaten zu bekommen.
+| Messgröße | gleich.db ohne Index | gleich.db mit Index | bias.db ohne Index | bias.db mit Index |
+|---|---|---|---|---|
+| Dateigröße | 11 571 200 B | 19 075 072 B | 11 571 200 B | 19 079 168 B |
+| Zuwachs durch Index | – | +7 503 872 B (+64,8 %) | – | +7 507 968 B (+64,9 %) |
 
-- Analysiere, wie zufällig die gewählte Bibliothek streut. 
-  
-	⚠️ Hier kann nicht unüberlegt die Varianz ermittelt werden! 
-	
-	Die Varianz ist ein mathematisches Maß, dass davon ausgeht, dass zwei Objekte eine Distanz zueinander haben. Bei Vor-/Nachnamen ist das nicht so einfach, man muss sich also überlegen, was man unter Streuung versteht.
-	
-- Zeige, welche Performance ein Index bringt und wie er sich auf den Speicherbedarf auswirkt. Hilfreiche Kommandos in der Datenbank: `.headers on`, `.mode column`, `.timer on`,  `WITH`-Statement für Select zur relativen Verteilung
-- Unter der Annahme, dass die Bibliothek die indizierte Spalte gleichverteilt befüllt hat: erzeuge eine Datenbank, die einen Bias hat; z.B. 50% gleicher Vorname. 
-- Erstelle auch für diese Datenbank einen Index, untersuche, was sich jetzt ändert und suche Gründe für diese Änderungen.
-- Erstelle einen kurzen Report (ca. 1/2 Seite), in dem du deine Erkenntnisse festhältst und begründest. Der Report ist bis zum Anfang der nächsten Stunde **im github classroom** abzugeben.
+
+| Nr. | DB | Index | real | user | sys |
+|---|---|---|---|---|---|---|
+| 1 | ? | ? | 0,542 s | 0,519341 s | 0,021494 s
+| 2 | ? | ? | 0,108 s | 0,095624 s | 0,011918 s
+| 3 | gleich.db | ohne | 0,267 s | 0,255826 s | 0,010736 s
+| 4 | gleich.db | mit | 0,040 s | 0,039906 s | 0,000000 s
+
+Abfrage:
+WITH base AS (
+    SELECT vorname, COUNT(*) AS anzahl
+    FROM personen
+    GROUP BY vorname
+)
+SELECT vorname,anzahl * 100.0 / (SELECT COUNT(*) FROM personen)
+FROM base
+ORDER BY 2 desc
+;
+
