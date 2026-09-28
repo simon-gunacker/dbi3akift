@@ -1,6 +1,8 @@
 from sqlite3 import connect
 from faker import Faker
 
+fake = Faker("de_AT")
+
 
 def conver_to_dict(cursor, row):
     result_dict = {}
@@ -55,8 +57,18 @@ def get_all_persons(conn):
     return cursor.fetchall()
 
 
-if __name__ == "__main__":
-    fake = Faker("de_AT")
+@with_connect(":memory:")
+def test_in_memory(conn):
+    create_table(conn)
 
-    for i in range(10):
-        print(fake.first_name(), fake.last_name())
+    for i in range(100):
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        insert_person(conn, first_name, last_name)
+
+    for p in get_all_persons(conn):
+        print(p)
+
+
+if __name__ == "__main__":
+    test_in_memory()
