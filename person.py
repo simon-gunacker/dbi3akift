@@ -146,5 +146,22 @@ def test_in_memory(conn):
     get_repeat(conn, get_first_name_group_amount_orderd(conn))
 
 
+def fill_db(conn):
+    for i in range(500_000):
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        insert_person(conn, first_name, last_name)
+
+
+@with_connect(":persons.db:")
+def run_person_db(conn):
+    create_table(conn)
+    fill_db(conn)
+
+    get_uniformity(conn, get_first_name_group_amount(conn))
+    get_repeat(conn, get_first_name_group_amount_orderd(conn))
+
+
 if __name__ == "__main__":
-    test_in_memory()
+    # test_in_memory()
+    run_person_db()
