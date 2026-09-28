@@ -153,7 +153,7 @@ def fill_db(conn):
         insert_person(conn, first_name, last_name)
 
 
-@with_connect(":persons.db:")
+@with_connect("persons.db")
 def run_person_db(conn):
     create_table(conn)
     fill_db(conn)
