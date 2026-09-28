@@ -1,5 +1,5 @@
 from sqlite3 import connect
-from sqlite3.dbapi2 import Cursor
+from faker import Faker
 
 
 def conver_to_dict(cursor, row):
@@ -34,3 +34,10 @@ def create_table(conn):
             last_name TEXT
         )
     """)
+
+
+if __name__ == "__main__":
+    fake = Faker("de_AT")
+
+    for i in range(3):
+        print(fake.name())
