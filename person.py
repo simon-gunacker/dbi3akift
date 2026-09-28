@@ -1,6 +1,7 @@
 from sqlite3 import connect
 from faker import Faker
 from faker.providers.person.de_AT import Provider
+import os
 
 fake = Faker("de_AT")
 
@@ -159,9 +160,26 @@ def fill_db(conn):
     )
     conn.commit()
 
+def fill_db_bias(conn):
+    bias_name = "Anna"
+    rows = []
+
+    for i in range(500_000 // 2):
+        last_name = fake.last_name()
+        rows.append((bias_name, last_name))
+
+    for i in range(500_000 // 2):
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        rows.append((first_name, last_name))
+
+    conn.executemany(
+        "INSERT INTO persons (first_name, last_name) VALUES (?, ?)", rows
+    )
+    conn.commit()
 
 
-@with_connect(":memory:")
+@with_connect("persons.db")
 def run_person_db(conn):
     create_table(conn)
     fill_db(conn)
@@ -170,6 +188,21 @@ def run_person_db(conn):
     get_repeat(conn, get_first_name_group_amount_orderd(conn))
 
 
+@with_connect("persons_bias.db")
+def run_person_db_bias(conn):
+    create_table(conn)
+    fill_db_bias(conn)
+
+    get_uniformity(conn, get_first_name_group_amount(conn))
+    get_repeat(conn, get_first_name_group_amount_orderd(conn))
+
+
 if __name__ == "__main__":
+    if os.path.exists("persons.db"):
+        os.remove("persons.db")
+    if os.path.exists("persons_bias.db"):
+        os.remove("persons_bias.db")
+
     # test_in_memory()
-    run_person_db()
+    # run_person_db()
+    run_person_db_bias()

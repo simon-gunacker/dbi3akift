@@ -15,9 +15,19 @@ Also habe ich mit Group by alle bei Vornamen sortiert. Dann habe ich alle Gruppe
 Damit habe ich nun eine Liste mit anzahlen, damit kann man die Varianz berechnen. Die mir dann sagt wie oft jeder Vorname vorkommt.
 
 **Ergebnis**
-Varianz: 2308.52
-Erwartet: 892.85
-Verhältnis: 2.59
+Varianz: 2171.8114253346585
+Erwartet: 892.8542855405608
+Verhältnis: 2.4324365806451596
+\
+Wiederholungen: 903
+Erwartet: 894.4525939177101
+Verhältnis: 1.0095560191120383
+
+**Dateigröße**
+11 MiB
+
+Durchlauf bei der normalen DB: Run Time: real 1.202257 user 0.311912 sys 0.397489
+
 
 === Was sagt die Varianz aus?
 
@@ -36,3 +46,18 @@ Das ist gemessene Varianz geteilt durch erwartete Varianz. Bei 1 streut Faker ge
 === Was ist dein Ergebnis?
 
 "Mit 500.000 Ziehungen kam ein Verhältnis von etwa 2,6 heraus. Faker zieht die Vornamen also nicht gleichverteilt. Manche Namen kommen deutlich öfter vor als andere."
+
+== Durchlauf bei Bias
+**Ergebnis**
+Varianz: 111601204.28369725
+Erwartet: 892.8542855405608
+Verhältnis: 124993.74880205735
+
+Wiederholungen: 250442
+Erwartet: 894.4525939177101
+Verhältnis: 279.994715989432
+
+**Zeit**
+Run Time: real 1.195454 user 0.309488 sys 0.396021
+
+Die Varianz ist jetzt so hoch weil 50% davon den gleichen Namen haben.
