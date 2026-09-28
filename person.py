@@ -64,19 +64,27 @@ def get_count(conn):
     return cursor.fetchall()
 
 
+def get_first_name_group_amount(conn):
+    sql = """
+        SELECT first_name, COUNT(*) AS amount
+        FROM persons
+        GROUP BY first_name
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_table(conn)
 
-    for i in range(500_000):
+    for i in range(500):
         first_name = fake.first_name()
         last_name = fake.last_name()
         insert_person(conn, first_name, last_name)
 
-    # for p in get_all_persons(conn):
-    #     print(p)
-
-    print(get_count(conn))
+    for i in get_first_name_group_amount(conn):
+        print(i)
 
 
 if __name__ == "__main__":
