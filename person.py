@@ -1,6 +1,7 @@
 from sqlite3 import connect
 from sqlite3.dbapi2 import Cursor
 from faker import Faker
+from faker.providers.person.de_AT import Provider
 
 fake = Faker("de_AT")
 
@@ -106,20 +107,43 @@ def get_uniformity(conn, first_name_amount: list):
     print("Erwartet:", expected)
     print("Verhältnis:", varianc / expected)
 
-    for i in get_first_name_group_amount_orderd(conn):
-        print(i)
+
+def get_repeat(conn, first_name_dict: list):
+    K = len(set(Provider.first_names))
+    list_first_name = []
+    repeat = 0
+    result = 0
+    n = len(list_first_name)
+    for name in first_name_dict:
+        list_first_name.append(name["first_name"])
+
+    for i in range(len(list_first_name)):
+        if list_first_name[i] == list_first_name[i - 1]:
+            repeat += 1
+
+    result = (n - 1) / K
+    print("=" * 25)
+    print("Wiederholungen:", repeat)
+    print("Erwartet:", result)
+    print("Verhältnis:", repeat / result)
 
 
 @with_connect(":memory:")
 def test_in_memory(conn):
+    user_input = 0
+    user_input = int(input("Anzahl an Personen (default: 500K): "))
+    if user_input == 0:
+        user_input = 500_000
+
     create_table(conn)
 
-    for i in range(500):
+    for i in range(user_input):
         first_name = fake.first_name()
         last_name = fake.last_name()
         insert_person(conn, first_name, last_name)
 
     get_uniformity(conn, get_first_name_group_amount(conn))
+    get_repeat(conn, get_first_name_group_amount_orderd(conn))
 
 
 if __name__ == "__main__":
