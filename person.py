@@ -79,15 +79,28 @@ def get_uniformity(conn, first_name_amount: list):
     for person in first_name_amount:
         amount_list.append(person["amount"])
 
-    print(len(amount_list))
-    print(sum(amount_list))
+    k = len(amount_list)
+    n = sum(amount_list)
+
+    medium = sum(amount_list) / k
+
+    temp_sum = 0
+    for x in amount_list:
+        temp_sum += (x - medium) ** 2
+    varianc = temp_sum / k
+
+    expected = n * (1 / k) * (1 - 1 / k)
+
+    print("Varianz:", varianc)
+    print("Erwartet:", expected)
+    print("Verhältnis:", varianc / expected)
 
 
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_table(conn)
 
-    for i in range(500):
+    for i in range(500_000):
         first_name = fake.first_name()
         last_name = fake.last_name()
         insert_person(conn, first_name, last_name)
