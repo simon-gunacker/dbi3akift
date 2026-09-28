@@ -204,5 +204,6 @@ if __name__ == "__main__":
         os.remove("persons_bias.db")
 
     # test_in_memory()
-    # run_person_db()
+    run_person_db()
+    print("+"* 25)
     run_person_db_bias()

@@ -26,7 +26,41 @@ Verhältnis: 1.0095560191120383
 **Dateigröße**
 11 MiB
 
-Durchlauf bei der normalen DB: Run Time: real 1.202257 user 0.311912 sys 0.397489
+**Zeitmessung**
+SELECT first_name, COUNT(*) AS anzahl
+FROM persons
+GROUP BY first_name
+ORDER BY anzahl ASC
+LIMIT 3;
+
+Run Time: real 0.167530 user 0.160507 sys 0.006268
+
+**Nach Indexierung**
+CREATE INDEX idx_first_name ON persons(first_name)
+
+Run Time: real 0.021526 user 0.020459 sys 0.000985
+
+- Viel Schneller als vorher
+- Die Dateigröße ist aber dann gestigen.
+
+
+== Durchlauf bei Bias
+**Ergebnis**
+Varianz: 111601204.28369725
+Erwartet: 892.8542855405608
+Verhältnis: 124993.74880205735
+
+Wiederholungen: 250442
+Erwartet: 894.4525939177101
+Verhältnis: 279.994715989432
+
+**Zeit**
+Run Time: real 0.131400 user 0.125903 sys 0.004599
+
+**Dateigröße**
+10.6 MiB
+
+Die Varianz ist jetzt so hoch weil 50% davon den gleichen Namen haben.
 
 
 === Was sagt die Varianz aus?
@@ -46,18 +80,3 @@ Das ist gemessene Varianz geteilt durch erwartete Varianz. Bei 1 streut Faker ge
 === Was ist dein Ergebnis?
 
 "Mit 500.000 Ziehungen kam ein Verhältnis von etwa 2,6 heraus. Faker zieht die Vornamen also nicht gleichverteilt. Manche Namen kommen deutlich öfter vor als andere."
-
-== Durchlauf bei Bias
-**Ergebnis**
-Varianz: 111601204.28369725
-Erwartet: 892.8542855405608
-Verhältnis: 124993.74880205735
-
-Wiederholungen: 250442
-Erwartet: 894.4525939177101
-Verhältnis: 279.994715989432
-
-**Zeit**
-Run Time: real 1.195454 user 0.309488 sys 0.396021
-
-Die Varianz ist jetzt so hoch weil 50% davon den gleichen Namen haben.
