@@ -1,4 +1,5 @@
 from sqlite3 import connect
+from sqlite3.dbapi2 import Cursor
 from faker import Faker
 
 fake = Faker("de_AT")
@@ -74,6 +75,16 @@ def get_first_name_group_amount(conn):
     return cursor.fetchall()
 
 
+def get_first_name_group_amount_orderd(conn):
+    sql = """
+        SELECT first_name
+        FROM persons
+        ORDER BY rowid
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 def get_uniformity(conn, first_name_amount: list):
     amount_list = []
     for person in first_name_amount:
@@ -95,12 +106,15 @@ def get_uniformity(conn, first_name_amount: list):
     print("Erwartet:", expected)
     print("Verhältnis:", varianc / expected)
 
+    for i in get_first_name_group_amount_orderd(conn):
+        print(i)
+
 
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_table(conn)
 
-    for i in range(500_000):
+    for i in range(500):
         first_name = fake.first_name()
         last_name = fake.last_name()
         insert_person(conn, first_name, last_name)
