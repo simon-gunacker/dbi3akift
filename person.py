@@ -24,3 +24,13 @@ def with_connect(db):
         return wrapper
 
     return decorator
+
+
+def create_table(conn):
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS persons(
+            id INT,
+            first_name TEXT,
+            last_name TEXT
+        )
+    """)
