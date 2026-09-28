@@ -1,5 +1,4 @@
 from sqlite3 import connect
-from sqlite3.dbapi2 import Cursor
 from faker import Faker
 from faker.providers.person.de_AT import Provider
 
@@ -33,7 +32,7 @@ def with_connect(db):
 def create_table(conn):
     conn.execute("""
         CREATE TABLE IF NOT EXISTS persons(
-            id INT,
+            id INTEGER PRIMARY KEY,
             first_name TEXT,
             last_name TEXT
         )
@@ -132,7 +131,7 @@ def get_repeat(conn, first_name_dict: list):
 @with_connect(":memory:")
 def test_in_memory(conn):
     user_input = 0
-    user_input = int(input("Anzahl an Personen (default: 500K): "))
+    user_input = int(input("Anzahl an Personen (default: 500K => 0): "))
     if user_input == 0:
         user_input = 500_000
 
@@ -148,13 +147,21 @@ def test_in_memory(conn):
 
 
 def fill_db(conn):
+    rows = []
+
     for i in range(500_000):
         first_name = fake.first_name()
         last_name = fake.last_name()
-        insert_person(conn, first_name, last_name)
+        rows.append((first_name, last_name))
+
+    conn.executemany(
+        "INSERT INTO persons (first_name, last_name) VALUES (?, ?)", rows
+    )
+    conn.commit()
 
 
-@with_connect("persons.db")
+
+@with_connect(":memory:")
 def run_person_db(conn):
     create_table(conn)
     fill_db(conn)
