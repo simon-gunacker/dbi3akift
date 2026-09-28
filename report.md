@@ -1,18 +1,18 @@
-= Mögliche Definitonen von Streuung
+= Mögliche Definitionen von Streuung
 
 + Gleichmäßigkeit: Kommt jeder Name ungefähr gleich oft dran?
-Also wenn ich 100.000 Namen bekomme und 500 verschiedene Namen enthalten sind. Sollte jeder Name etwa 200 mal vorkommen.
+Wenn ich zum Beispiel 100.000 Namen bekomme und darin 500 verschiedene Namen enthalten sind, sollte jeder Name etwa 200-mal vorkommen.
 
-+ Wiederholungen: Kommt derselbe Name auffällig oft direkt hintereinandner?
-Bei Zufall kann sein das ein Name zweimal hintereinander vorkommen kann. Bei sehr vielen aufrufen sollte aber jeder Name mindestens einmal vorkommen.
++ Wiederholungen: Kommt derselbe Name auffällig oft direkt hintereinander vor?
+Bei Zufall kann es sein, dass ein Name zweimal hintereinander vorkommt. Bei sehr vielen Aufrufen sollte aber trotzdem jeder Name mindestens einmal vorkommen.
 
 
 == Erstes Ergebnis der Gleichmäßigkeit
 
 **Idee**
-Die Varianz zu zeigen bei Namen ist kompliziert, welche Gewichtung/Wert gibt man einen Namen.
-Also habe ich mit Group by alle bei Vornamen sortiert. Dann habe ich alle Gruppen in eine Liste hinzugefügt, davon aber nur die Anzahl wie viele Vornamen in dieser Gruppe sind. 
-Damit habe ich nun eine Liste mit anzahlen, damit kann man die Varianz berechnen. Die mir dann sagt wie oft jeder Vorname vorkommt.
+Die Varianz bei Namen zu zeigen ist kompliziert, weil man sich fragen muss, welche Gewichtung/welchen Wert man einem Namen gibt.
+Also habe ich mit Group by alle Einträge nach Vornamen gruppiert. Dann habe ich alle Gruppen in eine Liste eingefügt, aber nur die Anzahl, wie viele Vornamen in dieser Gruppe sind.
+Damit habe ich nun eine Liste mit Anzahlen, mit der man die Varianz berechnen kann. Sie sagt mir dann, wie oft jeder Vorname vorkommt.
 
 **Ergebnis**
 Varianz: 2171.8114253346585
@@ -40,8 +40,8 @@ CREATE INDEX idx_first_name ON persons(first_name)
 
 Run Time: real 0.021526 user 0.020459 sys 0.000985
 
-- Viel Schneller als vorher
-- Die Dateigröße ist aber dann gestigen.
+- Viel schneller als vorher
+- Die Dateigröße ist aber gestiegen.
 
 
 == Durchlauf bei Bias
@@ -60,7 +60,7 @@ Run Time: real 0.131400 user 0.125903 sys 0.004599
 **Dateigröße**
 10.6 MiB
 
-Die Varianz ist jetzt so hoch weil 50% davon den gleichen Namen haben.
+Die Varianz ist jetzt so hoch, weil 50 % davon den gleichen Namen haben.
 
 
 === Was sagt die Varianz aus?
@@ -75,7 +75,7 @@ Die Formel dafür ist n · (1/k) · (1 − 1/k), mit n = Anzahl der Ziehungen un
 
 === Was ist das Verhältnis?
 
-Das ist gemessene Varianz geteilt durch erwartete Varianz. Bei 1 streut Faker genau so, wie ein fairer Zufall es tun würde. Bei einem Wert deutlich über 1 streuen die Häufigkeiten stärker, es gibt also Namen, die bevorzugt werden. Bei einem Wert deutlich unter 1 wäre es gleichmäßiger als Zufall.
+Das ist die gemessene Varianz geteilt durch die erwartete Varianz. Bei 1 streut Faker genau so, wie ein fairer Zufall es tun würde. Bei einem Wert deutlich über 1 streuen die Häufigkeiten stärker, es gibt also Namen, die bevorzugt werden. Bei einem Wert deutlich unter 1 wäre es gleichmäßiger als Zufall.
 
 === Was ist dein Ergebnis?
 
