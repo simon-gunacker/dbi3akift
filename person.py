@@ -74,6 +74,15 @@ def get_first_name_group_amount(conn):
     return cursor.fetchall()
 
 
+def get_uniformity(conn, first_name_amount: list):
+    amount_list = []
+    for person in first_name_amount:
+        amount_list.append(person["amount"])
+
+    print(len(amount_list))
+    print(sum(amount_list))
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_table(conn)
@@ -83,8 +92,7 @@ def test_in_memory(conn):
         last_name = fake.last_name()
         insert_person(conn, first_name, last_name)
 
-    for i in get_first_name_group_amount(conn):
-        print(i)
+    get_uniformity(conn, get_first_name_group_amount(conn))
 
 
 if __name__ == "__main__":
