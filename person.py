@@ -36,8 +36,20 @@ def create_table(conn):
     """)
 
 
+def insert_person(conn, first_name: str, last_name: str):
+    sql = """
+        INSERT INTO persons (first_name, last_name)
+        VALUES (?, ?)
+    """
+    conn.execute(
+        sql,
+        (first_name, last_name),
+    )
+    conn.commit()
+
+
 if __name__ == "__main__":
     fake = Faker("de_AT")
 
-    for i in range(3):
-        print(fake.name())
+    for i in range(10):
+        print(fake.first_name(), fake.last_name())
