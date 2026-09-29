@@ -2,7 +2,8 @@
 
 Ein Onlineshop hat das folgende Datenmodell:
 
-![[img/erd.png]]
+![img/erd.png]
+
 ## 1. Datenbank erstellen
 
 Erstelle die Datenbank anhand des vorgegebenen Datenmodells.
