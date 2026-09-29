@@ -2,7 +2,11 @@
 
 Ein Onlineshop hat das folgende Datenmodell:
 
+<<<<<<< HEAD
 ![ERD](img/erd.png)
+=======
+![img/erd.png]
+>>>>>>> 7804aae (Fix image syntax in assignment.md)
 
 ## 1. Datenbank erstellen
 
