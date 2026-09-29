@@ -2,7 +2,7 @@
 
 Ein Onlineshop hat das folgende Datenmodell:
 
-![img/erd.png]
+![ERD](img/erd.png)
 
 ## 1. Datenbank erstellen
 
