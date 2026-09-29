@@ -1,0 +1,16 @@
+*.db
+# LaTeX Haupt-Hilfsdateien
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.bbl
+*.blg
+*.bcf
+*.xml
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.xdv

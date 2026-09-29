@@ -1,0 +1,137 @@
+
+\documentclass{article}
+
+% Sprach- und Zeichencodierung
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+
+% Mathematische Symbole und Einheiten
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Seitenlayout
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+\begin{document}
+
+\title{Analyse von Datenbank-Performance, Streuung und Indizierung}
+\author{David Rinner}
+\date{\today}
+
+\maketitle
+
+\section{Einleitung und Methodik}
+
+Ziel dieser Analyse ist die Untersuchung des Verhaltens von
+SQLite-Datenbanken bei großen Datenmengen ($\geq 500\,000$ Datensätze).
+Dabei wurden die Streuung von Zufallsdaten, die mithilfe von Python und
+\texttt{Faker} generiert wurden, die Auswirkungen von Indizes auf die
+Performance sowie der Einfluss eines Daten-Bias untersucht.
+
+\section{Streuungsanalyse der Zufallsdaten}
+
+Da Namen keine Distanz im herkömmlichen Sinne besitzen, lässt sich ihre
+Streuung nicht direkt über geometrische Abstände bestimmen.
+Stattdessen wird die Streuung über die \textbf{Häufigkeitsverteilung der
+Vornamen} definiert.
+
+Jeder Vorname wird dabei als Kategorie betrachtet, deren Häufigkeit über
+alle Datensätze hinweg gezählt wird.
+
+\begin{itemize}
+    \item \textbf{Durchschnittliche Häufigkeit:} $\approx 249{,}75$
+    Vorkommen pro Vorname.
+    
+    \item \textbf{Varianz der Häufigkeiten:} $267{,}28$
+    (Standardabweichung $\sigma \approx 16{,}35$).
+\end{itemize}
+
+Die geringe Varianz zeigt, dass die verwendete Bibliothek
+\texttt{Faker} die Vornamen relativ gleichmäßig über die Datensätze
+verteilt.
+
+\section{Performance und Speicherbedarf mit und ohne Index}
+
+Ohne Index muss die Datenbank bei einer Abfrage 
+die gesamte Tabelle durchsuchen und benötigt in der vorliegenden
+Messung etwa $0{,}178\,\mathrm{s}$.
+
+Nach der Erstellung eines Indexes 
+sinkt die Abfragezeit auf etwa $0{,}001\,\mathrm{s}$. Dadurch wird die
+Abfrage in diesem Beispiel deutlich beschleunigt.
+
+Dieser Geschwindigkeitsgewinn geht jedoch mit einem erhöhten
+Speicherbedarf einher. Während die Datenbank vor der Erstellung des
+Indexes $11\,755\,520\,\mathrm{Byte}$ 
+beanspruchte, steigt der Speicherbedarf nach dem Aufbau des
+B-Tree-Indexes auf $19\,578\,880\,\mathrm{Byte}$.
+
+Der zusätzliche Speicherbedarf entsteht dadurch, dass neben der
+eigentlichen Tabelle eine zusätzliche Indexstruktur gespeichert werden
+muss.
+
+\section{Untersuchung der Biased Database}
+
+Wird die Verteilung der Vornamen gezielt verändert, sodass
+50\,\% aller Datensätze denselben Vornamen (\texttt{Simon}) tragen,
+verändert sich die Geschwindigkeit der Suche.
+
+\begin{itemize}
+
+    \item \textbf{Seltener Wert (\texttt{Peter}):}
+
+    Wird nach einem selten vorkommenden Namen gesucht, kann der Index
+    die passenden Datensätze sehr schnell finden. In der Messung wurde
+    eine Abfragezeit von etwa $0{,}001\,\mathrm{s}$ erreicht.
+
+    \item \textbf{Häufiger Wert (\texttt{Simon}):}
+
+    Da \texttt{Simon} in 50\,\% der Datensätze vorkommt, muss die
+    Datenbank sehr viele passende Datensätze finden. Dadurch ist die
+    Suche mit dem Index langsamer als bei einem seltenen Namen.
+    Mit Index benötigt die Abfrage etwa $0{,}050\,\mathrm{s}$,
+    während ohne Index etwa $0{,}131\,\mathrm{s}$ benötigt werden.
+
+\end{itemize}
+
+\textbf{Grund für dieses Verhalten:}
+
+Der Unterschied liegt darin, wie oft ein bestimmter Name in der
+Datenbank vorkommt. Bei einem seltenen Namen wie \texttt{Peter} gibt
+es nur wenige passende Datensätze. Der Index kann diese daher schnell
+finden.
+
+Bei \texttt{Simon} sieht es anders aus: Der Name kommt in der Hälfte
+aller Datensätze vor. Bei insgesamt $500\,000$ Datensätzen sind das
+ungefähr $250\,000$ Treffer. Der Index muss deshalb deutlich mehr
+passende Einträge verarbeiten.
+
+Trotzdem ist die Suche mit dem Index in diesem Beispiel noch schneller
+als die Suche ohne Index. Das zeigt, dass ein Index besonders bei
+selten vorkommenden Werten hilfreich ist. Bei sehr häufig vorkommenden
+Werten fällt der Vorteil dagegen kleiner aus.
+
+
+\section{Fazit}
+
+Die Untersuchung zeigt, dass die Verwendung eines Indexes bei großen
+Datenmengen einen erheblichen Einfluss auf die Abfragegeschwindigkeit
+haben kann. Besonders bei Suchbegriffen 
+mit selten vorkommenden Werten ist der Geschwindigkeitsgewinn deutlich.
+
+Gleichzeitig erhöht ein Index den Speicherbedarf der Datenbank, da
+zusätzliche Strukturen angelegt und verwaltet werden müssen.
+
+Die Untersuchung der \texttt{bias.db} zeigt außerdem, dass die
+Verteilung der Daten einen wesentlichen Einfluss auf die Effektivität
+eines Indexes hat. Bei häufig vorkommenden Werten ist der Vorteil eines
+Indexes geringer als bei seltenen Werten.
+
+Damit wird deutlich, dass bei der Optimierung von Datenbanken nicht
+nur die Anzahl der Datensätze, sondern auch deren Verteilung und die
+Selektivität der verwendeten Suchbedingungen berücksichtigt werden
+müssen.
+
+\end{document}
+

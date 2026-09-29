@@ -1,0 +1,903 @@
+LaTeX-BEFEHLE – AUFSCHLÜSSELUNG FÜR DEN REPORT
+=================================================
+
+Diese Datei erklärt die LaTeX-Befehle, die im Report verwendet werden.
+Die Beispiele beziehen sich auf dein aktuelles Dokument.
+
+------------------------------------------------------------
+1. DOKUMENTGRUNDLAGE
+------------------------------------------------------------
+
+\documentclass{article}
+
+Bedeutung:
+Legt die Dokumentklasse fest. "article" eignet sich für kurze
+wissenschaftliche Arbeiten, Berichte und Dokumentationen.
+
+Beispiel:
+\documentclass{article}
+
+
+------------------------------------------------------------
+2. PAKETE EINBINDEN
+------------------------------------------------------------
+
+\usepackage{utf8}{inputenc}
+
+Bedeutung:
+Ermöglicht die Verwendung von UTF-8-Zeichen wie ä, ö, ü und ß.
+Bei modernen LaTeX-Versionen ist UTF-8 normalerweise bereits Standard.
+
+Beispiel:
+\usepackage[utf8]{inputenc}
+
+
+\usepackage[T1]{fontenc}
+
+Bedeutung:
+Legt die Zeichenkodierung der verwendeten Schrift fest.
+T1 ist besonders für europäische Sprachen und deutsche Texte geeignet.
+
+Beispiel:
+\usepackage[T1]{fontenc}
+
+
+\usepackage[ngerman]{babel}
+
+Bedeutung:
+Passt LaTeX an die deutsche Sprache an.
+Unter anderem werden Trennungen und bestimmte Bezeichnungen
+automatisch an Deutsch angepasst.
+
+Beispiel:
+\usepackage[ngerman]{babel}
+
+
+\usepackage{amsmath}
+
+Bedeutung:
+Erweitert LaTeX um zusätzliche Funktionen für mathematische Formeln.
+
+Beispiel:
+\usepackage{amsmath}
+
+
+\usepackage{amssymb}
+
+Bedeutung:
+Stellt zusätzliche mathematische Symbole zur Verfügung.
+
+Beispiel:
+\usepackage{amssymb}
+
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+Bedeutung:
+Ermöglicht die Einstellung des Seitenlayouts.
+
+a4paper:
+Verwendet DIN-A4 als Papierformat.
+
+margin=2.5cm:
+Setzt den Seitenrand auf 2,5 cm.
+
+Beispiel:
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+
+------------------------------------------------------------
+3. BEGINN UND ENDE DES DOKUMENTS
+------------------------------------------------------------
+
+\begin{document}
+
+Bedeutung:
+Markiert den Beginn des eigentlichen Dokuments.
+Alles davor gehört zum Vorspann.
+
+Beispiel:
+\begin{document}
+
+
+\end{document}
+
+Bedeutung:
+Beendet das Dokument.
+
+Beispiel:
+\end{document}
+
+
+------------------------------------------------------------
+4. TITEL, AUTOR UND DATUM
+------------------------------------------------------------
+
+\title{...}
+
+Bedeutung:
+Legt den Titel des Dokuments fest.
+
+Beispiel:
+\title{Analyse von Datenbank-Performance, Streuung und Indizierung}
+
+
+\author{...}
+
+Bedeutung:
+Legt den Autor des Dokuments fest.
+
+Beispiel:
+\author{David Rinner}
+
+
+\date{...}
+
+Bedeutung:
+Legt das Datum fest.
+
+Beispiel:
+\date{\today}
+
+
+\today
+
+Bedeutung:
+Setzt automatisch das aktuelle Datum ein.
+
+Beispiel:
+\date{\today}
+
+
+\maketitle
+
+Bedeutung:
+Erzeugt den Titelbereich mit Titel, Autor und Datum.
+Die Informationen werden vorher mit \title, \author und \date
+festgelegt.
+
+Beispiel:
+\maketitle
+
+
+------------------------------------------------------------
+5. ÜBERSCHRIFTEN
+------------------------------------------------------------
+
+\section{...}
+
+Bedeutung:
+Erstellt eine nummerierte Hauptüberschrift.
+
+Beispiel:
+\section{Einleitung und Methodik}
+
+Das Ergebnis sieht ungefähr so aus:
+
+1 Einleitung und Methodik
+
+
+\subsection{...}
+
+Bedeutung:
+Erstellt eine Unterüberschrift innerhalb einer section.
+
+Beispiel:
+\subsection{Messaufbau}
+
+Das Ergebnis sieht ungefähr so aus:
+
+1.1 Messaufbau
+
+
+\subsubsection{...}
+
+Bedeutung:
+Erstellt eine weitere Unterebene.
+
+Beispiel:
+\subsubsection{Datengenerierung}
+
+Das Ergebnis sieht ungefähr so aus:
+
+1.1.1 Datengenerierung
+
+
+------------------------------------------------------------
+6. FETT, KURSIV UND SCHRIFTARTEN
+------------------------------------------------------------
+
+\textbf{...}
+
+Bedeutung:
+Stellt Text fett dar.
+
+Beispiel:
+\textbf{Wichtiger Begriff}
+
+Ergebnis:
+Wichtiger Begriff
+
+
+\textit{...}
+
+Bedeutung:
+Stellt Text kursiv dar.
+
+Beispiel:
+\textit{Full Table Scan}
+
+Ergebnis:
+Full Table Scan
+
+
+\texttt{...}
+
+Bedeutung:
+Stellt Text in einer Schreibmaschinenschrift dar.
+Geeignet für Programmcode, Dateinamen, Tabellen- oder
+Spaltennamen und Befehle.
+
+Beispiel:
+\texttt{Faker}
+
+Weitere Beispiele:
+\texttt{bias.db}
+\texttt{personen}
+\texttt{vorname}
+
+
+\textrm{...}
+
+Bedeutung:
+Setzt Text in eine normale Schriftart.
+
+Beispiel:
+\textrm{normaler Text}
+
+
+\textsf{...}
+
+Bedeutung:
+Setzt Text in eine serifenlose Schrift.
+
+Beispiel:
+\textsf{serifenloser Text}
+
+
+------------------------------------------------------------
+7. MATHEMATIKMODUS
+------------------------------------------------------------
+
+$...$
+
+Bedeutung:
+Alles zwischen zwei Dollarzeichen wird als mathematische Formel
+interpretiert.
+
+Beispiel:
+$500\,000$
+
+Beispiel:
+$x + y = 10$
+
+
+\[...\]
+
+Bedeutung:
+Erstellt eine mathematische Formel als eigenen, abgesetzten Block.
+
+Beispiel:
+\[
+x + y = 10
+\]
+
+Für einfache Formeln innerhalb eines Satzes ist $...$ geeignet.
+
+
+------------------------------------------------------------
+8. MATHEMATISCHE BEFEHLE AUS DEINEM REPORT
+------------------------------------------------------------
+
+\geq
+
+Bedeutung:
+"größer oder gleich".
+
+Symbol:
+≥
+
+Beispiel:
+$\geq 500\,000$
+
+
+\approx
+
+Bedeutung:
+"ungefähr gleich".
+
+Symbol:
+≈
+
+Beispiel:
+$\approx 249{,}75$
+
+
+\sigma
+
+Bedeutung:
+Erzeugt den griechischen Buchstaben Sigma.
+
+Symbol:
+σ
+
+Beispiel:
+$\sigma \approx 16{,}35$
+
+
+\mathrm{...}
+
+Bedeutung:
+Stellt Text im Mathematikmodus aufrecht dar.
+Das ist besonders für Einheiten sinnvoll.
+
+Beispiel:
+$\mathrm{s}$
+
+Beispiel:
+$0{,}178\,\mathrm{s}$
+
+Hier steht "s" für Sekunden.
+
+
+{,}
+
+Bedeutung:
+Erzeugt ein Komma innerhalb des Mathematikmodus.
+Dadurch wird das Komma typografisch passend dargestellt.
+
+Beispiel:
+$249{,}75$
+
+
+------------------------------------------------------------
+9. ABSTÄNDE
+------------------------------------------------------------
+
+\, 
+
+Bedeutung:
+Erzeugt einen kleinen horizontalen Abstand.
+
+Beispiel:
+$500\,000$
+
+Beispiel:
+$0{,}178\,\mathrm{s}$
+
+Bei Zahlen und Einheiten ist das praktisch:
+
+0,178 s
+
+statt:
+
+0,178s
+
+
+WICHTIG:
+Für deinen Report ist \, korrekt.
+
+Nicht:
+500\\,000
+
+Sondern:
+500\,000
+
+
+------------------------------------------------------------
+10. PROZENTZEICHEN
+------------------------------------------------------------
+
+\%
+
+Bedeutung:
+Erzeugt ein echtes Prozentzeichen.
+
+Beispiel:
+50\,\%
+
+Ergebnis:
+50 %
+
+
+WICHTIG:
+Ein einzelnes "%" ist in LaTeX ein Kommentarzeichen.
+
+FALSCH:
+50%
+
+RICHTIG:
+50\,%
+
+
+------------------------------------------------------------
+11. AUFZÄHLUNGEN
+------------------------------------------------------------
+
+\begin{itemize}
+
+Bedeutung:
+Startet eine Aufzählung mit Punkten.
+
+Beispiel:
+
+\begin{itemize}
+    \item Erster Punkt
+    \item Zweiter Punkt
+    \item Dritter Punkt
+\end{itemize}
+
+
+\item
+
+Bedeutung:
+Erzeugt einen einzelnen Aufzählungspunkt.
+
+Beispiel:
+\item Erster Punkt
+
+
+\end{itemize}
+
+Bedeutung:
+Beendet die Aufzählung.
+
+
+------------------------------------------------------------
+12. NUMMERIERTE AUFZÄHLUNGEN
+------------------------------------------------------------
+
+\begin{enumerate}
+
+Bedeutung:
+Startet eine nummerierte Aufzählung.
+
+Beispiel:
+
+\begin{enumerate}
+    \item Erster Punkt
+    \item Zweiter Punkt
+    \item Dritter Punkt
+\end{enumerate}
+
+
+\item
+
+Bedeutung:
+Erzeugt einen neuen nummerierten Punkt.
+
+
+\end{enumerate}
+
+Bedeutung:
+Beendet die nummerierte Aufzählung.
+
+
+------------------------------------------------------------
+13. CODE UND BEFEHLE DARSTELLEN
+------------------------------------------------------------
+
+\texttt{...}
+
+Bedeutung:
+Gut geeignet für kurze Codeelemente innerhalb eines Satzes.
+
+Beispiel:
+\texttt{CREATE INDEX}
+
+
+\begin{verbatim}
+
+Bedeutung:
+Startet einen Bereich, in dem der enthaltene Text nahezu unverändert
+dargestellt wird.
+
+Besonders praktisch für längere Codeblöcke.
+
+Beispiel:
+
+\begin{verbatim}
+CREATE INDEX idx_vorname
+ON personen(vorname);
+\end{verbatim}
+
+
+\end{verbatim}
+
+Bedeutung:
+Beendet den verbatim-Bereich.
+
+
+------------------------------------------------------------
+14. KOMMENTARE IN LATEX
+------------------------------------------------------------
+
+%
+
+Bedeutung:
+Das Prozentzeichen startet einen Kommentar.
+
+Alles nach "%" bis zum Ende der Zeile wird von LaTeX ignoriert.
+
+Beispiel:
+
+% Das ist ein Kommentar.
+Dieser Text wird angezeigt.
+
+
+Wichtig:
+Ein Prozentzeichen muss deshalb escaped werden, wenn es tatsächlich
+im fertigen Dokument erscheinen soll:
+
+\%
+
+Beispiel:
+
+50\,\%
+
+
+------------------------------------------------------------
+15. GESCHWEIFTE KLAMMERN
+------------------------------------------------------------
+
+{...}
+
+Bedeutung:
+Geschweifte Klammern begrenzen normalerweise das Argument eines
+LaTeX-Befehls.
+
+Beispiel:
+
+\textbf{Dieser Text ist fett.}
+
+Hier ist:
+
+\textbf
+
+der Befehl
+
+und:
+
+{Dieser Text ist fett.}
+
+das Argument.
+
+
+------------------------------------------------------------
+16. ECKIGE KLAMMERN
+------------------------------------------------------------
+
+[...]
+
+Bedeutung:
+Eckige Klammern werden häufig für optionale Einstellungen
+eines Befehls verwendet.
+
+Beispiel:
+
+\usepackage[ngerman]{babel}
+
+Hier ist:
+
+[ngerman]
+
+eine optionale Einstellung.
+
+Ein weiteres Beispiel:
+
+\documentclass[a4paper,12pt]{article}
+
+Hier werden Papierformat und Schriftgröße eingestellt.
+
+
+------------------------------------------------------------
+17. BACKSLASH
+------------------------------------------------------------
+
+\
+
+Bedeutung:
+Ein Backslash leitet in LaTeX normalerweise einen Befehl ein.
+
+Beispiele:
+
+\section
+\textbf
+\texttt
+\usepackage
+\begin
+\end
+
+
+------------------------------------------------------------
+18. ZEILENUMBRUCH UND ABSÄTZE
+------------------------------------------------------------
+
+Eine normale neue Zeile im Quellcode bedeutet nicht automatisch,
+dass im fertigen PDF eine neue Zeile beginnt.
+
+Beispiel:
+
+Das ist ein Satz.
+Dieser Satz steht im Quellcode in einer neuen Zeile.
+
+LaTeX kann daraus im PDF einen normalen zusammenhängenden Absatz
+machen.
+
+
+Eine Leerzeile im Quellcode erzeugt dagegen einen neuen Absatz.
+
+Beispiel:
+
+Das ist der erste Absatz.
+
+Das ist der zweite Absatz.
+
+
+------------------------------------------------------------
+19. MANUELLER ZEILENUMBRUCH
+------------------------------------------------------------
+
+\\
+
+Bedeutung:
+Erzwingt normalerweise einen Zeilenumbruch.
+
+Beispiel:
+
+Erste Zeile\\
+Zweite Zeile
+
+WICHTIG:
+\\ sollte nicht verwendet werden, um normalen Fließtext
+zu formatieren.
+
+LaTeX übernimmt den normalen Zeilenumbruch automatisch.
+
+
+------------------------------------------------------------
+20. MANUELLER SEITENUMBRUCH
+------------------------------------------------------------
+
+\newpage
+
+Bedeutung:
+Beginnt auf einer neuen Seite.
+
+Beispiel:
+
+Text auf Seite 1.
+
+\newpage
+
+Text auf Seite 2.
+
+
+------------------------------------------------------------
+21. BESONDERE ZEICHEN
+------------------------------------------------------------
+
+Einige Zeichen haben in LaTeX eine besondere Bedeutung.
+
+%   Kommentar
+$   Mathematikmodus
+&   Tabellenspalte
+_   Index/Tiefstellung im Mathematikmodus
+^   Hochstellung im Mathematikmodus
+#   Parameter
+{ } Gruppierung
+~   geschützter Abstand
+\   Befehl
+
+
+Wenn diese Zeichen tatsächlich im Text erscheinen sollen,
+müssen sie teilweise mit einem Backslash escaped werden.
+
+Beispiele:
+
+\%  = %
+\$  = $
+\&  = &
+\_  = _
+\#  = #
+\{  = {
+\}  = }
+
+
+------------------------------------------------------------
+22. EINHEITEN
+------------------------------------------------------------
+
+Für Einheiten sollte im Mathematikmodus häufig \mathrm verwendet
+werden.
+
+Beispiel:
+
+$0{,}178\,\mathrm{s}$
+
+Bedeutung:
+
+0,178 Sekunden
+
+
+Weitere Beispiele:
+
+$11\,755\,520\,\mathrm{Byte}$
+
+$18{,}7\,\mathrm{MB}$
+
+$2{,}5\,\mathrm{cm}$
+
+
+------------------------------------------------------------
+23. WICHTIGE BEFEHLE AUS DEINEM KONKRETEN REPORT
+------------------------------------------------------------
+
+\documentclass{article}
+    Dokumentklasse "article".
+
+\usepackage[utf8]{inputenc}
+    UTF-8-Zeichenkodierung.
+
+\usepackage[T1]{fontenc}
+    Zeichenkodierung der Schrift.
+
+\usepackage[ngerman]{babel}
+    Deutsche Spracheinstellungen.
+
+\usepackage{amsmath}
+    Erweiterte Mathematikfunktionen.
+
+\usepackage{amssymb}
+    Zusätzliche mathematische Symbole.
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+    Seitenformat und Seitenränder.
+
+\begin{document}
+    Beginn des Dokuments.
+
+\title{...}
+    Dokumenttitel.
+
+\author{...}
+    Autor.
+
+\date{...}
+    Datum.
+
+\today
+    Aktuelles Datum.
+
+\maketitle
+    Titelbereich erzeugen.
+
+\section{...}
+    Hauptüberschrift.
+
+\textbf{...}
+    Fettschrift.
+
+\textit{...}
+    Kursivschrift.
+
+\texttt{...}
+    Schreibmaschinenschrift / Code.
+
+\begin{itemize}
+    Aufzählung beginnen.
+
+\item
+    Neuer Aufzählungspunkt.
+
+\end{itemize}
+    Aufzählung beenden.
+
+$\ldots$
+    Mathematikmodus.
+
+\geq
+    Größer oder gleich.
+
+\approx
+    Ungefähr gleich.
+
+\sigma
+    Griechischer Buchstabe Sigma.
+
+\mathrm{...}
+    Aufrechter Text im Mathematikmodus.
+
+\,
+    Kleiner Abstand.
+
+\%
+    Prozentzeichen.
+
+\texttt{...}
+    Code oder technische Bezeichnung.
+
+\end{document}
+    Ende des Dokuments.
+
+
+------------------------------------------------------------
+24. MERKREGELN FÜR DEINEN REPORT
+------------------------------------------------------------
+
+1. Befehle beginnen normalerweise mit einem Backslash:
+
+   \section
+   \textbf
+   \texttt
+
+
+2. Argumente stehen normalerweise in geschweiften Klammern:
+
+   \textbf{fetter Text}
+
+
+3. Optionale Einstellungen stehen häufig in eckigen Klammern:
+
+   \usepackage[ngerman]{babel}
+
+
+4. Mathematik steht zwischen Dollarzeichen:
+
+   $x + y = 10$
+
+
+5. Ein Prozentzeichen im fertigen Dokument schreibt man:
+
+   \%
+
+
+6. Einen kleinen Abstand schreibt man:
+
+   \,
+
+
+7. Code oder Dateinamen kann man so darstellen:
+
+   \texttt{bias.db}
+
+
+8. Aufzählungen:
+
+   \begin{itemize}
+       \item Punkt
+   \end{itemize}
+
+
+9. Kommentare:
+
+   % Das ist ein Kommentar.
+
+
+10. Ein normales Dokument hat mindestens:
+
+   \documentclass{article}
+   \begin{document}
+
+   Inhalt
+
+   \end{document}
+
+
+------------------------------------------------------------
+ENDE DER LATEX-REFERENZ
+------------------------------------------------------------
+
+Diese Übersicht deckt die LaTeX-Syntax ab, die in deinem aktuellen
+Report verwendet wird, und dient als Nachschlagewerk für spätere
+Änderungen.
