@@ -21,3 +21,5 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
                   'Königsallee 42, 40212 Düsseldorf', 'Mozartplatz 5, 5020 Salzburg',
                     'Hauptstraße 100, 60311 Frankfurt', 'Landstraße 12, 4020 Linz', 
                     'Reeperbahn 1, 20359 Hamburg', 'Innrain 52, 6020 Innsbruck']
+
+#random.seed(10)
