@@ -66,13 +66,23 @@ Erwartet: 894.4525939177101 \
 Verhältnis: 279.994715989432 \
 
 *Zeit* \
-Run Time: real 0.131400 user 0.125903 sys 0.004599
+Run Time: real 0.114433 user 0.106008 sys 0.007774
 
 *Dateigröße*
 10.6 MiB
 
 Die Varianz ist jetzt so hoch, weil 50 % davon den gleichen Namen haben.
 
+*Nach Indexierung bei Bias* \
+```sql
+CREATE INDEX idx_first_name ON persons(first_name)
+```
+
+*Dateigröße* \
+18 MiB
+
+*Zeitmessung* \
+Run Time: real 0.017884 user 0.015818 sys 0.001986
 
 === Was sagt die Varianz aus?
 
