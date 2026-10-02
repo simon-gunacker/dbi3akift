@@ -1,5 +1,7 @@
 import sqlite3
 import random 
+from decimal import Decimal#für preis
+from datetime import date,datetime
 
 PRODUCT_SIZE = 10000
 BESTELLPOSITION_SIZE = 500000
@@ -24,4 +26,14 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
                     'Hauptstraße 100, 60311 Frankfurt', 'Landstraße 12, 4020 Linz', 
                     'Reeperbahn 1, 20359 Hamburg', 'Innrain 52, 6020 Innsbruck']
 
+#random +seed ergibt reproduzuirbare werte
 random.seed(SEED)
+
+
+#DB
+db_name = 'onlineshop.db'
+conn = sqlite3.connect(db_name)
+cursor = conn.cursor()
+
+SQL_STRING_KUNDE=  'INSERT INTO personen (vorname, nachname,email,geburtsdatum,telefon,adresse) VALUES (?, ?,?,?,?,?,?)'
+SQL_PRODUCT_=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
