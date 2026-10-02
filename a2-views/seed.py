@@ -124,10 +124,20 @@ def get_count_produkt(conn):
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
+
 def get_count_kunde(conn):
     sql = """
         SELECT COUNT(*)
         FROM kunde
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
+def get_count_bestellung(conn):
+    sql = """
+        SELECT COUNT(*)
+        FROM bestellung
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
