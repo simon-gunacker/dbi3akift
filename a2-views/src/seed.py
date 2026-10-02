@@ -6,6 +6,8 @@ BESTELLPOSITION_SIZE = 500000
 BESTELLUNG_SIZE = 100000
 KUNDE_SIZE = 10000
 
+SEED= 42
+
 BEZEICHNUG_LIST = ['Apfel','Birne', 'Kirsche', 'Banane','Mango',
                    'Erdbeere',' Pfirsich','Himbeere','Orange','Ananas']
 
@@ -22,4 +24,4 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
                     'Hauptstraße 100, 60311 Frankfurt', 'Landstraße 12, 4020 Linz', 
                     'Reeperbahn 1, 20359 Hamburg', 'Innrain 52, 6020 Innsbruck']
 
-#random.seed(10)
+random.seed(SEED)
