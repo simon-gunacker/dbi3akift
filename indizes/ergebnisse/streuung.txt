@@ -1,0 +1,33 @@
+versch_vornamen  versch_nachnamen
+---------------  ----------------
+559              937             
+vorname    anzahl  Prozentanteil
+---------  ------  -------------
+Nikola     1786    0.357        
+Annabella  981     0.196        
+Kevin      973     0.195        
+Lukas      973     0.195        
+Lean       971     0.194        
+Lisa       966     0.193        
+Mila       966     0.193        
+Joshua     964     0.193        
+Karla      961     0.192        
+Marijana   961     0.192        
+seltenster  haeufigster  durchschnitt
+----------  -----------  ------------
+810         1786         894.5       
+nachname   anzahl  Prozentanteil
+---------  ------  -------------
+Scherz     613     0.123        
+Adler      610     0.122        
+Grabher    596     0.119        
+Jöbstl     595     0.119        
+Kaspar     595     0.119        
+Schmidt    595     0.119        
+Reichmann  594     0.119        
+Schäfer    593     0.119        
+Suppan     593     0.119        
+Enzinger   590     0.118        
+seltenster  haeufigster  durchschnitt
+----------  -----------  ------------
+470         613          533.6       
