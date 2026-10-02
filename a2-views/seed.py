@@ -1,5 +1,6 @@
 from sqlite3 import connect
 import json
+import random
 
 
 def conver_to_dict(cursor, row):
@@ -32,7 +33,7 @@ def create_tables(conn):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             bezeichnung varchar,
             preis decimal,
-            lagerbestand integer,
+            lagerbestand integer
         )
     """)
     conn.execute("""
@@ -41,7 +42,7 @@ def create_tables(conn):
             kunde_id INTEGER,
             bestelldatum datetime,
             status varchar,
-            FOREIGN KEY (kund_id) REFERNCES kund(id)
+            FOREIGN KEY (kunde_id) REFERENCES kunde(id)
         )
     """)
     conn.execute("""
@@ -52,7 +53,7 @@ def create_tables(conn):
             email varchar,
             geburtsdatum date,
             telefon varchar,
-            adresse varchar,
+            adresse varchar
         )
     """)
     conn.execute("""
@@ -158,5 +159,18 @@ def random_produkt(suffix: bool, praefixe: int) -> str:
         
     return produkt_dict["praefixe"][praefixe] + produkt_dict["suffixe"][suffix]
 
+@with_connect(":memory:")
+def test_in_memory(conn):
+    create_tables(conn)
+
+    produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
+    print(produkt)
+
 if __name__ == "__main__":
-    print(random_produkt(1, 0))
+    seed = input("Ohne seed Enter: ")
+    if seed == "":
+        test_in_memory()
+    else:
+        random.seed(seed)
+        test_in_memory()
+
