@@ -1,4 +1,5 @@
 from sqlite3 import connect
+import json
 
 
 def conver_to_dict(cursor, row):
@@ -150,3 +151,12 @@ def get_count_bestellposition(conn):
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
+
+def random_produkt(suffix: bool, praefixe: int) -> str:
+    with open("produkt.json", "r", encoding="utf-8") as file:
+        produkt_dict = json.load(file)
+        
+    return produkt_dict["praefixe"][praefixe] + produkt_dict["suffixe"][suffix]
+
+if __name__ == "__main__":
+    print(random_produkt(1, 0))
