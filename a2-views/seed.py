@@ -66,16 +66,32 @@ def create_tables(conn):
     """)
 
 
-def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int):
+def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int) -> int:
     sql = """
         INSERT INTO produkt (bezeichnung, preis, lagerbestand)
         VALUES (?, ?, ?)
     """
-    conn.execute(
+    cursor = conn.execute(
         sql,
             (bezeichnung, preis, lagerbestand),
     )
     conn.commit()
+    return cursor.lastrowid
+
+
+def insert_kunde(conn, vorname: str, nachname: str, email: str, geburtsdatum: str, telefon: str, adresse: str) -> int:
+    sql = """
+        INSERT INTO kunde (vorname, nachname, email, geburstdatum, telefon, adresse)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """
+    conn.execute(
+        sql,
+            (vorname. nachname, email, geburtsdatum, telefon, adresse),
+    )
+    conn.commit()
+    return cursor.lastrowid
+
+
 
 
 def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: int):
