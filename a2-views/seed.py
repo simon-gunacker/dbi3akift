@@ -33,7 +33,7 @@ def create_tables(conn):
             preis decimal,
             lagerbestand integer,
             PRIMARY KEY (id),
-            FOREIGEN KEY (id) REFERENCES bestellpostion(produkt_id)
+            FOREIGN KEY (id) REFERENCES bestellpostion(produkt_id)
         )
     """)
     conn.execute("""
@@ -42,8 +42,8 @@ def create_tables(conn):
             produkt_id INTEGER NOT NULL,
             menge INTEGER,
             PRIMARY KEY (bestellung_id, produkt_id),
-            FOREIGEN KEY (bestellung_id) REFERENCES bestellung(id),
-            FOREIGEN KEY (produkt_id) REFERENCES produkt(id)
+            FOREIGN KEY (bestellung_id) REFERENCES bestellung(id),
+            FOREIGN KEY (produkt_id) REFERENCES produkt(id)
         )
     """)
     conn.execute("""
@@ -53,8 +53,8 @@ def create_tables(conn):
             bestelldatum datetime,
             status varchar,
             PRIMARY KEY (id),
-            FOREIGEN KEY (id) REFERENCES bestellposition(bestellung_id),
-            FOREIGEN KEY (kunde_id) REFERENCES kunde(id)
+            FOREIGN KEY (id) REFERENCES bestellposition(bestellung_id),
+            FOREIGN KEY (kunde_id) REFERENCES kunde(id)
         )
     """)
     conn.execute("""
@@ -67,7 +67,7 @@ def create_tables(conn):
             telefon varchar,
             adresse varchar,
             PRIMARY KEY (id),
-            FOREIGEN KEY (id) REFERENCES kunde(kunde_id)
+            FOREIGN KEY (id) REFERENCES kunde(kunde_id)
         )
     """)
 
@@ -82,6 +82,7 @@ def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int):
             (bezeichnung, preis, lagerbestand),
     )
     conn.commit()
+
 
 def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: int):
     sql = """
