@@ -36,4 +36,4 @@ conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
 
 SQL_STRING_KUNDE=  'INSERT INTO personen (vorname, nachname,email,geburtsdatum,telefon,adresse) VALUES (?, ?,?,?,?,?,?)'
-SQL_PRODUCT_=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
+SQL_STRING_PRODUCT=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
