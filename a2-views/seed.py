@@ -91,7 +91,17 @@ def insert_kunde(conn, vorname: str, nachname: str, email: str, geburtsdatum: st
     conn.commit()
     return cursor.lastrowid
 
-
+def insert_bestellung(conn, kunde_id: int, bestelldatum: str, status: str) -> int:
+    sql = """
+        INSERT INTO bestellung (kunde_id, bestelldatum, status)
+        VALUES (?, ?, ?)
+    """
+    cursor = conn.execute(
+        sql,
+            (kunde_id, bestelldatum, status),
+    )
+    conn.commit()
+    return cursor.lastrowid
 
 
 def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: int):
