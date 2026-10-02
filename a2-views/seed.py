@@ -120,7 +120,7 @@ def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: in
 
 def get_count_produkt(conn):
     sql = """
-        SELECT COUNT(*)
+        SELECT COUNT(*) AS amount
         FROM produkt
     """
     cursor = conn.execute(sql)
@@ -187,8 +187,7 @@ def test_in_memory(conn):
         lagerbestand = random.randint(1, 100)
         produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
 
-    print(get_all_produkt(conn))
-    print(get_count_produkt(conn))
+    print(get_count_produkt(conn)[0]["amount"])
     print(produkt_id)
 
 if __name__ == "__main__":
