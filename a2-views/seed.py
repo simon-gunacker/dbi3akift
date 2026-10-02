@@ -84,7 +84,7 @@ def insert_kunde(conn, vorname: str, nachname: str, email: str, geburtsdatum: st
         INSERT INTO kunde (vorname, nachname, email, geburstdatum, telefon, adresse)
         VALUES (?, ?, ?, ?, ?, ?)
     """
-    conn.execute(
+    curusor = conn.execute(
         sql,
             (vorname. nachname, email, geburtsdatum, telefon, adresse),
     )
