@@ -153,6 +153,14 @@ def get_count_bestellposition(conn):
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
+def get_all_produkt(conn):
+    sql = """
+        SELECT *
+        FROM produkt
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
 def random_produkt(suffix: bool, praefixe: int) -> str:
     with open("produkt.json", "r", encoding="utf-8") as file:
         produkt_dict = json.load(file)
@@ -164,7 +172,15 @@ def test_in_memory(conn):
     create_tables(conn)
 
     produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
-    print(produkt)
+    
+    for i in range(10_000):
+        preis = random.randint(99, 9999_99) / 100
+        lagerbestand = random.randint(1, 100)
+        produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
+
+    print(get_all_produkt(conn))
+    print(get_count_produkt(conn))
+    print(produkt_id)
 
 if __name__ == "__main__":
     seed = input("Ohne seed Enter: ")
