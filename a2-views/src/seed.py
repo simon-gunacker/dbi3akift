@@ -25,6 +25,10 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
                   'Königsallee 42, 40212 Düsseldorf', 'Mozartplatz 5, 5020 Salzburg',
                     'Hauptstraße 100, 60311 Frankfurt', 'Landstraße 12, 4020 Linz', 
                     'Reeperbahn 1, 20359 Hamburg', 'Innrain 52, 6020 Innsbruck']
+TELEFONNUMMER_PREFIX_LIST=['0650', '0660', '0664', '0676', '0677', '0678', '0680',
+                    '0681', '0688', '0699']
+
+TELEFONNUMMER_LENGTH=7
 
 #random +seed ergibt reproduzuirbare werte
 random.seed(SEED)
