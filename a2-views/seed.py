@@ -179,14 +179,14 @@ def random_produkt(suffix: bool, praefixe: int) -> str:
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
-
-    produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
     
     for i in range(10_000):
+        produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
         preis = random.randint(99, 9999_99) / 100
         lagerbestand = random.randint(1, 100)
         produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
 
+    print(get_all_produkt(conn))
     print(get_count_produkt(conn)[0]["amount"])
     print(produkt_id)
 
