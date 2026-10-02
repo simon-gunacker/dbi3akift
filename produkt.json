@@ -1,0 +1,22 @@
+{
+  "suffixe": [
+    "mittel",
+    "zeug"
+  ],
+  "praefixe": [
+    "Feuer", "Flug", "Spiel", "Werk", "Schreib", "Fahr", "Schlag", "Bett",
+    "Näh", "Putz", "Grün", "Rüst", "Flick", "Mess", "Lande", "Druck",
+    "Hebe", "Rettungs", "Abschlepp", "Bohr", "Schleif", "Garten", "Kletter",
+    "Wasch", "Lebens", "Arznei", "Heil", "Lösungs", "Spül", "Düng",
+    "Desinfektions", "Konservierungs", "Sucht", "Bindungs", "Glanz",
+    "Dichtungs", "Pflege", "Färbe", "Kühl", "Treib", "Dämpfungs",
+    "Beruhigungs", "Rostschutz", "Reinigungs", "Scheuer", "Poliermittel",
+    "Brenn", "Klebe", "Anker", "Polster", "Leder", "Glas", "Fenster",
+    "Boden", "Kachel", "Fugen", "Sanitär", "Kalk", "Schimmel", "Fett",
+    "Flecken", "Backofen", "Grill", "Metall", "Messing", "Kupfer", "Silber",
+    "Gold", "Felgen", "Insekten", "Teer", "Harz", "Motor", "Getriebe",
+    "Ketten", "Bremsen", "Hydraulik", "Isolier", "Abdicht", "Spachtel",
+    "Füll", "Guss", "Löt", "Schweiß", "Ätz", "Beiz", "Imprägnier",
+    "Bleich", "Entkalkungs", "Enteisungs", "Kühlmittel", "Frostschutz"
+  ]
+}
