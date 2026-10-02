@@ -28,12 +28,30 @@ def with_connect(db):
 def create_tables(conn):
     conn.execute("""
         CREATE TABLE IF NOT EXISTS produkt(
-            id INTEGER NOT NULL,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             bezeichnung varchar,
             preis decimal,
             lagerbestand integer,
-            PRIMARY KEY (id),
-            FOREIGN KEY (id) REFERENCES bestellpostion(produkt_id)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS bestellung(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            kunde_id INTEGER,
+            bestelldatum datetime,
+            status varchar,
+            FOREIGN KEY (kund_id) REFERNCES kund(id)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS kunde(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vorname varchar,
+            nachname varchar,
+            email varchar,
+            geburtsdatum date,
+            telefon varchar,
+            adresse varchar,
         )
     """)
     conn.execute("""
@@ -44,30 +62,6 @@ def create_tables(conn):
             PRIMARY KEY (bestellung_id, produkt_id),
             FOREIGN KEY (bestellung_id) REFERENCES bestellung(id),
             FOREIGN KEY (produkt_id) REFERENCES produkt(id)
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS bestellung(
-            id INTEGER NOT NULL,
-            kunde_id INTEGER,
-            bestelldatum datetime,
-            status varchar,
-            PRIMARY KEY (id),
-            FOREIGN KEY (id) REFERENCES bestellposition(bestellung_id),
-            FOREIGN KEY (kunde_id) REFERENCES kunde(id)
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS kunde(
-            id INTEGER NOT NULL,
-            vorname varchar,
-            nachname varchar,
-            email varchar,
-            geburtsdatum date,
-            telefon varchar,
-            adresse varchar,
-            PRIMARY KEY (id),
-            FOREIGN KEY (id) REFERENCES kunde(kunde_id)
         )
     """)
 
