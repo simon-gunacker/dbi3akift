@@ -114,3 +114,12 @@ def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: in
             (bezeichnung, preis, lagerbestand),
     )
     conn.commit()
+
+
+def get_count_produkt(conn):
+    sql = """
+        SELECT COUNT(*)
+        FROM produkt
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
