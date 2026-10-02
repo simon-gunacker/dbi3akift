@@ -141,3 +141,12 @@ def get_count_bestellung(conn):
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
+
+
+def get_count_bestellposition(conn):
+    sql = """
+        SELECT COUNT(*)
+        FROM bestellposition
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
