@@ -123,3 +123,11 @@ def get_count_produkt(conn):
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
+
+def get_count_kunde(conn):
+    sql = """
+        SELECT COUNT(*)
+        FROM kunde
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
