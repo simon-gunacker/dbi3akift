@@ -161,6 +161,15 @@ def get_all_produkt(conn):
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
+def get_produkt_by_id(conn, id: int) -> list:
+    sql = f"""
+        SELECT *
+        FROM produkt
+        WHERE id = {id}
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
 def random_produkt(suffix: bool, praefixe: int) -> str:
     with open("produkt.json", "r", encoding="utf-8") as file:
         produkt_dict = json.load(file)
