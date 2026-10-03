@@ -103,7 +103,7 @@ created_couples= set()
 
 for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   data_bestellposition_batch=[]
-  for n in range(0, BATCH_SIZE):
+  while len(data_bestellung_batch)< BATCH_SIZE:
     bestellung_id=random.randint(1,BESTELLUNG_SIZE)
     produkt_id=random.randint(1,PRODUCT_SIZE)
     menge=random.randint(1,MAX_MENGE)
@@ -112,8 +112,7 @@ for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
     if couple  not in created_couples:
       created_couples.add(couple)
       data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
-    else:
-      n-=1
+   
     
   cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_batch)
   conn.commit()
