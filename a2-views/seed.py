@@ -109,14 +109,14 @@ def insert_bestellung(conn, kunde_id: int, bestelldatum: str) -> int:
     return cursor.lastrowid
 
 
-def insert_bestellpostion(conn, bezeichnung: str, preis: float, lagerbestand: int):
+def insert_bestellpostion(conn, bestell_id: str, produkt_id: int, menge: int):
     sql = """
-        INSERT INTO produkt (bezeichnung, preis, lagerbestand)
+        INSERT INTO bestellposition (bestellung_id, produkt_id, menge)
         VALUES (?, ?, ?)
     """
     conn.execute(
         sql,
-            (bezeichnung, preis, lagerbestand),
+            (bestell_id, produkt_id, menge),
     )
     conn.commit()
 
@@ -132,7 +132,7 @@ def get_count_produkt(conn):
 
 def get_count_kunde(conn):
     sql = """
-        SELECT COUNT(*)
+        SELECT COUNT(*) AS amount
         FROM kunde
     """
     cursor = conn.execute(sql)
@@ -141,7 +141,7 @@ def get_count_kunde(conn):
 
 def get_count_bestellung(conn):
     sql = """
-        SELECT COUNT(*)
+        SELECT COUNT(*) AS amount
         FROM bestellung
     """
     cursor = conn.execute(sql)
@@ -150,7 +150,7 @@ def get_count_bestellung(conn):
 
 def get_count_bestellposition(conn):
     sql = """
-        SELECT COUNT(*)
+        SELECT COUNT(*) AS amount
         FROM bestellposition
     """
     cursor = conn.execute(sql)
@@ -289,7 +289,9 @@ def test_in_memory(conn):
 
     date = "2026-10-02 10:15"
     email_end="@maily.com"
-    for i in range(100):
+    produkt_list = set()
+    produkt_id = random.randint(1, 10_000)
+    for i in range(10_000):
         vorname = random_vorname().capitalize()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
         geburstdatum = random_geburtsdatum()
@@ -297,9 +299,20 @@ def test_in_memory(conn):
         adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
         kunde_id = insert_kunde(conn, vorname, nachname, email_end, geburstdatum, telefonnummer, adresse)
 
-        date = random_datum(date)
-        bestell_id = insert_bestellung(conn, kunde_id, date)
+        for i in range(10):
+            date = random_datum(date)
+            bestell_id = insert_bestellung(conn, kunde_id, date)
+            for i in range(5):
+                while (produkt_id in produkt_list):
+                    produkt_id = random.randint(1, 10_000)
+                produkt_list.add(produkt_id)
+                insert_bestellpostion(conn, bestell_id, produkt_id, random.randint(1, 12))
+            produkt_list.clear()
 
+    print(get_count_produkt(conn))
+    print(get_count_kunde(conn))
+    print(get_count_bestellung(conn))
+    print(get_count_bestellposition(conn))
 
 
 if __name__ == "__main__":
