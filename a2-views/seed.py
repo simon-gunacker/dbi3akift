@@ -297,6 +297,29 @@ def get_view_simple(conn):
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
+def create_view_sum(conn):
+    sql = """
+        CREATE VIEW IF NOT EXISTS v_bestellung_gesamtwert AS
+        SELECT 
+            b.id AS bestellnummer,
+            b.kunde_id AS kundennummer,
+            SUM(bp.menge * p.preis) AS gesamtwert
+        FROM bestellung b
+        JOIN bestellposition bp ON b.id = bp.bestellung_id
+        JOIN produkt p ON bp.produkt_id = p.id
+        GROUP BY b.id, b.kunde_id;
+    """
+    conn.execute(sql)
+    conn.commit()
+
+def get_view_sum(conn):
+    sql = """
+        SELECT *
+        FROM v_bestellung_gesamtwert;
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
@@ -335,7 +358,8 @@ def test_in_memory(conn):
     print(get_count_bestellposition(conn))
 
     create_view_simple(conn)
-    for i in get_view_simple(conn):
+    create_view_sum(conn)
+    for i in get_view_sum(conn):
         print(i)
 
 
