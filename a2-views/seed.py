@@ -276,6 +276,26 @@ def random_adresse(strassen_staemme: int, strassen_endungen: int, orte: int) -> 
 
     return f"{adressen_dict["strassen_staemme"][strassen_staemme] + adressen_dict["strassen_endungen"][strassen_endungen]} {str(random.randint(1, 999))}, {adressen_dict["orte"][orte]["plz"]} {adressen_dict["orte"][orte]["ort"]}"
 
+def create_view_simple(conn):
+    sql = """
+        CREATE VIEW IF NOT EXISTS v_kunden_kontakt AS
+        SELECT 
+            id AS kundennummer,
+            vorname,
+            nachname,
+            email
+        FROM kunde; 
+    """
+    conn.execute(sql)
+    conn.commit()
+
+def get_view_simple(conn):
+    sql = """
+        SELECT *
+        FROM v_kunden_kontakt;
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
 
 @with_connect(":memory:")
 def test_in_memory(conn):
@@ -313,6 +333,10 @@ def test_in_memory(conn):
     print(get_count_kunde(conn))
     print(get_count_bestellung(conn))
     print(get_count_bestellposition(conn))
+
+    create_view_simple(conn)
+    for i in get_view_simple(conn):
+        print(i)
 
 
 if __name__ == "__main__":
