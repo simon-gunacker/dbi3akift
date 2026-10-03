@@ -289,7 +289,7 @@ def create_view_simple(conn):
     conn.execute(sql)
     conn.commit()
 
-def get_view_simple(conn):
+def get_view_simple(conn) -> list:
     sql = """
         SELECT *
         FROM v_kunden_kontakt;
@@ -312,10 +312,39 @@ def create_view_sum(conn):
     conn.execute(sql)
     conn.commit()
 
-def get_view_sum(conn):
+def get_view_sum(conn) -> list:
     sql = """
         SELECT *
         FROM v_bestellung_gesamtwert;
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+def create_view_interface(conn):
+    sql = """
+        CREATE VIEW IF NOT EXISTS v_bestelluebersicht AS
+        SELECT 
+            b.id AS bestellnummer,
+            k.id AS kundennummer,
+            b.bestelldatum,
+            b.status AS bestellstatus,
+            k.vorname,
+            k.nachname
+        FROM bestellung b
+        JOIN kunde k ON b.kunde_id = k.id;
+    """
+    conn.execute(sql)
+    conn.commit()
+
+def get_view_interface_status(conn, status: str) -> list:
+    sql = f"""
+        SELECT 
+            bestellnummer, 
+            bestelldatum, 
+            vorname, 
+            nachname
+        FROM v_bestelluebersicht
+        WHERE bestellstatus = '{status}';
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
@@ -330,7 +359,7 @@ def test_in_memory(conn):
         lagerbestand = random.randint(1, 100)
         insert_produkt(conn, produkt, preis, lagerbestand)
 
-    date = "2026-10-02 10:15"
+    date = "2016-10-02 10:15"
     email_end="@maily.com"
     produkt_list = set()
     produkt_id = random.randint(1, 10_000)
@@ -352,14 +381,10 @@ def test_in_memory(conn):
                 insert_bestellpostion(conn, bestell_id, produkt_id, random.randint(1, 12))
             produkt_list.clear()
 
-    print(get_count_produkt(conn))
-    print(get_count_kunde(conn))
-    print(get_count_bestellung(conn))
-    print(get_count_bestellposition(conn))
-
     create_view_simple(conn)
     create_view_sum(conn)
-    for i in get_view_sum(conn):
+    create_view_interface(conn)
+    for i in get_view_interface_status(conn, "versendet"):
         print(i)
 
 
