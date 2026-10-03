@@ -100,6 +100,11 @@ for k in range(0,BESTELLUNG_SIZE,BATCH_SIZE):
 #bestellposition befüllen
 SQL_STRING_BESTELLPOSITION='INSERT OR IGNORE INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)'
 #ignore fängt duplikate ab 
+
+cursor.execute("SELECT COUNT(*) FROM bestellposition")
+start_count = cursor.fetchone()[0]
+goal = start_count + BESTELLPOSITION_SIZE
+
 for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   data_bestellposition_batch=[]
   for n in range(0,BATCH_SIZE):
@@ -112,18 +117,19 @@ for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_batch)
   conn.commit()
 # diferenz der dopplten papre auffüllen:
-def get_missing_count(cursor,size):
+def get_current_count(cursor,size):
   cursor.execute("SELECT COUNT(*) FROM bestellposition")
   current_count=cursor.fetchone()[0]
   return size-current_count
 
-missing=get_missing_count(cursor,BESTELLPOSITION_SIZE)
+missing=get_current_count(cursor,BESTELLPOSITION_SIZE)
 
-data_bestellposition_missing=[]
 while True:
-    missing=get_missing_count(cursor,BESTELLPOSITION_SIZE)
+    missing=get_current_count(cursor,goal)
     if missing<=0:
       break
+    data_bestellposition_missing=[]
+
     for o in range(missing):
       bestellung_id=random.randint(1,BESTELLUNG_SIZE)
       produkt_id=random.randint(1,PRODUCT_SIZE)
@@ -133,7 +139,6 @@ while True:
    
     cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_missing)
     conn.commit()
-
 
 
 conn.close()    
