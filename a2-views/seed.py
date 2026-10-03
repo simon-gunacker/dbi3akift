@@ -204,6 +204,38 @@ def random_nachname(stamm: int, end: int) -> str:
         nachname_dict = json.load(file)
 
     return nachname_dict["stamms"][stamm] + nachname_dict["endungen"][end]
+
+def random_datum(start_datum: str) -> str:
+    result_date = ""
+
+    len(start_datum)
+    minute = int(start_datum[14] + start_datum[15])
+    hour = int(start_datum[11] + start_datum[12])
+    day = int(start_datum[8] + start_datum[9])
+    month = int(start_datum[5] + start_datum[6])
+    year = int(start_datum[:4])
+
+    if minute >= 55:
+        minute = 0
+        hour += 1
+    else:
+        minute += random.randrange(5, 46, 5)
+        if minute > 55:
+            minute = 55
+    
+    if hour > 23:
+        hour = 1
+        day += 1
+
+    if day >= 30:
+        day = 1
+        month += 1
+
+    if month >= 12:
+        month = 1
+        year += 1
+
+    return f"{str(year)}-{str(month).zfill(2)}-{str(day).zfill(2)} {str(hour).zfill(2)}:{str(minute).zfill(2)}"
     
 
 @with_connect(":memory:")
@@ -214,12 +246,15 @@ def test_in_memory(conn):
         produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
         preis = random.randint(99, 9999_99) / 100
         lagerbestand = random.randint(1, 100)
-        produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
+        insert_produkt(conn, produkt, preis, lagerbestand)
 
-    for i in range(5):
+    date = "2026-10-02 10:15"
+    for i in range(10_000):
         vorname = random_vorname()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
-        print(nachname)
+        date = random_datum(date)
+        print(date)
+
 
 
 if __name__ == "__main__":
