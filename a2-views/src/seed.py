@@ -10,11 +10,17 @@ KUNDE_SIZE = 10000
 
 SEED= 42
 
+START_DATE = date(1945, 1, 1)
+END_DATE= date(2008, 12, 31)
+
+
+
+
 BEZEICHNUG_LIST = ['Apfel','Birne', 'Kirsche', 'Banane','Mango',
                    'Erdbeere',' Pfirsich','Himbeere','Orange','Ananas']
 
-VORNAME_LIST = ['Simon ', 'Andreas', 'Jakobus', 'Johannes', 'Philippus', 
-              'Bartholomäus', 'Thomas', 'Matthaeus', 'Petrus', 'Thaddaeus']
+VORNAME_LIST = ['Simon', 'Andreas', 'Jakobus', 'Johannes', 'Philippus', 
+              'Bartholomaeus', 'Thomas', 'Matthaeus', 'Petrus', 'Thaddaeus']
 NACHNAME_LIST = ['Mueller', 'Schmidt', 'Schneider', 'Fischer', 
                'Weber', 'Meyer', 'Wagner', 'Becker', 'Schulz', 'Hoffmann']
 EMAIL_LIST = ['@gmail.com', '@yahoo.com', '@outlook.com', '@hotmail.com', 
@@ -28,7 +34,6 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
 TELEFONNUMMER_PREFIX_LIST=['0650', '0660', '0664', '0676', '0677', '0678', '0680',
                     '0681', '0688', '0699']
 
-TELEFONNUMMER_LENGTH=7
 
 #random +seed ergibt reproduzuirbare werte
 random.seed(SEED)
@@ -39,5 +44,26 @@ db_name = 'onlineshop.db'
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
 
-SQL_STRING_KUNDE=  'INSERT INTO personen (vorname, nachname,email,geburtsdatum,telefon,adresse) VALUES (?, ?,?,?,?,?,?)'
+#kunde befüllen
+SQL_STRING_KUNDE=  'INSERT INTO kunde (vorname, nachname,email,geburtsdatum,telefon,adresse) VALUES (?,?,?,?,?,?)'
+data=[]
+for i in range(0,KUNDE_SIZE):
+  
+    vorname=random.choice(VORNAME_LIST)
+    nachname=random.choice(NACHNAME_LIST)
+    email=vorname+nachname+random.choice(EMAIL_LIST)
+    geburtsdatum=datetime.fromordinal(random.randint(START_DATE.toordinal(),END_DATE.toordinal())).isoformat()
+    #ordinal nummeriert datum fortlaufen
+    telefon=(random.choice(TELEFONNUMMER_PREFIX_LIST))+str(random.randint(1000000, 9999999))
+    adresse=random.choice(ADRESSE_LIST)
+    data.append((vorname,nachname,email,geburtsdatum,telefon,adresse))
+
+cursor.executemany(SQL_STRING_KUNDE, data)
+conn.commit()
+
+
 SQL_STRING_PRODUCT=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
+
+
+
+conn.close()    
