@@ -30,7 +30,7 @@ bestellung_id int
 ,product_id int
 ,menge int
 ,PRIMARY KEY (bestellung_id, product_id )
-,FOREIGN KEY ( product_id) REFERENCES product(id)
+,FOREIGN KEY ( produkt_id) REFERENCES product(id)
 ,FOREIGN KEY ( bestellung_id) REFERENCES bestellung(id)
 );
 
