@@ -51,3 +51,6 @@
 **Überlegung**
 1. Datenschutz: Wenn ich einen Mitarbeiter rechte gebe Views zu nutzen kann ich das mit den Views eingrenzen was er sehen kann.
 2. Vereinfachung: Bei großen Selects mit vielen Joins oder viele subselects können die selects mit view sehr klein werden.
+**Schnittstelle**
+- Mit so einem View muss ich nicht wissen wie die Tabelle zusammenhängen. So kann ich ganz einfach die Abfrage erweitern.
+- Spart auch Zeilen, macht den Select übersichtlicher
