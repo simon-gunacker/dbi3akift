@@ -83,12 +83,13 @@ def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int) -> i
 
 def insert_kunde(conn, vorname: str, nachname: str, email_end: str, geburtsdatum: str, telefon: str, adresse: str) -> int:
     sql = """
-        INSERT INTO kunde (vorname, nachname, email, geburstdatum, telefon, adresse)
+        INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon, adresse)
         VALUES (?, ?, ?, ?, ?, ?)
     """
-    curusor = conn.execute(
+    email_end = f"{vorname}.{nachname}{email_end}"
+    cursor = conn.execute(
         sql,
-            (vorname. nachname, email, geburtsdatum, telefon, adresse),
+            (vorname, nachname, email_end, geburtsdatum, telefon, adresse),
     )
     conn.commit()
     return cursor.lastrowid
@@ -157,6 +158,14 @@ def get_all_produkt(conn):
     sql = """
         SELECT *
         FROM produkt
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+def get_all_kunde(conn):
+    sql = """
+        SELECT *
+        FROM kunde
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
@@ -265,8 +274,6 @@ def random_adresse(strassen_staemme: int, strassen_endungen: int, orte: int) -> 
 
     return f"{adressen_dict["strassen_staemme"][strassen_staemme] + adressen_dict["strassen_endungen"][strassen_endungen]} {str(random.randint(1, 999))}, {adressen_dict["orte"][orte]["plz"]} {adressen_dict["orte"][orte]["ort"]}"
 
-    
-
 
 @with_connect(":memory:")
 def test_in_memory(conn):
@@ -279,14 +286,13 @@ def test_in_memory(conn):
         insert_produkt(conn, produkt, preis, lagerbestand)
 
     date = "2026-10-02 10:15"
-    for i in range(1):
+    for i in range(100):
         vorname = random_vorname()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
         geburstdatum = random_geburtsdatum()
         telefonnummer = random_telefonummer()
         adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
-        print(adresse)
-        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", geburtsdatum, telefonnummer, )
+        kunde_id = insert_kunde(conn, vorname=vorname, nachname=nachname, email_end="@maily.com", geburtsdatum=geburstdatum, telefon=telefonnummer, adresse=adresse)
         date = random_datum(date)
 
 
