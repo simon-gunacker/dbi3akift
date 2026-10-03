@@ -39,10 +39,41 @@
 - View B - Gesamt: 61.7661s | Schnitt pro Aufruf: 0.001235s
 - Der Test hat: 123.4693 Sekunden gebraucht.
 
-
 **Performance ohne LIMIT**
 - Starte Benchmark für kunde_id = 42
 - Wiederholungen = 100...
 - View A - Gesamt: 4.8780s | Schnitt pro Aufruf: 0.048780s
 - View B - Gesamt: 0.7519s | Schnitt pro Aufruf: 0.007519s
 - Der Test hat: 5.63 Sekunden gebraucht.
+
+---
+## Nachteile von Views
+- Versteckte Komplexität
+- Keine eigenen Indizes
+- Write-Einschränkungen (read-only => kein insert)
+
+---
+## Query plan
+- Bestellung A
+´´´sql 
+EXPLAIN QUERY PLAN 
+SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42;
+QUERY PLAN
+|--SCAN b
+`--CORRELATED SCALAR SUBQUERY 3
+   `--SEARCH b2
+´´´
+- - **CORRELATED SCALAR SUBQUERY**: Das ist das Hauptproblem. Das Wort "CORRELATED" bedeutet, dass die Subquery für jede einzelne Zeile der äußeren Tabelle neu ausgeführt werden muss.
+
+- Bestellung B
+´´´sql
+    EXPLAIN QUERY PLAN 
+    SELECT * FROM letzte_bestellung_b WHERE kunde_id = 42;
+    QUERY PLAN
+    |--CO-ROUTINE letzte
+    |  `--SCAN bestellung
+    |--SCAN b
+    |--BLOOM FILTER ON letzte (kunde_id=?)
+    `--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)
+´´´
+
