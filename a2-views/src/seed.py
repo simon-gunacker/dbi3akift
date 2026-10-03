@@ -20,6 +20,7 @@ LAGER_BESTAND_MAX=1000
 START_TIMESTAMP = datetime(2020, 1, 1, 0, 0, 0).timestamp()# zeit in sek
 END_TIMESTAMP = datetime(2026, 10, 3, 23, 59, 59).timestamp()
 
+MAX_MENGE= 1000
 
 BEZEICHNUG_LIST = ['Apfel','Birne', 'Kirsche', 'Banane','Mango',
                    'Erdbeere',' Pfirsich','Himbeere','Orange','Ananas']
@@ -94,6 +95,19 @@ for k in range(0,BESTELLUNG_SIZE,BATCH_SIZE):
     status=random.choice(STATUS_LIST)
     data_bestellung_batch.append((kunde_id, bestelldatum, status))
   cursor.executemany(SQL_STRING_BESTELLUNG, data_bestellung_batch)
+  conn.commit()
+
+#bestellposition befüllen
+SQL_STRING_BESTELLPOSITION='INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)'
+
+for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
+  data_bestellposition_batch=[]
+  for n in range(0, BATCH_SIZE):
+    bestellung_id=random.randint(1,BESTELLUNG_SIZE)
+    produkt_id=random.randint(1,PRODUCT_SIZE)
+    menge=random.randint(1,MAX_MENGE)
+    data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
+  cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_batch)
   conn.commit()
 
 conn.close()    
