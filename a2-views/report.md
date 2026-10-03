@@ -38,3 +38,6 @@
 | 5002 | 102 (Maus) | 5 | Ben kauft in Bestellung 5002 5x Mäuse |
 | 5003 | 103 (Tastatur) | 2 | Anna kauft in Bestellung 5003 2x Tastaturen |
 
+---
+## Namensgenerierung (vor nach) JSON
+Überlegung wie bekomme ich zufällige namen zusammen ohne libary. Meine Idee Konsonaten und Vokale in die JSON zu speichern und dann immer paar zu bilden. zb K + V + K + V -> 4 Buchstaben => Lina, Niko, Karo
