@@ -255,6 +255,19 @@ def random_telefonummer() -> str:
     return result
 
 
+def random_adresse(strassen_staemme: int, strassen_endungen: int, orte: int) -> str:
+    """ Str. Stam -> Leange: 36
+        Str. Endung -> Leange: 8
+        Orte -> Leange: 20
+    """
+    with open(".data/adressen.json", "r", encoding="utf-8") as file:
+        adressen_dict = json.load(file)
+
+    return f"{adressen_dict["strassen_staemme"][strassen_staemme] + adressen_dict["strassen_endungen"][strassen_endungen]} {str(random.randint(1, 999))}, {adressen_dict["orte"][orte]["plz"]} {adressen_dict["orte"][orte]["ort"]}"
+
+    
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
@@ -266,13 +279,14 @@ def test_in_memory(conn):
         insert_produkt(conn, produkt, preis, lagerbestand)
 
     date = "2026-10-02 10:15"
-    for i in range(10_000):
+    for i in range(1):
         vorname = random_vorname()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
         geburstdatum = random_geburtsdatum()
-        telefonummer = random_telefonummer()
-        print(telefonummer)
-        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", geburtsdatum, )
+        telefonnummer = random_telefonummer()
+        adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
+        print(adresse)
+        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", geburtsdatum, telefonnummer, )
         date = random_datum(date)
 
 

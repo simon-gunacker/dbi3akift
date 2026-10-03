@@ -1,0 +1,34 @@
+{
+  "strassen_staemme": [
+    "Haupt", "Bahnhof", "Kirch", "Schul", "Dorf", "Ring", "Park", "Schloss",
+    "Wiener", "Grazer", "Linzer", "Salzburger", "Innsbrucker", "Alpine",
+    "Garten", "Sonnen", "Wald", "Wiesen", "Berg", "Tal", "Bach", "Brunnen",
+    "Post", "Rathaus", "Markt", "Kirschen", "Linden", "Eichen", "Buchen",
+    "Mozart", "Schubert", "Goethe", "Schiller", "Kaiser", "Herzog", "Freiheits"
+  ],
+  "strassen_endungen": [
+    "straße", "gasse", "weg", "platz", "ring", "allee", "ufer", "zeile"
+  ],
+  "orte": [
+    { "plz": "1010", "ort": "Wien" },
+    { "plz": "8010", "ort": "Graz" },
+    { "plz": "4020", "ort": "Linz" },
+    { "plz": "5020", "ort": "Salzburg" },
+    { "plz": "6020", "ort": "Innsbruck" },
+    { "plz": "9020", "ort": "Klagenfurt am Wörthersee" },
+    { "plz": "3100", "ort": "St. Pölten" },
+    { "plz": "6900", "ort": "Bregenz" },
+    { "plz": "7000", "ort": "Eisenstadt" },
+    { "plz": "8200", "ort": "Gleisdorf" },
+    { "plz": "8051", "ort": "Thal" },
+    { "plz": "4600", "ort": "Wels" },
+    { "plz": "4400", "ort": "Steyr" },
+    { "plz": "8700", "ort": "Leoben" },
+    { "plz": "9500", "ort": "Villach" },
+    { "plz": "6850", "ort": "Dornbirn" },
+    { "plz": "2500", "ort": "Baden" },
+    { "plz": "3430", "ort": "Tulln an der Donau" },
+    { "plz": "6330", "ort": "Kufstein" },
+    { "plz": "5700", "ort": "Zell am See" }
+  ]
+}
