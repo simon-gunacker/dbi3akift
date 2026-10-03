@@ -94,11 +94,13 @@ def insert_kunde(conn, vorname: str, nachname: str, email_end: str, geburtsdatum
     conn.commit()
     return cursor.lastrowid
 
-def insert_bestellung(conn, kunde_id: int, bestelldatum: str, status: str) -> int:
+def insert_bestellung(conn, kunde_id: int, bestelldatum: str) -> int:
     sql = """
         INSERT INTO bestellung (kunde_id, bestelldatum, status)
         VALUES (?, ?, ?)
     """
+    status_list = ["versendet", "in Bearbeitun", "neu"]
+    status = status_list[random.randint(0, 2)]
     cursor = conn.execute(
         sql,
             (kunde_id, bestelldatum, status),
@@ -286,14 +288,17 @@ def test_in_memory(conn):
         insert_produkt(conn, produkt, preis, lagerbestand)
 
     date = "2026-10-02 10:15"
+    email_end="@maily.com"
     for i in range(100):
-        vorname = random_vorname()
+        vorname = random_vorname().capitalize()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
         geburstdatum = random_geburtsdatum()
         telefonnummer = random_telefonummer()
         adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
-        kunde_id = insert_kunde(conn, vorname=vorname, nachname=nachname, email_end="@maily.com", geburtsdatum=geburstdatum, telefon=telefonnummer, adresse=adresse)
+        kunde_id = insert_kunde(conn, vorname, nachname, email_end, geburstdatum, telefonnummer, adresse)
+
         date = random_datum(date)
+        bestell_id = insert_bestellung(conn, kunde_id, date)
 
 
 
