@@ -13,6 +13,10 @@ SEED= 42
 START_DATE = date(1945, 1, 1)
 END_DATE= date(2008, 12, 31)
 
+MIN_BETRAG= 100 #euro in cent
+MAX_BETRAG= 1000000
+LAGER_BESTAND_MAX=1000
+
 
 
 
@@ -46,7 +50,7 @@ cursor = conn.cursor()
 
 #kunde befüllen
 SQL_STRING_KUNDE=  'INSERT INTO kunde (vorname, nachname,email,geburtsdatum,telefon,adresse) VALUES (?,?,?,?,?,?)'
-data=[]
+data_kunde=[]
 for i in range(0,KUNDE_SIZE):
   
     vorname=random.choice(VORNAME_LIST)
@@ -56,14 +60,25 @@ for i in range(0,KUNDE_SIZE):
     #ordinal nummeriert datum fortlaufen
     telefon=(random.choice(TELEFONNUMMER_PREFIX_LIST))+str(random.randint(1000000, 9999999))
     adresse=random.choice(ADRESSE_LIST)
-    data.append((vorname,nachname,email,geburtsdatum,telefon,adresse))
+    data_kunde.append((vorname,nachname,email,geburtsdatum,telefon,adresse))
 
-cursor.executemany(SQL_STRING_KUNDE, data)
+cursor.executemany(SQL_STRING_KUNDE, data_kunde)
 conn.commit()
 
 
 SQL_STRING_PRODUCT=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
 
+data_produkt=[]
+for i in range(0,PRODUCT_SIZE):
+  
+  bezeichnung=random.choice(BEZEICHNUG_LIST)
+  preis=Decimal(random.randint(MIN_BETRAG,MAX_BETRAG))/Decimal(100)#Kommazahlen / Dezimalbrüche immer als String in Anführungszeichen:
+  lagerbestand=random.randint(0, LAGER_BESTAND_MAX)
+
+  data_produkt.append((vorname,nachname,email,geburtsdatum,telefon,adresse))
+
+cursor.executemany(SQL_STRING_KUNDE, data_produkt)
+conn.commit()
 
 
 conn.close()    
