@@ -1,0 +1,10 @@
+{
+  "stamms": [
+    "Bau", "Müll", "Schmid", "Fisch", "Schnei", "Wag", "Web", "Berg", 
+    "Stein", "Hoff", "Neu", "Kauf", "Gold", "Sommer", "Winter", "Feld", 
+    "Wald", "See", "Rosen", "Lind", "Eich", "Tann", "Lang", "Kurz"
+  ],
+  "endungen": [
+    "er", "mann", "berg", "burg", "bach", "thal", "feld", "dorf", "stein"
+  ]
+}

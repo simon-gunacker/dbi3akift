@@ -40,4 +40,5 @@
 
 ---
 ## Namensgenerierung (vor nach) JSON
-Überlegung wie bekomme ich zufällige namen zusammen ohne libary. Meine Idee Konsonaten und Vokale in die JSON zu speichern und dann immer paar zu bilden. zb K + V + K + V -> 4 Buchstaben => Lina, Niko, Karo
+- Überlegung wie bekomme ich zufällige Vornamen zusammen ohne libary. Meine Idee Konsonaten und Vokale in die JSON zu speichern und dann immer paar zu bilden. zb K + V + K + V -> 4 Buchstaben => Lina, Niko, Karo Das nennt man in der Sprachwissenschaft eine offene Silbe.
+- Bei Deutsche Nachnamen bestehen fast immer aus einem Stamm/Wort + einer typischen Endung.
