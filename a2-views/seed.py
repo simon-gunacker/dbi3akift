@@ -1,4 +1,5 @@
 import sqlite3
+import names
 
 conn = sqlite3.connect("datenbank.db")
 
