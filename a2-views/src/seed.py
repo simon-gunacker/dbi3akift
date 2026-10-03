@@ -17,7 +17,8 @@ MIN_BETRAG= 100 #euro in cent
 MAX_BETRAG= 1000000
 LAGER_BESTAND_MAX=1000
 
-
+START_TIMESTAMP = datetime(2020, 1, 1, 0, 0, 0).timestamp()# zeit in sek
+END_TIMESTAMP = datetime(2026, 10, 3, 23, 59, 59).timestamp()
 
 
 BEZEICHNUG_LIST = ['Apfel','Birne', 'Kirsche', 'Banane','Mango',
@@ -38,6 +39,8 @@ ADRESSE_LIST = ['Schloßstraße 14, 10115 Berlin', 'Herrengasse 3, 8010 Graz',
 TELEFONNUMMER_PREFIX_LIST=['0650', '0660', '0664', '0676', '0677', '0678', '0680',
                     '0681', '0688', '0699']
 
+STATUS_LIST=['Eingegangen / Zahlung eingegangen', 'In Bearbeitung / Warten auf Details', 'Freigegeben / Kommissionierung', 'Versandt / An Paketdienst übergeben', 'In Zustellung', 'Zugestellt / Abgeholt', 
+             'Verzögert', 'Aktion erforderlich', 'Storniert', 'Retoure / Rücksendung']
 
 #random +seed ergibt reproduzuirbare werte
 random.seed(SEED)
@@ -65,20 +68,32 @@ for i in range(0,KUNDE_SIZE):
 cursor.executemany(SQL_STRING_KUNDE, data_kunde)
 conn.commit()
 
-
+#produkt befüllen
 SQL_STRING_PRODUCT=  'INSERT INTO product (bezeichnung, preis,lagerbestand) VALUES (?, ?,?)'
-
 data_produkt=[]
-for i in range(0,PRODUCT_SIZE):
+for j in range(0,PRODUCT_SIZE):
   
   bezeichnung=random.choice(BEZEICHNUG_LIST)
   preis=Decimal(random.randint(MIN_BETRAG,MAX_BETRAG))/Decimal(100)#Kommazahlen / Dezimalbrüche immer als String in Anführungszeichen:
   lagerbestand=random.randint(0, LAGER_BESTAND_MAX)
+  data_produkt.append((bezeichnung, float(preis),lagerbestand))
 
-  data_produkt.append((vorname,nachname,email,geburtsdatum,telefon,adresse))
-
-cursor.executemany(SQL_STRING_KUNDE, data_produkt)
+cursor.executemany(SQL_STRING_PRODUCT, data_produkt)
 conn.commit()
 
+#bestellung befüllen
+SQL_STRING_BESTELLUNG='INSERT INTO bestellung(kunde_id, bestelldatum,status) VALUES (?,?,?)'
+
+BATCH_SIZE=10000
+for k in range(0,BESTELLUNG_SIZE,BATCH_SIZE):
+  data_bestellung_batch=[]
+  for l in range(0, BATCH_SIZE):
+    kunde_id=random.randint(1,KUNDE_SIZE)
+    bestelldatum = datetime.fromtimestamp(random.uniform(START_TIMESTAMP, END_TIMESTAMP)).strftime('%Y-%m-%d %H:%M:%S')
+    #randuniform is für float
+    status=random.choice(STATUS_LIST)
+    data_bestellung_batch.append((kunde_id, bestelldatum, status))
+  cursor.executemany(SQL_STRING_BESTELLUNG, data_bestellung_batch)
+  conn.commit()
 
 conn.close()    
