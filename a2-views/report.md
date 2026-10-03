@@ -43,3 +43,11 @@
 - Überlegung wie bekomme ich zufällige Vornamen zusammen ohne libary. Meine Idee Konsonaten und Vokale in die JSON zu speichern und dann immer paar zu bilden. zb K + V + K + V -> 4 Buchstaben => Lina, Niko, Karo Das nennt man in der Sprachwissenschaft eine offene Silbe.
 - Bei Deutsche Nachnamen bestehen fast immer aus einem Stamm/Wort + einer typischen Endung.
 - Adressen enden auch alle in einem Schema.
+
+---
+## View erstellen
+- Eine View ist eine *gespeicherte SQL-Abfrage*, die sich nach außen hin verhält wie eine virtuelle Tabelle sie speichert selbst aber **keine eigenen Daten**.
+- Jedes Mal, wenn ich *SELECT * FROM view_name;* aufrufe, führt die Datenbank im Hintergrund live das definierte SELECT-Statement auf den echten Tabellen aus.
+**Überlegung**
+1. Datenschutz: Wenn ich einen Mitarbeiter rechte gebe Views zu nutzen kann ich das mit den Views eingrenzen was er sehen kann.
+2. Vereinfachung: Bei großen Selects mit vielen Joins oder viele subselects können die selects mit view sehr klein werden.
