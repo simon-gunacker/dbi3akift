@@ -27,9 +27,9 @@ id int PRIMARY KEY
 
 CREATE TABLE bestellposition(
 bestellung_id int
-,product_id int
+,produkt_id int
 ,menge int
-,PRIMARY KEY (bestellung_id, product_id )
+,PRIMARY KEY (bestellung_id, produkt_id )
 ,FOREIGN KEY ( produkt_id) REFERENCES product(id)
 ,FOREIGN KEY ( bestellung_id) REFERENCES bestellung(id)
 );
