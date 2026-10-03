@@ -176,6 +176,26 @@ def random_produkt(suffix: bool, praefixe: int) -> str:
         
     return produkt_dict["praefixe"][praefixe] + produkt_dict["suffixe"][suffix]
 
+def random_vorname()-> str:
+    """ K = Konstanten => Leange liste: 18
+        V = Vokal => Leange liste: 5
+    """
+    result_vorname = ""
+    k = random.randint(0, 17)
+    v = random.randint(0, 4)
+    paare = random.randint(1, 3)
+
+    with open("vorname.json", "r", encoding="utf-8") as file:
+        vorname_dict = json.load(file)
+
+    for i in range(paare):
+        result_vorname += (vorname_dict["konsonanten"][k] + vorname_dict["vokale"][v])
+        k = random.randint(0, 17)
+        v = random.randint(0, 4)
+
+    return result_vorname
+    
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
@@ -186,9 +206,9 @@ def test_in_memory(conn):
         lagerbestand = random.randint(1, 100)
         produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
 
-    print(get_all_produkt(conn))
-    print(get_count_produkt(conn)[0]["amount"])
-    print(produkt_id)
+    for i in range(100):
+        vorname = random_vorname()
+        print(vorname)
 
 if __name__ == "__main__":
     seed = input("Ohne seed Enter: ")
