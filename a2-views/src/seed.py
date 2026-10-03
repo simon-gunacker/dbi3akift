@@ -103,7 +103,7 @@ created_couples= set()
 
 for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   data_bestellposition_batch=[]
-  while len(data_bestellung_batch)< BATCH_SIZE:
+  while len(data_bestellposition_batch)< BATCH_SIZE:
     bestellung_id=random.randint(1,BESTELLUNG_SIZE)
     produkt_id=random.randint(1,PRODUCT_SIZE)
     menge=random.randint(1,MAX_MENGE)
