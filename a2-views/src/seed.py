@@ -98,23 +98,42 @@ for k in range(0,BESTELLUNG_SIZE,BATCH_SIZE):
   conn.commit()
 
 #bestellposition befüllen
-SQL_STRING_BESTELLPOSITION='INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)'
-created_couples= set()
-
+SQL_STRING_BESTELLPOSITION='INSERT OR IGNORE INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)'
+#ignore fängt duplikate ab 
 for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   data_bestellposition_batch=[]
-  while len(data_bestellposition_batch)< BATCH_SIZE:
+  for n in range(0,BATCH_SIZE):
     bestellung_id=random.randint(1,BESTELLUNG_SIZE)
     produkt_id=random.randint(1,PRODUCT_SIZE)
     menge=random.randint(1,MAX_MENGE)
-    couple=(bestellung_id, produkt_id)
-
-    if couple  not in created_couples:
-      created_couples.add(couple)
-      data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
+    data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
    
     
   cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_batch)
   conn.commit()
+# diferenz der dopplten papre auffüllen:
+def get_missing_count(cursor,size):
+  cursor.execute("SELECT COUNT(*) FROM bestellposition")
+  current_count=cursor.fetchone()[0]
+  return size-current_count
+
+missing=get_missing_count(cursor,BESTELLPOSITION_SIZE)
+
+data_bestellposition_missing=[]
+while True:
+    missing=get_missing_count(cursor,BESTELLPOSITION_SIZE)
+    if missing<=0:
+      break
+    for o in range(missing):
+      bestellung_id=random.randint(1,BESTELLUNG_SIZE)
+      produkt_id=random.randint(1,PRODUCT_SIZE)
+      menge=random.randint(1,MAX_MENGE)
+      data_bestellposition_missing.append((bestellung_id, produkt_id, menge))
+
+   
+    cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_missing)
+    conn.commit()
+
+
 
 conn.close()    
