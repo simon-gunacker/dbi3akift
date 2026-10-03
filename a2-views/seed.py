@@ -243,6 +243,18 @@ def random_geburtsdatum() -> str:
     day = str(random.randint(1, 30))
     return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
 
+def random_telefonummer() -> str:
+    result = "06"
+    len_number = random.randint(10, 12)
+    prefix = random.randint(60, 90)
+    result += str(prefix)
+
+    for i in range(len_number):
+        result += str(random.randint(0, 9))
+
+    return result
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
@@ -258,8 +270,9 @@ def test_in_memory(conn):
         vorname = random_vorname()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
         geburstdatum = random_geburtsdatum()
-        print(geburstdatum)
-        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", )
+        telefonummer = random_telefonummer()
+        print(telefonummer)
+        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", geburtsdatum, )
         date = random_datum(date)
 
 
