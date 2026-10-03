@@ -194,6 +194,16 @@ def random_vorname()-> str:
         v = random.randint(0, 4)
 
     return result_vorname
+
+def random_nachname(stamm: int, end: int) -> str:
+    """ Stamm/Wort -> Leange: 24
+        Endung -> Leange: 9
+    """
+
+    with open(".data/nachname.json", "r", encoding="utf-8") as file:
+        nachname_dict = json.load(file)
+
+    return nachname_dict["stamms"][stamm] + nachname_dict["endungen"][end]
     
 
 @with_connect(":memory:")
@@ -206,9 +216,11 @@ def test_in_memory(conn):
         lagerbestand = random.randint(1, 100)
         produkt_id = insert_produkt(conn, produkt, preis, lagerbestand)
 
-    for i in range(100):
+    for i in range(5):
         vorname = random_vorname()
-        print(vorname)
+        nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
+        print(nachname)
+
 
 if __name__ == "__main__":
     seed = input("Ohne seed Enter: ")
