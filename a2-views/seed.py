@@ -81,7 +81,7 @@ def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int) -> i
     return cursor.lastrowid
 
 
-def insert_kunde(conn, vorname: str, nachname: str, email: str, geburtsdatum: str, telefon: str, adresse: str) -> int:
+def insert_kunde(conn, vorname: str, nachname: str, email_end: str, geburtsdatum: str, telefon: str, adresse: str) -> int:
     sql = """
         INSERT INTO kunde (vorname, nachname, email, geburstdatum, telefon, adresse)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -208,7 +208,6 @@ def random_nachname(stamm: int, end: int) -> str:
 def random_datum(start_datum: str) -> str:
     result_date = ""
 
-    len(start_datum)
     minute = int(start_datum[14] + start_datum[15])
     hour = int(start_datum[11] + start_datum[12])
     day = int(start_datum[8] + start_datum[9])
@@ -236,7 +235,13 @@ def random_datum(start_datum: str) -> str:
         year += 1
 
     return f"{str(year)}-{str(month).zfill(2)}-{str(day).zfill(2)} {str(hour).zfill(2)}:{str(minute).zfill(2)}"
-    
+
+
+def random_geburtsdatum() -> str:
+    year = str(random.randint(1955, 2026))
+    month = str(random.randint(1, 12))
+    day = str(random.randint(1, 30))
+    return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
 
 @with_connect(":memory:")
 def test_in_memory(conn):
@@ -252,8 +257,10 @@ def test_in_memory(conn):
     for i in range(10_000):
         vorname = random_vorname()
         nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
+        geburstdatum = random_geburtsdatum()
+        print(geburstdatum)
+        #kunde_id = insert_kunde(conn, vorname, nachname, email_end="@maily.com", )
         date = random_datum(date)
-        print(date)
 
 
 
