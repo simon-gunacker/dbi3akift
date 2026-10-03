@@ -353,12 +353,10 @@ def create_view_performance_a(conn):
             b.kunde_id,
             b.id AS bestellung_id,
             b.bestelldatum
-        FROM (
-            SELECT * FROM bestellung LIMIT 10000
-        ) b
+        FROM bestellung b
         WHERE b.bestelldatum = (
             SELECT MAX(b2.bestelldatum)
-            FROM (SELECT * FROM bestellung LIMIT 10000) b2
+            FROM bestellung b2
             WHERE b2.kunde_id = b.kunde_id
         );
     """
@@ -372,14 +370,12 @@ def create_view_performance_b(conn):
             b.kunde_id,
             b.id AS bestellung_id,
             b.bestelldatum
-        FROM (
-            SELECT * FROM bestellung LIMIT 10000
-        ) b
+        FROM bestellung b
         JOIN (
             SELECT
                 kunde_id,
                 MAX(bestelldatum) AS bestelldatum
-            FROM (SELECT * FROM bestellung LIMIT 10000)
+            FROM bestellung
             GROUP BY kunde_id
         ) letzte
             ON letzte.kunde_id = b.kunde_id

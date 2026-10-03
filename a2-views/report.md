@@ -4,41 +4,7 @@
 3. Zu den einen Kunden eine Bestellung erstellen. Diese bestellung bekommt dann ein Datum und einen random status. Diese bestell id lasse ich mir ausgeben und übergebe sie an bestellposition.
 4. In der Bestellposition insert ich die bestellung_id was ich übergeben habe. Dann lasse ich zufällig entscheiden wie viele produkte der kunde gekauft hat. Dann wird ein produkt zufällig ausgeben und dazu zufällig menge Und das so oft bis der kunde keine Produkte mehr auf dieser bestellung gekauft hat. 
 ---
-## Beispieldaten
 
-### Tabelle 1: Produkte (produkte)
-
-| id | bezeichnung | preis | lagerbestand |
-|---|---|---|---|
-| 101 | Laptop | 899.00 | 15 |
-| 102 | Wireless Maus | 29.90 | 100 |
-| 103 | Tastatur | 49.90 | 45 |
-
-### Tabelle 2: Kunden (kunden)
-
-| id | vorname | nachname | email |
-|---|---|---|---|
-| 1 | Anna | Schmidt | anna@example.com |
-| 2 | Ben | Weber | ben@example.com |
-
-### Tabelle 3: Bestellungen (bestellungen)
-
-| id | kunde_id | bestelldatum | status |
-|---|---|---|---|
-| 5001 | 1 (Anna) | 2026-10-02 10:15 | versendet |
-| 5002 | 2 (Ben) | 2026-10-02 11:30 | in Bearbeitung |
-| 5003 | 1 (Anna) | 2026-10-02 14:00 | neu |
-
-### Tabelle 4: Bestellpositionen (bestellung_details)
-
-| bestellung_id | produkt_id | menge | Was das logisch bedeutet: |
-|---|---|---|---|
-| 5001 | 101 (Laptop) | 1 | Anna kauft in Bestellung 5001 1x Laptop |
-| 5001 | 102 (Maus) | 1 | Anna kauft in Bestellung 5001 1x Maus |
-| 5002 | 102 (Maus) | 5 | Ben kauft in Bestellung 5002 5x Mäuse |
-| 5003 | 103 (Tastatur) | 2 | Anna kauft in Bestellung 5003 2x Tastaturen |
-
----
 ## Namensgenerierung JSON
 - Überlegung wie bekomme ich zufällige Vornamen zusammen ohne libary. Meine Idee Konsonaten und Vokale in die JSON zu speichern und dann immer paar zu bilden. zb K + V + K + V -> 4 Buchstaben => Lina, Niko, Karo Das nennt man in der Sprachwissenschaft eine offene Silbe.
 - Bei Deutsche Nachnamen bestehen fast immer aus einem Stamm/Wort + einer typischen Endung.
@@ -54,3 +20,29 @@
 **Schnittstelle**
 - Mit so einem View muss ich nicht wissen wie die Tabelle zusammenhängen. So kann ich ganz einfach die Abfrage erweitern.
 - Spart auch Zeilen, macht den Select übersichtlicher
+
+---
+## Performance
+**Funktion von timeit**
+´´´python
+    import timeit
+    laufzeit = timeit.timeit(stmt=..., number=100)
+´´´
+- **stmt** (Statement): Den Code, den ich messen will. Das kann ein String-Befehl sein oder am einfachsten eine lambda-Funktion bzw. eine Funktion ohne Argumente.
+- **number**: Wie oft der Code ausgeführt werden soll (Standard ist $1.000.000$).
+- **Rückgabewert**: Die Gesamtlaufzeit in Sekunden für alle number-Durchläufe zusammen.
+
+**Performance mit LIMIT**
+- Starte Benchmark für kunde_id = 42
+- Wiederholungen = 50000...
+- View A - Gesamt: 61.7019s | Schnitt pro Aufruf: 0.001234s
+- View B - Gesamt: 61.7661s | Schnitt pro Aufruf: 0.001235s
+- Der Test hat: 123.4693 Sekunden gebraucht.
+
+
+**Performance ohne LIMIT**
+- Starte Benchmark für kunde_id = 42
+- Wiederholungen = 100...
+- View A - Gesamt: 4.8780s | Schnitt pro Aufruf: 0.048780s
+- View B - Gesamt: 0.7519s | Schnitt pro Aufruf: 0.007519s
+- Der Test hat: 5.63 Sekunden gebraucht.
