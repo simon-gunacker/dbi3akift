@@ -349,6 +349,61 @@ def get_view_interface_status(conn, status: str) -> list:
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
+def create_view_performance_a(conn):
+    sql = """
+        CREATE VIEW IF NOT EXISTS letzte_bestellung_a AS
+        SELECT
+            b.kunde_id,
+            b.id AS bestellung_id,
+            b.bestelldatum
+        FROM (
+            SELECT * FROM bestellung LIMIT 10000
+        ) b
+        WHERE b.bestelldatum = (
+            SELECT MAX(b2.bestelldatum)
+            FROM (SELECT * FROM bestellung LIMIT 10000) b2
+            WHERE b2.kunde_id = b.kunde_id
+        );
+    """
+    conn.execute(sql)
+    conn.commit()
+
+def create_view_performance_b(conn):
+    sql = """
+        CREATE VIEW IF NOT EXISTS letzte_bestellung_b AS
+        SELECT
+            b.kunde_id,
+            b.id AS bestellung_id,
+            b.bestelldatum
+        FROM (
+            SELECT * FROM bestellung LIMIT 10000
+        ) b
+        JOIN (
+            SELECT
+                kunde_id,
+                MAX(bestelldatum) AS bestelldatum
+            FROM (SELECT * FROM bestellung LIMIT 10000)
+            GROUP BY kunde_id
+        ) letzte
+            ON letzte.kunde_id = b.kunde_id
+        AND letzte.bestelldatum = b.bestelldatum;
+    """
+    conn.execute(sql)
+    conn.commit()
+
+def check_view_performance_even(conn) -> bool:
+    sql = """
+        SELECT * 
+        FROM letzte_bestellung_a 
+        EXCEPT SELECT * 
+        FROM letzte_bestellung_b;
+    """
+    cursor = conn.execute(sql)
+    if len(cursor.fetchall()) == 0:
+        return True
+    else:
+        return False
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     create_tables(conn)
@@ -384,8 +439,9 @@ def test_in_memory(conn):
     create_view_simple(conn)
     create_view_sum(conn)
     create_view_interface(conn)
-    for i in get_view_interface_status(conn, "versendet"):
-        print(i)
+    create_view_performance_a(conn)
+    create_view_performance_b(conn)
+    print(check_view_performance_even(conn))
 
 
 if __name__ == "__main__":
