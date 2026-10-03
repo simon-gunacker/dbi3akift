@@ -63,7 +63,7 @@ QUERY PLAN
 `--CORRELATED SCALAR SUBQUERY 3
    `--SEARCH b2
 ´´´
-- - **CORRELATED SCALAR SUBQUERY**: Das ist das Hauptproblem. Das Wort "CORRELATED" bedeutet, dass die Subquery für jede einzelne Zeile der äußeren Tabelle neu ausgeführt werden muss.
+    - **CORRELATED SCALAR SUBQUERY**: Das ist das Hauptproblem. Das Wort "CORRELATED" bedeutet, dass die Subquery für jede einzelne Zeile der äußeren Tabelle neu ausgeführt werden muss.
 
 - Bestellung B
 ´´´sql
