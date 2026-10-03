@@ -171,7 +171,7 @@ def get_produkt_by_id(conn, id: int) -> list:
     return cursor.fetchall()
 
 def random_produkt(suffix: bool, praefixe: int) -> str:
-    with open("produkt.json", "r", encoding="utf-8") as file:
+    with open(".data/produkt.json", "r", encoding="utf-8") as file:
         produkt_dict = json.load(file)
         
     return produkt_dict["praefixe"][praefixe] + produkt_dict["suffixe"][suffix]
@@ -185,7 +185,7 @@ def random_vorname()-> str:
     v = random.randint(0, 4)
     paare = random.randint(1, 3)
 
-    with open("vorname.json", "r", encoding="utf-8") as file:
+    with open(".data/vorname.json", "r", encoding="utf-8") as file:
         vorname_dict = json.load(file)
 
     for i in range(paare):
