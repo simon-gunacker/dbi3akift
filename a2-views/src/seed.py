@@ -99,6 +99,7 @@ for k in range(0,BESTELLUNG_SIZE,BATCH_SIZE):
 
 #bestellposition befüllen
 SQL_STRING_BESTELLPOSITION='INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)'
+created_couples= set()
 
 for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
   data_bestellposition_batch=[]
@@ -106,7 +107,14 @@ for m in range(0,BESTELLPOSITION_SIZE,BATCH_SIZE):
     bestellung_id=random.randint(1,BESTELLUNG_SIZE)
     produkt_id=random.randint(1,PRODUCT_SIZE)
     menge=random.randint(1,MAX_MENGE)
-    data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
+    couple=(bestellung_id, produkt_id)
+
+    if couple  not in created_couples:
+      created_couples.add(couple)
+      data_bestellposition_batch.append((bestellung_id, produkt_id, menge))
+    else:
+      n-=1
+    
   cursor.executemany(SQL_STRING_BESTELLPOSITION, data_bestellposition_batch)
   conn.commit()
 
