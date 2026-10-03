@@ -1,6 +1,7 @@
 from sqlite3 import connect
 import json
 import random
+import os
 
 
 def conver_to_dict(cursor, row):
@@ -77,7 +78,6 @@ def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int) -> i
         sql,
             (bezeichnung, preis, lagerbestand),
     )
-    conn.commit()
     return cursor.lastrowid
 
 
@@ -91,7 +91,6 @@ def insert_kunde(conn, vorname: str, nachname: str, email_end: str, geburtsdatum
         sql,
             (vorname, nachname, email_end, geburtsdatum, telefon, adresse),
     )
-    conn.commit()
     return cursor.lastrowid
 
 def insert_bestellung(conn, kunde_id: int, bestelldatum: str) -> int:
@@ -105,7 +104,6 @@ def insert_bestellung(conn, kunde_id: int, bestelldatum: str) -> int:
         sql,
             (kunde_id, bestelldatum, status),
     )
-    conn.commit()
     return cursor.lastrowid
 
 
@@ -118,7 +116,6 @@ def insert_bestellpostion(conn, bestell_id: str, produkt_id: int, menge: int):
         sql,
             (bestell_id, produkt_id, menge),
     )
-    conn.commit()
 
 
 def get_count_produkt(conn):
@@ -442,13 +439,58 @@ def test_in_memory(conn):
     create_view_performance_a(conn)
     create_view_performance_b(conn)
     print(check_view_performance_even(conn))
+    conn.commit()
+
+
+@with_connect("shop.db")
+def start_db(conn):
+    create_tables(conn)
+    
+    for i in range(10_000):
+        produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
+        preis = random.randint(99, 9999_99) / 100
+        lagerbestand = random.randint(1, 100)
+        insert_produkt(conn, produkt, preis, lagerbestand)
+
+    date = "2016-10-02 10:15"
+    email_end="@maily.com"
+    produkt_list = set()
+    produkt_id = random.randint(1, 10_000)
+    for i in range(10_000):
+        vorname = random_vorname().capitalize()
+        nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
+        geburstdatum = random_geburtsdatum()
+        telefonnummer = random_telefonummer()
+        adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
+        kunde_id = insert_kunde(conn, vorname, nachname, email_end, geburstdatum, telefonnummer, adresse)
+
+        for i in range(10):
+            date = random_datum(date)
+            bestell_id = insert_bestellung(conn, kunde_id, date)
+            for i in range(5):
+                while (produkt_id in produkt_list):
+                    produkt_id = random.randint(1, 10_000)
+                produkt_list.add(produkt_id)
+                insert_bestellpostion(conn, bestell_id, produkt_id, random.randint(1, 12))
+            produkt_list.clear()
+
+    create_view_simple(conn)
+    create_view_sum(conn)
+    create_view_interface(conn)
+    create_view_performance_a(conn)
+    create_view_performance_b(conn)
+    conn.commit()
 
 
 if __name__ == "__main__":
     seed = input("Ohne seed Enter: ")
+    if os.path.exists("shop.db"):
+        os.remove("shop.db")
     if seed == "":
-        test_in_memory()
+        #test_in_memory()
+        start_db()
     else:
         random.seed(seed)
-        test_in_memory()
+        start_db()
+        #test_in_memory()
 
