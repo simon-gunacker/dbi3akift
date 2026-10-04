@@ -65,3 +65,20 @@ def kunde_nachnamen():
 
     return liste_nachnamen
 
+def kunde_email():
+    liste_email = []
+
+    for i in range(5):
+        random_zeichen = random.choices(names.zeichen, k=5)
+        random_zeichen.append(str(i))
+
+        benutzername = "".join(random_zeichen)
+        domain = "seed.py" 
+        email = f"{benutzername}@{domain}"
+
+        liste_email.append(email)
+
+    return liste_email
+print(kunde_email())
+
+
