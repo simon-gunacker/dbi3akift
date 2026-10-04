@@ -69,7 +69,7 @@ def kunde_nachnamen():
 def kunde_email():
     liste_email = []
 
-    for i in range(5):
+    for i in range(10_000):
         random_zeichen = random.choices(data.zeichen, k=5)
         random_zeichen.append(str(i))
 
@@ -95,3 +95,18 @@ def kunde_geburtsdatum():
 
     return liste_geburtstage
 
+def kunde_telefonnummer():
+    liste_telefonnummern = []
+    
+    for i in range(10_000):
+        vorwahl = "0" + random.choice(data.vorwahlen)
+        telefonnummer = vorwahl + str(i)
+
+        while len(telefonnummer) <= 10:
+            telefonnummer += str(random.randint(0, 9))
+
+        liste_telefonnummern.append(telefonnummer)
+    return liste_telefonnummern
+
+
+#print(kunde_telefonnummer())
