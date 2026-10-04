@@ -1,6 +1,7 @@
 import sqlite3
 import names
 import random
+from datetime import date, timedelta
 
 conn = sqlite3.connect("datenbank.db")
 random.seed(1) # Startwert 1
@@ -79,6 +80,20 @@ def kunde_email():
         liste_email.append(email)
 
     return liste_email
-print(kunde_email())
 
+def geburtsdatum():
+    datum_laufend = date(1950, 1, 1)
+    datum_bis = date(2007, 12, 31)
+
+    geburtstage = [datum_laufend]
+
+    while datum_laufend < datum_bis:
+        datum_laufend += timedelta(days=1)
+        geburtstage.append(datum_laufend)
+    
+    liste_geburtstage = random.choices(geburtstage, k=10_000)
+
+    return liste_geburtstage
+
+print(geburtsdatum())
 
