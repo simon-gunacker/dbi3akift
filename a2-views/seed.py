@@ -49,13 +49,19 @@ conn.executescript(
 SEED = 1
 
 def kunde_vornamen():
-    liste_namen = []
+    liste_vornamen = []
 
-    liste_namen.extend(random.choices(names.kunde_vorname_w, k=5_000))
-    liste_namen.extend(random.choices(names.kunde_vorname_m, k=5_000))
+    liste_vornamen.extend(random.choices(names.kunde_vorname_w, k=5_000))
+    liste_vornamen.extend(random.choices(names.kunde_vorname_m, k=5_000))
 
-    random.shuffle(liste_namen)
+    random.shuffle(liste_vornamen)
 
-    return liste_namen
+    return liste_vornamen
 
+def kunde_nachnamen():
+    liste_nachnamen = []
+
+    liste_nachnamen.extend(random.choices(names.kunde_nachnamen, k=10_000))
+
+    return liste_nachnamen
 
