@@ -1,7 +1,9 @@
 import sqlite3
 import names
+import random
 
 conn = sqlite3.connect("datenbank.db")
+random.seed(1) # Startwert 1
 
 conn.executescript(
     """
@@ -43,3 +45,17 @@ conn.executescript(
 
     """
 )
+
+SEED = 1
+
+def kunde_vornamen():
+    liste_namen = []
+
+    liste_namen.extend(random.choices(names.kunde_vorname_w, k=5_000))
+    liste_namen.extend(random.choices(names.kunde_vorname_m, k=5_000))
+
+    random.shuffle(liste_namen)
+
+    return liste_namen
+
+
