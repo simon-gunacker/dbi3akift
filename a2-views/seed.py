@@ -116,4 +116,10 @@ def kunde_adresse():
 
     return liste_adressen
 
-#print (kunde_adresse())
+def produkt_name():
+    liste_produkte = []
+
+    liste_produkte.extend(random.choices(data.produkt_namen, k=3))
+
+    return liste_produkte
+
