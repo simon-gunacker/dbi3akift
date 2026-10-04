@@ -646,7 +646,36 @@ kunde_nachnamen = [
 
 zeichen =  ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
             "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "1", "2",
-            "3", "4", "5", "6", "7", "8", "9", "0"]
+            "3", "4", "5", "6", "7", "8", "9", "0",]
 
 vorwahlen = ["664", "667", "688", "676", "650", "678", "660", "699", "677", "670", 
-            "680", "681", "665"]
+            "680", "681", "665",]
+
+adressen = [
+    "Galgenweg 10, 8190 Birkfeld", 
+    "Gschaid b. Birkfeld 85, 8190 Birkfeld",
+    "Kögelruhweg 21, 8190 Birkfeld",
+    "Pfanghofweg 130, 8045 Graz",
+    "Sparbersbachgasse 19, 8010 Graz",
+    "Otto-Loewi-G 18, 8042 Graz",
+    "Fischergasse 23D, 8010 Graz", 
+    "Münzgrabenstraße 84B, 8041 Graz",
+    "Straßgangerstraße 402E, 8054 Graz",
+    "Mainersbergstraße 24, 8051 Graz",
+    "Dorfviertel 107, 8190 Miesenbach",
+    "Egg 48, 8672 Sankt Kathrein am Hauenstein",
+    "Sonnenweg 3, 8184 Anger",
+    "Galgenweg 14, 8190 Birkfeld", 
+    "Gschaid b. Birkfeld 83, 8190 Birkfeld",
+    "Kögelruhweg 20, 8190 Birkfeld",
+    "Pfanghofweg 140, 8045 Graz",
+    "Sparbersbachgasse 14, 8010 Graz",
+    "Otto-Loewi-G 14, 8042 Graz",
+    "Fischergasse 24C, 8010 Graz", 
+    "Münzgrabenstraße 23, 8041 Graz",
+    "Straßgangerstraße 64, 8054 Graz",
+    "Mainersbergstraße 23, 8051 Graz",
+    "Dorfviertel 64, 8190 Miesenbach",
+    "Egg 23, 8672 Sankt Kathrein am Hauenstein",
+    "Sonnenweg 5, 8184 Anger",
+    ]

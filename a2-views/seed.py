@@ -109,4 +109,11 @@ def kunde_telefonnummer():
     return liste_telefonnummern
 
 
-#print(kunde_telefonnummer())
+def kunde_adresse():
+    liste_adressen = []
+
+    liste_adressen.extend(random.choices(data.adressen, k=10_000))
+
+    return liste_adressen
+
+#print (kunde_adresse())
