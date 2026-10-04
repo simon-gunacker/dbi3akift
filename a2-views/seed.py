@@ -116,10 +116,21 @@ def kunde_adresse():
 
     return liste_adressen
 
-def produkt_name():
+def produkt_bezeichnung():
     liste_produkte = []
 
     liste_produkte.extend(random.choices(data.produkt_namen, k=3))
 
     return liste_produkte
+
+def produkt_preis():
+    liste_preise = []
+
+    while len(liste_preise) < 10_000:
+        preis = round(random.uniform(2, 12), 2)
+        liste_preise.append(preis)
+    
+    return liste_preise
+
+#print(produkt_preis())
 
