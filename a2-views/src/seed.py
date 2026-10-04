@@ -59,7 +59,7 @@ for i in range(0,KUNDE_SIZE):
   
     vorname=random.choice(VORNAME_LIST)
     nachname=random.choice(NACHNAME_LIST)
-    email=vorname+nachname+random.choice(EMAIL_LIST)
+    email=vorname.lower()+nachname.lower()+random.choice(EMAIL_LIST)
     geburtsdatum=datetime.fromordinal(random.randint(START_DATE.toordinal(),END_DATE.toordinal())).isoformat()
     #ordinal nummeriert datum fortlaufen
     telefon=(random.choice(TELEFONNUMMER_PREFIX_LIST))+str(random.randint(1000000, 9999999))
