@@ -1,5 +1,5 @@
 import sqlite3
-import names
+import data
 import random
 from datetime import date, timedelta
 
@@ -52,8 +52,8 @@ SEED = 1
 def kunde_vornamen():
     liste_vornamen = []
 
-    liste_vornamen.extend(random.choices(names.kunde_vorname_w, k=5_000))
-    liste_vornamen.extend(random.choices(names.kunde_vorname_m, k=5_000))
+    liste_vornamen.extend(random.choices(data.kunde_vorname_w, k=5_000))
+    liste_vornamen.extend(random.choices(data.kunde_vorname_m, k=5_000))
 
     random.shuffle(liste_vornamen)
 
@@ -62,7 +62,7 @@ def kunde_vornamen():
 def kunde_nachnamen():
     liste_nachnamen = []
 
-    liste_nachnamen.extend(random.choices(names.kunde_nachnamen, k=10_000))
+    liste_nachnamen.extend(random.choices(data.kunde_nachnamen, k=10_000))
 
     return liste_nachnamen
 
@@ -70,7 +70,7 @@ def kunde_email():
     liste_email = []
 
     for i in range(5):
-        random_zeichen = random.choices(names.zeichen, k=5)
+        random_zeichen = random.choices(data.zeichen, k=5)
         random_zeichen.append(str(i))
 
         benutzername = "".join(random_zeichen)
@@ -81,7 +81,7 @@ def kunde_email():
 
     return liste_email
 
-def geburtsdatum():
+def kunde_geburtsdatum():
     datum_laufend = date(1950, 1, 1)
     datum_bis = date(2007, 12, 31)
 
@@ -94,6 +94,4 @@ def geburtsdatum():
     liste_geburtstage = random.choices(geburtstage, k=10_000)
 
     return liste_geburtstage
-
-print(geburtsdatum())
 
