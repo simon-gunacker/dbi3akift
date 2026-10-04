@@ -1,6 +1,6 @@
 
 CREATE TABLE kunde(
-id int PRIMARY KEY
+id integer PRIMARY KEY AUTOINCREMENT
 ,vorname varchar(255)
 ,nachname varchar(255)
 ,email varchar(255)
@@ -10,15 +10,15 @@ id int PRIMARY KEY
 );
 
 CREATE TABLE product(
-id int PRIMARY KEY
+id integer PRIMARY KEY AUTOINCREMENT
 ,bezeichnung varchar(255)
 ,preis decimal not null
 ,lagerbestand int
 );
 
 CREATE TABLE bestellung(
-id int PRIMARY KEY
-,kunde_id int
+id integer PRIMARY KEY AUTOINCREMENT
+,kunde_id integer
 ,bestelldatum datetime
 ,status varchar(255)
 ,FOREIGN KEY ( kunde_id) REFERENCES kunde(id)
@@ -26,9 +26,9 @@ id int PRIMARY KEY
 
 
 CREATE TABLE bestellposition(
-bestellung_id int
-,produkt_id int
-,menge int
+bestellung_id integer
+,produkt_id integer
+,menge integer
 ,PRIMARY KEY (bestellung_id, produkt_id )
 ,FOREIGN KEY ( produkt_id) REFERENCES product(id)
 ,FOREIGN KEY ( bestellung_id) REFERENCES bestellung(id)
