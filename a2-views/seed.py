@@ -132,5 +132,14 @@ def produkt_preis():
     
     return liste_preise
 
-#print(produkt_preis())
+def produkt_lagerbestand():
+    liste_lagerbestand = []
+
+    while len(liste_lagerbestand) < 10_000:
+        lager = random.randint(0, 250)
+        liste_lagerbestand.append(lager)
+
+    return liste_lagerbestand
+
+print(produkt_lagerbestand())
 
