@@ -49,6 +49,13 @@ WHERE b.bestelldatum = (
     WHERE b2.kunde_id = b.kunde_id
 );
 
+SELECT *
+FROM letzte_bestellung_a
+WHERE kunde_id = 42;
+--42|5212|2026-07-17 06:53:10
+
+--View A Aufrufe = 1000 Zeit = 93.4351860480092sec
+
 CREATE VIEW letzte_bestellung_b AS
 SELECT
     b.kunde_id,
@@ -64,3 +71,11 @@ JOIN (
 ) letzte
     ON letzte.kunde_id = b.kunde_id
    AND letzte.bestelldatum = b.bestelldatum;
+
+
+SELECT *
+FROM letzte_bestellung_b
+WHERE kunde_id = 42;
+--42|5212|2026-07-17 06:53:10
+
+-- View B Aufrufe = 1000 Zeit = 10.218509223981528sec
