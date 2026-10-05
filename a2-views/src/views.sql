@@ -24,10 +24,15 @@ SELECT
     ,k.id AS kundennummer
     ,b.bestelldatum
     ,b.status AS bestellstatus
-    ,k.vorname
+    ,k.vorname 
     ,k.nachname
 FROM bestellung b
 JOIN kunde k ON b.kunde_id= k.id;
 
 
 
+--veinfachte Abfrage
+SELECT *
+FROM view_vereinfachte_schnittstelle
+WHERE bestellstatus= 'Zugestellt / Abgeholt'
+AND  vorname='Simon';
