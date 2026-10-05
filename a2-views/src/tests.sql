@@ -5,3 +5,13 @@ UNION ALL
 SELECT 'bestellung', COUNT(*) FROM bestellung
 UNION ALL
 SELECT 'bestellposition', COUNT(*) FROM bestellposition;
+
+
+SELECT * FROM view_kunde;
+
+SELECT * FROM view_bestellung_gesamtwert;
+
+SELECT * FROM view_vereinfachte_schnittstelle;
+
+.headers on
+.mode column
