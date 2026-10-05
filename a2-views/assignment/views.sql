@@ -88,8 +88,26 @@ SELECT *
 FROM letzte_bestellung_a
 WHERE kunde_id = 42;
 
+-- QUERY PLAN
+-- |--SCAN b
+-- `--CORRELATED SCALAR SUBQUERY 3
+--    `--SEARCH b2
+-- sqlite> 
+
+
+
 
 EXPLAIN QUERY PLAN
 SELECT *
 FROM letzte_bestellung_b
 WHERE kunde_id = 42;
+
+-- QUERY PLAN
+-- |--CO-ROUTINE letzte
+-- |  `--SCAN bestellung
+-- |--SCAN b
+-- |--BLOOM FILTER ON letzte (kunde_id=?)
+-- `--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)
+-- sqlite> 
+
+
