@@ -55,6 +55,7 @@ WHERE kunde_id = 42;
 --42|5212|2026-07-17 06:53:10
 
 --View A Aufrufe = 1000 Zeit = 93.4351860480092sec
+--View A Aufrufe = 10000 Zeit = 950.1127493749955sec
 
 CREATE VIEW letzte_bestellung_b AS
 SELECT
@@ -79,9 +80,14 @@ WHERE kunde_id = 42;
 --42|5212|2026-07-17 06:53:10
 
 -- View B Aufrufe = 1000 Zeit = 10.218509223981528sec
+--View B Aufrufe = 10000 Zeit = 107.19593377198908sec
+
 
 --man weiß nicht welche logik hinter dem view steckt -> keine Ahnung wie rechenintsiv die Abfrage ist
 --und man weiß nicht wie die Abfage aufgebaut ist erschwert Fehlersuche 
+
+--Kann man von außen erkennen, dass die beiden Views intern unterschiedlich effizient umgesetzt sind?
+-- nö sieht von aussen ident aus
 
 EXPLAIN QUERY PLAN
 SELECT *
@@ -89,10 +95,10 @@ FROM letzte_bestellung_a
 WHERE kunde_id = 42;
 
 -- QUERY PLAN
--- |--SCAN b
--- `--CORRELATED SCALAR SUBQUERY 3
+-- |--SCAN b    -->vollständiger tabellen scan zeile für zeile
+-- `--CORRELATED SCALAR SUBQUERY 3   -->für jede zeile in b wird eine unterabfrage ausgeführt
 --    `--SEARCH b2
--- sqlite> 
+
 
 
 
@@ -104,10 +110,11 @@ WHERE kunde_id = 42;
 
 -- QUERY PLAN
 -- |--CO-ROUTINE letzte
--- |  `--SCAN bestellung
--- |--SCAN b
--- |--BLOOM FILTER ON letzte (kunde_id=?)
--- `--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)
--- sqlite> 
+-- |  `--SCAN bestellung  -->erstllt co-routine mit einem vollständigen  tabellen scan asu
+-- |--SCAN b -->vollständiger tabellen scan zeile für zeile
+-- |--BLOOM FILTER ON letzte (kunde_id=?)  --> Bloom Filter vor. Das ist ein speicherbasierter Schnellfilter, der vorab prüft, ob eine gesuchte kunde_id überhaupt in der Co-Routine enthalten sein kann
+-- `--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)  -->da kein echter, permanenter Index existiert erstellt SQLite während der Abfrage im Arbeitsspeicher flüchtig einen eigenen Index dies kostet cpu zeit und ram ressouren
 
 
+
+--nein kann  zwar eine abfrage zub schreiben vereinfachen um die gewünschten daten zu erhalten  aber die komplexität und perfomance muss trotzdem berücksichtigt werden
