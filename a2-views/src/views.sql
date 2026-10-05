@@ -27,5 +27,7 @@ SELECT
     ,k.vorname
     ,k.nachname
 FROM bestellung b
-JOIN kunde k ON b.kunde_id= k.id
+JOIN kunde k ON b.kunde_id= k.id;
+
+
 
