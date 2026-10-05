@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXIST kunde (
+CREATE TABLE IF NOT EXISTS kunde (
 	id INTEGER PRIMARY KEY,
 	vorname VARCHAR,
 	nachname VARCHAR,
@@ -8,21 +8,21 @@ CREATE TABLE IF NOT EXIST kunde (
 	adresse VARCHAR
 );
 
-CREATE TABLE IF NOT EXIST bestellposition (
+CREATE TABLE IF NOT EXISTS bestellposition (
 	bestellung_id INTEGER PRIMARY KEY,
 	produkt_id INTEGER PRIMARY KEY,
 	FOREIGN KEY(bestellung_id) REFERENCES bestellung(id),
 	FOREIGN KEY(produkt_id) REFERENCES produkt(id)
 );
 
-CREATE TABLE IF NOT EXIST bestellung (
+CREATE TABLE IF NOT EXISTS bestellung (
 	id INTEGER PRIMARY KEY,
 	kunde_id INTEGER,
 	bestelldatum DATE,
 	status VARCHAR,
 	FOREIGN KEY(kunde_id) REFERENCES kunde(id)
 );
-CREATE TABLE IF NOT EXIST produkt (
+CREATE TABLE IF NOT EXISTS produkt (
 	id INTEGER PRIMARY KEY,
 	bezeichnung VARCHAR,
 	preis DECIMAL,
