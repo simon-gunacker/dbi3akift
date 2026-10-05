@@ -17,11 +17,11 @@ Die erzeugten Daten sollen realistisch genug sein, um sinnvolle SQL-Abfragen und
 
 DATABASE = "shop.db"
 
-product = {
+products = {
     "name" : [
         "Computer", "Bildschirm", "Tastatur", "Maus", "Mikrofon",
-        "Laptop", "Kamera", "HDMI-Kabel", "Stromkabel", "Festplatte",
-        "Grafikkarte", "Prozessor"
+        "Laptop", "Kamera", "HDMI-Kabel", "Stromkabel",
+        "Festplatte", "Grafikkarte", "Prozessor"
         ]
     , "price" : [
         499.99, 149.99, 19.99, 9.99, 12.99, 349.99,
@@ -33,43 +33,99 @@ product = {
         ]
 }
 
-random.seed(1)
+customers = {
+    "first_name": [
+        "Daniel", "Markus", "David", "Hansi", "Hubert",
+        "Pablo", "Sonia", "Sieglinde", "Simone", "Betti",
+        "Gerfried"
+    ],
+    "last_name": [
+        "Mustermann", "Maier", "Huber", "Schubert", "Escobar",
+        "Beethoven", "Precht", "Presley", "Hanser", "Newton",
+        "Kant", "Musterfrau"
+    ],
+    "email": [
+        "haus@mail.to", "hund@mail.to", "baum@mail.to",
+        "strasse@mail.to", "blume@mail.to", "katze@mail.to",
+        "turtle@mail.to", "teich@mail.to", "stift@mail.to",
+        "schere@mail.to", "maus@mail.to"
+    ],
+    "birth_date": [
+        "0000-01-01", "1987-03-02", "2000-07-29", "1899-12-13",
+        "1963-10-11", "1995-05-16", "2004-03-28", "1968-11-21",
+        "1999-12-31", "2000-01-01"
+    ],
+    "phone": [
+        "06601234567", "06647654321", "06769081726",
+        "06603847291", "06645529038", "06768810452",
+        "06602193746", "06647305918", "06765624087",
+        "06609472615", "06641836029", "06763058194"
+    ],
+    "address": [
+        "Hauptplatz 1, 8010 Graz",
+        "Mariahilfer Straße 45, 1060 Wien",
+        "Getreidegasse 12, 5020 Salzburg",
+        "Maria-Theresien-Straße 8, 6020 Innsbruck",
+        "Landstraße 33, 4020 Linz", "Herrengasse 17, 8010 Graz",
+        "Kärntner Straße 21, 1010 Wien",
+        "Bahnhofstraße 5, 9020 Klagenfurt",
+        "Rathausplatz 3, 3100 St. Pölten",
+        "Annenstraße 52, 8020 Graz",
+        "Domgasse 9, 5020 Salzburg",
+        "Hauptstraße 14, 7000 Eisenstadt"
+    ]
+}
 
-for x in range(5):
-    print(random.choice(product["name"]))
-    print(random.choice(product["name"]))
-    print(random.choice(product["name"]))
-    print('\n')
+orders = {
+    "customer_id": [],
+    "order_date": [
+        "2025-01-14", "2025-02-27", "2025-04-03", "2025-05-19",
+        "2025-06-30", "2025-08-12", "2025-09-24", "2025-11-06",
+        "2025-12-18", "2026-02-09", "2026-05-21", "2026-10-05"
+    ],
+    "status": ["completed", "retoured", "failed"],
 
-with connect(DATABASE) as con:
-    cur = con.cursor()
-    cur.execute(
-        """INSERT INTO ? (?)
-            VALUES (?)
+}
 
-        """, ("products", list(product.keys()),
-              ("Hi", 2.0, 2))
-    )
+product_order = {
+    "order_id": [],
+    "product_id": [],
+    "amount": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+        100, 200, 300, 500, 1000, 5000
+    ]
 
-# print(
-#     """INSERT INTO ? (?)
-#         VALUES (?)
-#
-#     """, ("products", product.keys(),
-#             map(lambda x: random.choice(product[x]), product))
-# )
+}
 
 def create_inserts(
-    database: str, table_name: str, colums: dict,
-    row_count: int, seed: int = None
+     table_name: str, columns: dict, row_count: int,
+     seed: int = None, database: str = DATABASE
     ) -> None:
 
     random.seed(seed) # takes curr time if seed's None
 
+    # results: col1, col2, col3, etc.
+    col_string = ', '.join(columns.keys())
+    # results: ?, ?, ?, etc.
+    val_string = '?, ' * len(columns.keys())
+
     with connect(database) as con:
         cur = con.cursor()
-        cur.execute(
-            """INSERT INTO ?
 
-            """
+        for x in range(row_count):
+            random_vals = []
+            for col, vals in columns.items():
+                if len(vals) == 0:
+                    continue
+                random_vals.append(random.choice(vals))
+            print(
+                f"INSERT INTO {table_name} ({col_string}) "
+                # [:-2] - leave last ', ' out
+                f"VALUES({val_string[:-2]}), {random_vals}"
             )
+
+
+create_inserts("products", products, 5, 1)
+create_inserts("customers", customers, 5, 1)
+create_inserts("orders", orders, 5, 1)
+create_inserts("product_order", product_order, 5, 1)
