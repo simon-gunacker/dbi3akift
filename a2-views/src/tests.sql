@@ -15,3 +15,11 @@ SELECT * FROM view_vereinfachte_schnittstelle;
 
 .headers on
 .mode column
+
+SELECT *
+FROM letzte_bestellung_a
+WHERE kunde_id = 42;
+
+SELECT *
+FROM letzte_bestellung_b
+WHERE kunde_id = 42;
