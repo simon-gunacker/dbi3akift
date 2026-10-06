@@ -132,4 +132,9 @@ Variante A sucht Zeile für Zeile während Variante B einen durch den Optimizer 
 
 *auf Wahrscheinlichkeiten beruhend
 
+---
+---
+Gesamtarbeitszeit : 12 Stunden
+
+
 
