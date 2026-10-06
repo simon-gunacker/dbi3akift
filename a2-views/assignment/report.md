@@ -80,7 +80,11 @@ QUERY PLAN
 `--CORRELATED SCALAR SUBQUERY 3    
    `--SEARCH b2
 ```
-Es wird sowohl ein Full Table Scan der Tabelle b  als auch für jede gefundene Zeile aus b  eine Unterabfrage mit einem Full Table Scan für Tabelle b2 durchgeführt.
+SCAN -> Es wird  ein Full Table Scan der Tabelle b durchgeführt. 
+CORRELATED SCALAR SUBQUERY 3 ->
+Scalar -> ein Wert wird zurückgegeben 
+Correlated Subquery -> die Werte ändern sich in abhängikeit der aktuellen zeile der äuseren Abfrage
+Search->sagt das nur ein subset von Tabellen Zeilen gesucht wird.
 ```text
  QUERY PLAN
 |--CO-ROUTINE letzte
