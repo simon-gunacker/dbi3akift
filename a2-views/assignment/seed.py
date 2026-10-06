@@ -4,6 +4,8 @@ import random
 conn = sqlite3.connect("datenbank.db")
 cursor = conn.cursor()
 
+random.seed(1)
+
 cursor.execute("PRAGMA foreign_keys = ON")
 cursor.execute("DROP TABLE IF EXISTS bestellposition")
 cursor.execute("DROP TABLE IF EXISTS bestellung")
@@ -83,7 +85,8 @@ bestellungen = []
 for i in range(100000):
     monat = random.randint(1, 12)
     tag = random.randint(1, 28)
-    datum = f"2024-{monat:02d}-{tag:02d}"
+    jahr = random.randint(2000, 2020)
+    datum = f"{jahr}-{monat:02d}-{tag:02d}"
     bestellungen.append((random.choice(kunden_ids), datum, random.choice(status)))
 
 cursor.executemany("INSERT INTO bestellung (kunde_id, bestelldatum, status) VALUES (?, ?, ?)", bestellungen)
@@ -109,11 +112,11 @@ bestellposition = []
 for i in range(500000):
     bestellposition.append((random.choice(bestellungen_id), random.choice(produkte_id), random.choice(menge)))
 
-cursor.execute("INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition)
+cursor.executemany("INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition)
 
 ## produkt
-bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel", "Kombizange", ""]
-preis = [10.00, 55.99, 20.55, 19.99, 05.45, 33.20]
+bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel", "Kombizange"]
+preis = [10.00, 55.99, 20.55, 19.99, 5.45, 33.20]
 lagerbestand = [0, 10, 55, 100, 99, 2, 7, 89, 43]
 produkte = []
 
