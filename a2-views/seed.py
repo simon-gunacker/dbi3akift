@@ -84,7 +84,6 @@ orders = {
         "2025-12-18", "2026-02-09", "2026-05-21", "2026-10-05"
     ],
     "status": ["completed", "retoured", "failed"],
-
 }
 
 product_order = {
@@ -94,12 +93,12 @@ product_order = {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
         100, 200, 300, 500, 1000, 5000
     ]
-
 }
 
 def create_inserts(
      table_name: str, columns: dict, row_count: int,
-     seed: int = None, database: str = DATABASE
+     seed: int = None, database: str = DATABASE,
+     has_fk: bool = False
     ) -> None:
 
     random.seed(seed) # takes curr time if seed's None
@@ -108,6 +107,7 @@ def create_inserts(
     col_string = ', '.join(columns.keys())
     # results: ?, ?, ?, etc.
     val_string = '?, ' * len(columns.keys())
+
 
     with connect(database) as con:
         cur = con.cursor()
@@ -118,14 +118,11 @@ def create_inserts(
                 if len(vals) == 0:
                     continue
                 random_vals.append(random.choice(vals))
-            print(
-                f"INSERT INTO {table_name} ({col_string}) "
-                # [:-2] - leave last ', ' out
-                f"VALUES({val_string[:-2]}), {random_vals}"
-            )
+            # [:-2] - leave last ', ' out
+            statement = f"INSERT INTO {table_name}" f"({col_string}) VALUES({val_string[:-2]})"
+            cur.execute(statement, random_vals)
 
-
-create_inserts("products", products, 5, 1)
-create_inserts("customers", customers, 5, 1)
-create_inserts("orders", orders, 5, 1)
-create_inserts("product_order", product_order, 5, 1)
+create_inserts("products", products, 10000)
+create_inserts("customers", customers, 10000)
+# create_inserts("orders", orders, 5, 1)
+# create_inserts("product_order", product_order, 5, 1)
