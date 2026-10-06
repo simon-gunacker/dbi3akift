@@ -15,6 +15,7 @@ Die erzeugten Daten sollen realistisch genug sein, um sinnvolle SQL-Abfragen und
 
 """
 
+
 DATABASE = "shop.db"
 
 products = {
@@ -77,7 +78,7 @@ customers = {
 }
 
 orders = {
-    "customer_id": [],
+    "customer_id": range(1, 10001),
     "order_date": [
         "2025-01-14", "2025-02-27", "2025-04-03", "2025-05-19",
         "2025-06-30", "2025-08-12", "2025-09-24", "2025-11-06",
@@ -87,18 +88,17 @@ orders = {
 }
 
 product_order = {
-    "order_id": [],
-    "product_id": [],
+    "order_id": range(1, 100001),
+    "product_id": range(1, 10001),
     "amount": [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
         100, 200, 300, 500, 1000, 5000
     ]
 }
 
-def create_inserts(
+def insert_data(
      table_name: str, columns: dict, row_count: int,
-     seed: int = None, database: str = DATABASE,
-     has_fk: bool = False
+     seed: int = None, database: str = DATABASE
     ) -> None:
 
     random.seed(seed) # takes curr time if seed's None
@@ -108,21 +108,49 @@ def create_inserts(
     # results: ?, ?, ?, etc.
     val_string = '?, ' * len(columns.keys())
 
-
     with connect(database) as con:
         cur = con.cursor()
 
         for x in range(row_count):
             random_vals = []
-            for col, vals in columns.items():
+            for _, vals in columns.items():
                 if len(vals) == 0:
                     continue
                 random_vals.append(random.choice(vals))
             # [:-2] - leave last ', ' out
-            statement = f"INSERT INTO {table_name}" f"({col_string}) VALUES({val_string[:-2]})"
+            statement = f"INSERT INTO {table_name}({col_string}) VALUES({val_string[:-2]})"
             cur.execute(statement, random_vals)
+            print(statement, "\n", random_vals)
 
-create_inserts("products", products, 10000)
-create_inserts("customers", customers, 10000)
-# create_inserts("orders", orders, 5, 1)
-# create_inserts("product_order", product_order, 5, 1)
+def create_orders(
+    table_name: str, order_d: dict, row_count: int,
+    seed: int = None, database: str = DATABASE
+    ):
+
+    random.seed(seed)
+
+    # results: col1, col2, col3, etc.
+    col_string = ', '.join(order_d.keys())
+    # results: ?, ?, ?, etc.
+    val_string = '?, ' * len(order_d.keys())
+
+    with connect(database) as con:
+        cur = con.cursor()
+        for order in order_d["order_id"]:
+            rand_prod_id = random.choice(order_d['product_id'])
+            rand_amount = random.choice(order_d['amount'])
+            random_vals = [order, rand_prod_id, rand_amount]
+            # [:-2] - leave last ', ' out
+            statement = f"INSERT INTO {table_name}({col_string}) VALUES({val_string[:-2]})"
+            cur.execute(statement, random_vals)
+            print(statement, "\n", random_vals)
+
+def main():
+
+    insert_data("products", products, 10000)
+    insert_data("customers", customers, 10000)
+    insert_data("orders", orders, 100000)
+    create_orders("product_order", product_order, 500000)
+
+if __name__ == "__main__":
+    main()
