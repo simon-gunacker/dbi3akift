@@ -4,6 +4,8 @@ import random
 DB = "shop.db"
 SEED = 42
 ANZAHL_KUNDEN = 10000
+ANZAHL_PRODUKT = 10000
+
 
 VORNAMEN = ["Daniela", "Sophia", "Simone", "Lisa", "Elisabeth", "Irina", "Christoph", "Philipp", "Michael", "Kersten"]
 NACHNAMEN = ["Avanzini", "Laforteza", "Raj", "Maurer", "Pusterhofer", "Karner", "Kager", "Traussnigg", "Kobos", "Schmid"]
@@ -12,6 +14,9 @@ STRASSEN = ["Hauptplatz", "Grazer Vorstadt", "Conrad-von-Hötzendorf-Straße", "
 ORTE = ["8570 Voitsberg", "8580 Köflach", "8572 Bärnbach", "8591 Maria Lankowitz",
         "8582 Rosental an der Kainach", "8563 Ligist", "8562 Mooskirchen",
         "8152 Stallhofen", "8583 Edelschrott", "8010 Graz"]
+
+BEZICHNUNGEN = ["Sleeves", "Deckbox", "Playmat", "Dice", "Booster", "Commander-Deck", 
+                "Toploader", "Binder", "Boardgame", "Cardgame"]
 
 def insert_kunde (cursor, rows):
     sql = "INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES (?, ?, ?, ?, ?, ?)"
@@ -42,10 +47,14 @@ def create_kunden():
         yield (vorname, nachname, email, geburtsdatum, telefon, adresse)
 
 def create_produkt():
-    return []
+    for x in range(ANZAHL_PRODUKT):
+        bezeichnung = f"{random.choice(BEZICHNUNGEN)} {x}"
+        preis = round(random.uniform(10, 80), 2)
+        lagerbestand = random.randint(0, 100)
+        yield (bezeichnung, preis, lagerbestand)
 
 def create_bestellung():
-    return []
+   return []
 
 def create_bestellpos():
     return []
@@ -56,8 +65,8 @@ def main():
     cursor = conn.cursor()
     
     insert_kunde(cursor, create_kunden())
-    #insert_produkt(cursor, create_produkt())
-    #insert_bestellungen (cursor, create_bestellung())
+    insert_produkt(cursor, create_produkt())
+    insert_bestellungen (cursor, create_bestellung())
     #insert_bestellpos (cursor, create_bestellpos())
 
 
