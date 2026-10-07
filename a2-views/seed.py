@@ -5,7 +5,8 @@ DB = "shop.db"
 SEED = 42
 ANZAHL_KUNDEN = 10000
 ANZAHL_PRODUKT = 10000
-ANZAHL_BESTLLUNGEN = 100000
+ANZAHL_BESTELLUNGEN = 100000
+POSITIONEN_PRO_BESTELLUNG = 5
 
 VORNAMEN = ["Daniela", "Sophia", "Simone", "Lisa", "Elisabeth", "Irina", "Christoph", "Philipp", "Michael", "Kersten"]
 NACHNAMEN = ["Avanzini", "Laforteza", "Raj", "Maurer", "Pusterhofer", "Karner", "Kager", "Traussnigg", "Kobos", "Schmid"]
@@ -33,7 +34,7 @@ def insert_bestellungen(cursor, rows):
     cursor.executemany(sql, rows)
 
 def insert_bestellpos(cursor, rows):
-    sql = "INSERT INTO bestellposition (bestellunf_id, produkt_id, menge) VALUES (?, ?, ?)"
+    sql = "INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?, ?, ?)"
     cursor.executemany(sql, rows)
 
 def create_kunden():
@@ -56,8 +57,8 @@ def create_produkt():
         yield (bezeichnung, preis, lagerbestand)
 
 def create_bestellung():
-    for x in range(ANZAHL_BESTLLUNGEN):
-        kunnden_id = random.randint(1, ANZAHL_KUNDEN)
+    for x in range(ANZAHL_BESTELLUNGEN):
+        kunden_id = random.randint(1, ANZAHL_KUNDEN)
         jahr = random.randint(2024, 2025)
         monat = random.randint(1,12)
         tag = random.randint(1,28)
@@ -66,10 +67,15 @@ def create_bestellung():
         sekunde = random.randint(0, 59)
         bestelldatum = f"{jahr}-{monat:02d}-{tag:02d} {stunde:02d}:{minute:02d}:{sekunde:02d}"
         satus = random.choice(STATUS)
-        yield (kunnden_id, bestelldatum, satus)
+        yield (kunden_id, bestelldatum, satus)
 
 def create_bestellpos():
-    return []
+    for bestellung_id in range(1, ANZAHL_BESTELLUNGEN + 1):
+        # 5 verschieden produkt ids für eine bestellung
+        produkt_ids = random.sample(range(1, ANZAHL_PRODUKT + 1), POSITIONEN_PRO_BESTELLUNG)
+        for produkt_id in produkt_ids:
+            menge= random.randint(1, 5)
+            yield (bestellung_id, produkt_id, menge)
 
 def main():
     random.seed(SEED)
@@ -79,8 +85,7 @@ def main():
     insert_kunde(cursor, create_kunden())
     insert_produkt(cursor, create_produkt())
     insert_bestellungen (cursor, create_bestellung())
-    #insert_bestellpos (cursor, create_bestellpos())
-
+    insert_bestellpos (cursor, create_bestellpos())
 
     conn.commit()
     conn.close()
