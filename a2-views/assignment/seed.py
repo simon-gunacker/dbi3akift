@@ -122,14 +122,14 @@ for prodk_id in produkt_id:
 
 menge = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-bestellposition = set()
+bestellposition = []
 
 while len(bestellposition) < 500000:
-    bestellposition.add((
-        random.choice(bestellungen_id),
-        random.choice(produkte_id),
-        random.choice(menge)
-    ))
+    bestellung = random.choice(bestellungen_id)
+    produkt = random.choice(produkte_id)
+
+    if (bestellung, produkt) not in bestellposition:
+        bestellposition.append((bestellung, produkt, random.choice(menge)))
 
 cursor.executemany("INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition)
 
