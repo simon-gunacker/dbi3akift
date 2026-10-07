@@ -125,11 +125,14 @@ class Product:
         self.cur = self.db.cursor()
         self.table = table
         self.name = ""
+        self.namePool = random.sample(range(1, 10001), 10000)
+        self.nameIndex = len(self.namePool)
         self.price = ""
         self.storageAmount = 0
 
     def setName(self):
-        self.name ="Produkt " + str(random.randrange(1, 10001))
+        self.nameIndex -= 1
+        self.name ="Produkt " + str(self.namePool[self.nameIndex])
 
     def setPrice(self):
         self.price = str(random.randrange(10, 1001, 10) - 0.1) + "€"
@@ -230,7 +233,7 @@ if __name__ == "__main__":
         bestellpositionsliste.append(bestellposition.getOrderposition())
         #curmain.execute("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES(?, ?, ?)", bestellposition.getOrderposition())
 
-    #curmain.executemany("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES(?, ?, ?)", bestellpositionsliste)
+    curmain.executemany("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES(?, ?, ?)", bestellpositionsliste)
     print(curmain.execute("SELECT COUNT(bestellung_id) FROM bestellposition").fetchone()[0])
     dbmain.commit()
 
