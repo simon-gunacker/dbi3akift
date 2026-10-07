@@ -1,16 +1,18 @@
 CREATE TABLE IF NOT EXISTS kunde (
 	id INTEGER PRIMARY KEY,
-	vorname VARCHAR,
-	nachname VARCHAR,
-	email VARCHAR,
-	geburtsdatum DATE,
-	telefon VARCHAR,
-	adresse VARCHAR
+	vorname VARCHAR NOT NULL,
+	nachname VARCHAR NOT NULL,
+	email VARCHAR UNIQUE,
+	geburtsdatum DATE NOT NULL,
+	telefon VARCHAR UNIQUE,
+	adresse VARCHAR NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS bestellposition (
-	bestellung_id INTEGER PRIMARY KEY,
-	produkt_id INTEGER PRIMARY KEY,
+	bestellung_id INTEGER,
+	produkt_id INTEGER,
+	menge INTEGER,
+	PRIMARY KEY (bestellung_id, produkt_id),
 	FOREIGN KEY(bestellung_id) REFERENCES bestellung(id),
 	FOREIGN KEY(produkt_id) REFERENCES produkt(id)
 );
@@ -28,3 +30,4 @@ CREATE TABLE IF NOT EXISTS produkt (
 	preis DECIMAL,
 	lagerbestand INTEGER
 );
+
