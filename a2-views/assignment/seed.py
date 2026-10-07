@@ -123,15 +123,18 @@ for prodk_id in produkt_id:
 menge = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 bestellposition = []
+kombinationen = set()
 
 while len(bestellposition) < 500000:
     bestellung = random.choice(bestellungen_id)
     produkt = random.choice(produkte_id)
 
-    if (bestellung, produkt) not in bestellposition:
+    # Keine doppelte Bestellung mit demselben Produkt
+    if (bestellung, produkt) not in kombinationen:
+        kombinationen.add((bestellung, produkt))
         bestellposition.append((bestellung, produkt, random.choice(menge)))
 
 cursor.executemany("INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition)
-
+print("Datenbank erfolgreich erstellt und befüllt!")
 conn.commit()
 conn.close()
