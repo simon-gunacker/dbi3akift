@@ -105,9 +105,9 @@ CO-ROUTINE: ist eine Unterabfrage, deren Daten während der Ausführung Zeile f�
 
 SCAN: Es wird  ein Full Table Scan der Tabelle bestellung dann der Tabelle b durchgeführt.
 
-BLOOM FILTER: " eine probabilistische* Datenstruktur, mit deren Hilfe sehr schnell festgestellt werden kann, welche Daten in einem Datenstrom schon einmal vorgekommen sind und welche erstmals auftreten"(aus https://de.wikipedia.org/w/index.php?title=Bloomfilter&oldid=260174336) schließt nicht vorhandene Kunden-IDs aus
+BLOOM FILTER: " eine probabilistische* Datenstruktur, mit deren Hilfe sehr schnell festgestellt werden kann, welche Daten in einem Datenstrom schon einmal vorgekommen sind und welche erstmals auftreten"(aus https://de.wikipedia.org/w/index.php?title=Bloomfilter&oldid=260174336) schließt nicht vorhandene Kunden-IDs aus.
 
-(kunde_id=?): Suchbedingung mit ? als Platzhalter für variablen Wert
+(kunde_id=?): Suchbedingung mit ? als Platzhalter für variablen Wert.
 
 SEARCH: sagt das nur ein Subset von Tabellen Zeilen abgesucht wird in diesem Fall letzte.
 
