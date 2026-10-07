@@ -5,7 +5,7 @@ DB = "shop.db"
 SEED = 42
 ANZAHL_KUNDEN = 10000
 ANZAHL_PRODUKT = 10000
-
+ANZAHL_BESTLLUNGEN = 100000
 
 VORNAMEN = ["Daniela", "Sophia", "Simone", "Lisa", "Elisabeth", "Irina", "Christoph", "Philipp", "Michael", "Kersten"]
 NACHNAMEN = ["Avanzini", "Laforteza", "Raj", "Maurer", "Pusterhofer", "Karner", "Kager", "Traussnigg", "Kobos", "Schmid"]
@@ -17,6 +17,8 @@ ORTE = ["8570 Voitsberg", "8580 Köflach", "8572 Bärnbach", "8591 Maria Lankowi
 
 BEZICHNUNGEN = ["Sleeves", "Deckbox", "Playmat", "Dice", "Booster", "Commander-Deck", 
                 "Toploader", "Binder", "Boardgame", "Cardgame"]
+
+STATUS = ["offen", "bezahlt", "versendet", "zugestellt", "storniert"]
 
 def insert_kunde (cursor, rows):
     sql = "INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES (?, ?, ?, ?, ?, ?)"
@@ -54,7 +56,17 @@ def create_produkt():
         yield (bezeichnung, preis, lagerbestand)
 
 def create_bestellung():
-   return []
+    for x in range(ANZAHL_BESTLLUNGEN):
+        kunnden_id = random.randint(1, ANZAHL_KUNDEN)
+        jahr = random.randint(2024, 2025)
+        monat = random.randint(1,12)
+        tag = random.randint(1,28)
+        stunde = random.randint(0, 23)
+        minute = random.randint(0, 59)
+        sekunde = random.randint(0, 59)
+        bestelldatum = f"{jahr}-{monat:02d}-{tag:02d} {stunde:02d}:{minute:02d}:{sekunde:02d}"
+        satus = random.choice(STATUS)
+        yield (kunnden_id, bestelldatum, satus)
 
 def create_bestellpos():
     return []
