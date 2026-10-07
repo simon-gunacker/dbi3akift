@@ -8,6 +8,14 @@ random.seed(1) # Startwert 1
 
 conn.executescript(
     """
+    DROP TABLE IF EXISTS kunde;
+    DROP TABLE IF EXISTS produkt;
+    DROP TABLE IF EXISTS bestellung;
+    DROP TABLE IF EXISTS bestellposition;
+    """
+    )
+conn.executescript(
+    """
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS kunde (
@@ -119,7 +127,7 @@ def kunde_adresse():
 def produkt_bezeichnung():
     liste_produkte = []
 
-    liste_produkte.extend(random.choices(data.produkt_namen, k=3))
+    liste_produkte.extend(random.choices(data.produkt_namen, k=10_000))
 
     return liste_produkte
 
@@ -141,5 +149,12 @@ def produkt_lagerbestand():
 
     return liste_lagerbestand
 
-print(produkt_lagerbestand())
 
+
+zipped_kunde = zip(kunde_vornamen(), kunde_nachnamen(), kunde_email(), kunde_geburtsdatum(), kunde_telefonnummer(), kunde_adresse())
+conn.executemany("INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES(?,?,?,?,?,?)", zipped_kunde)
+conn.commit()
+
+zipped_produkt = zip(produkt_bezeichnung(), produkt_preis(), produkt_lagerbestand())
+conn.executemany("INSERT INTO produkt(bezeichnung, preis, lagerbestand) VALUES(?,?,?)", zipped_produkt)
+conn.commit()
