@@ -21,7 +21,8 @@ table = """
         email VARCHAR(255),
         geburtsdatum DATE,
         telefon VARCHAR(255),
-        adresse VARCHAR(255)
+        adresse VARCHAR(255),
+        hausnummer INTEGER
     );
 
     CREATE TABLE IF NOT EXISTS produkt(
@@ -66,10 +67,23 @@ for i in range(10000):
 
     telefon = f"{random.randint(100000000, 999999999)}"
 
+    adress = ["Seestraße", "Blumenstraße", "Sonnenweg", "Birkenstraße", "Waldgasse", "Rosenweg", "Ahornstraße", "Lindenweg", "Fichtenstraße", "Kirschgasse"]
+    adresse = random.choice(adress)
+    hausnummer = random.randint(0, 9)
+    kunde.append((first_name, last_name, email, geburtsdatum, telefon, adresse, hausnummer))
 
-    kunde.append((first_name, last_name, email, geburtsdatum, telefon))
+cursor.executemany("INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon, adresse, hausnummer) VALUES (?,?,?,?,?,?,?)", kunde)
 
-cursor.executemany("INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon) VALUES (?,?,?,?,?)", kunde)
+## produkt
+bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel", "Kombizange"]
+preis = [10.00, 55.99, 20.55, 19.99, 5.45, 33.20]
+lagerbestand = [0, 10, 55, 100, 99, 2, 7, 89, 43]
+produkte = []
+
+for produkt in range(10000):
+    produkte.append((random.choice(bezeichnung), random.choice(preis), random.choice(lagerbestand)))
+
+cursor.executemany("INSERT INTO produkt (bezeichnung, preis, lagerbestand) VALUES (?, ?, ?)", produkte)
 
 ## bestellung 
 cursor.execute("SELECT id FROM kunde")
@@ -92,7 +106,7 @@ for i in range(100000):
 cursor.executemany("INSERT INTO bestellung (kunde_id, bestelldatum, status) VALUES (?, ?, ?)", bestellungen)
 
 ## bestellposition
-cursor.fetchall("SELECT id FROM bestellung")
+cursor.execute("SELECT id FROM bestellung")
 bestellung_id = cursor.fetchall()
 
 cursor.execute("SELECT id FROM produkt")
@@ -108,22 +122,16 @@ for prodk_id in produkt_id:
 
 menge = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-bestellposition = []
-for i in range(500000):
-    bestellposition.append((random.choice(bestellungen_id), random.choice(produkte_id), random.choice(menge)))
+bestellposition = set()
+
+while len(bestellposition) < 500000:
+    bestellposition.add((
+        random.choice(bestellungen_id),
+        random.choice(produkte_id),
+        random.choice(menge)
+    ))
 
 cursor.executemany("INSERT INTO bestellposition (bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition)
-
-## produkt
-bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel", "Kombizange"]
-preis = [10.00, 55.99, 20.55, 19.99, 5.45, 33.20]
-lagerbestand = [0, 10, 55, 100, 99, 2, 7, 89, 43]
-produkte = []
-
-for produkt in range(10000):
-    produkte.append((random.choice(bezeichnung), random.choice(preis), random.choice(lagerbestand)))
-
-cursor.executemany("INSERT INTO produkt (bezeichnung, preis, lagerbestand) VALUES (?, ?, ?)", produkte)
 
 conn.commit()
 conn.close()
