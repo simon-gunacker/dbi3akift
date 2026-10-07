@@ -102,6 +102,17 @@ def produkt_lagerbestand():
 
     return liste_lagerbestand
 
+def bestellung_kunde_id():
+    kunde_ids = []
+    ids = conn.execute("SELECT id FROM kunde").fetchall()
+
+    for i in ids:
+        kunde_ids.append(i[0])
+
+    liste_kunde_id = []
+    liste_kunde_id.extend(random.choices(kunde_ids, k = 100_000))
+
+    return len(liste_kunde_id)
 
 
 zipped_kunde = zip(kunde_vornamen(), kunde_nachnamen(), kunde_email(), kunde_geburtsdatum(), kunde_telefonnummer(), kunde_adresse())
@@ -111,3 +122,6 @@ conn.commit()
 zipped_produkt = zip(produkt_bezeichnung(), produkt_preis(), produkt_lagerbestand())
 conn.executemany("INSERT INTO produkt(bezeichnung, preis, lagerbestand) VALUES(?,?,?)", zipped_produkt)
 conn.commit()
+
+
+#print(bestellung_kunde_id())
