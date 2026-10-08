@@ -1,7 +1,7 @@
 import sqlite3
 import data
 import random
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 conn = sqlite3.connect("model.db")
 random.seed(1) # Startwert 1
@@ -112,7 +112,20 @@ def bestellung_kunde_id():
     liste_kunde_id = []
     liste_kunde_id.extend(random.choices(kunde_ids, k = 100_000))
 
-    return len(liste_kunde_id)
+    return liste_kunde_id
+
+def bestellung_bestelldatum():
+    datum_start = datetime(year=2010, month=10, day=1)
+    datum_bis = datetime(year=2026, month=10, day=7)
+
+    sekunden = int((datum_bis - datum_start).total_seconds())
+    #zufalls_tag = datum_start + timedelta(seconds=(random.randint(0, sekunden)))
+    
+    liste_bestelldatum = [(datum_start + timedelta(seconds=(random.randint(0, sekunden)))) for i in range(100_000)]
+        
+    #print(liste_bestelldatum)
+    #print(type(liste_bestelldatum))
+    return liste_bestelldatum
 
 
 zipped_kunde = zip(kunde_vornamen(), kunde_nachnamen(), kunde_email(), kunde_geburtsdatum(), kunde_telefonnummer(), kunde_adresse())
@@ -124,4 +137,5 @@ conn.executemany("INSERT INTO produkt(bezeichnung, preis, lagerbestand) VALUES(?
 conn.commit()
 
 
-#print(bestellung_kunde_id())
+#print(bestellung_bestelldatum())
+#print(timedelta(seconds=5))
