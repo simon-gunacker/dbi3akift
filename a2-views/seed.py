@@ -234,7 +234,7 @@ if __name__ == "__main__":
         #curmain.execute("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES(?, ?, ?)", bestellposition.getOrderposition())
 
     curmain.executemany("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES(?, ?, ?)", bestellpositionsliste)
-    print(curmain.execute("SELECT COUNT(bestellung_id) FROM bestellposition").fetchone()[0])
+    print(curmain.execute("SELECT COUNT(DISTINCT(produkt_id)), count(produkt_id) FROM bestellposition").fetchone())
     dbmain.commit()
 
     #print(curmain.execute("SELECT COUNT(id), COUNT(DISTINCT(email)) FROM kunde").fetchone())
