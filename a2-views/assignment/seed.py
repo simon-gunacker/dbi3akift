@@ -6,50 +6,10 @@ cursor = conn.cursor()
 
 random.seed(1)
 
-cursor.execute("PRAGMA foreign_keys = ON")
-cursor.execute("DROP TABLE IF EXISTS bestellposition")
-cursor.execute("DROP TABLE IF EXISTS bestellung")
-cursor.execute("DROP TABLE IF EXISTS produkt")
-cursor.execute("DROP TABLE IF EXISTS kunde")
+with open("model.sql", "r", encoding="utf-8") as f:
+    model = f.read()
 
-## CREATE TABLE
-table = """
-    CREATE TABLE IF NOT EXISTS kunde(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        vorname VARCHAR(255),
-        nachname VARCHAR(255),
-        email VARCHAR(255),
-        geburtsdatum DATE,
-        telefon VARCHAR(255),
-        adresse VARCHAR(255),
-        hausnummer INTEGER
-    );
-
-    CREATE TABLE IF NOT EXISTS produkt(
-            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-            bezeichnung VARCHAR(255) NOT NULL,
-            preis DECIMAL,
-            lagerbestand INTEGER
-        );
-
-    CREATE TABLE IF NOT EXISTS bestellung(
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        kunde_id INTEGER NOT NULL,
-        bestelldatum DATE,
-        status VARCHAR(255),
-        FOREIGN KEY (kunde_id) REFERENCES kunde (id)
-    );
-
-    CREATE TABLE IF NOT EXISTS bestellposition(
-        bestellung_id INTEGER,
-        produkt_id INTEGER,
-        menge INTEGER,
-        PRIMARY KEY (bestellung_id, produkt_id),
-        FOREIGN KEY (produkt_id) REFERENCES produkt (id),
-        FOREIGN KEY (bestellung_id) REFERENCES bestellung (id)
-    );
-"""
-cursor.executescript(table)
+cursor.executescript(model)
 
 ## kunde
 first = ["Bilal", "Thomas", "Manuel", "Asmir", "Marin", "Diyar", "Mario", "Yusuf", "Jakob", "Yunus"]
@@ -60,7 +20,7 @@ for i in range(10000):
     last_name = random.choice(last)
     email = f"{first_name}.{last_name}{i}@gmail.com"
 
-    jahr = random.randint(2000, 2020)
+    jahr = random.randint(1950, 2020)
     monat = random.randint(1, 12)
     tag = random.randint(1 ,28)
     geburtsdatum = f"{jahr}-{monat:02d}-{tag:02d}"
@@ -69,14 +29,16 @@ for i in range(10000):
 
     adress = ["Seestraße", "Blumenstraße", "Sonnenweg", "Birkenstraße", "Waldgasse", "Rosenweg", "Ahornstraße", "Lindenweg", "Fichtenstraße", "Kirschgasse"]
     adresse = random.choice(adress)
-    hausnummer = random.randint(0, 9)
+    hausnummer = random.randint(1, 9)
     kunde.append((first_name, last_name, email, geburtsdatum, telefon, adresse, hausnummer))
 
 cursor.executemany("INSERT INTO kunde (vorname, nachname, email, geburtsdatum, telefon, adresse, hausnummer) VALUES (?,?,?,?,?,?,?)", kunde)
 
 ## produkt
-bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel", "Kombizange"]
-preis = [10.00, 55.99, 20.55, 19.99, 5.45, 33.20]
+bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel",
+                "Kombizange","Bohrmaschine", "Akkuschrauber", "Säge", "Feile", "Maßband",
+                  "Schleifpapier", "Schraubendreher-Set", "Handschuhe", "Leiter", "Cuttermesser"]
+preis = [10.00, 20.55, 19.99, 5.45, 33.20, 89.99, 59.99, 24.99, 7.99, 6.49, 3.99, 29.99, 9.99, 119.99, 4.99]
 lagerbestand = [0, 10, 55, 100, 99, 2, 7, 89, 43]
 produkte = []
 
@@ -99,7 +61,7 @@ bestellungen = []
 for i in range(100000):
     monat = random.randint(1, 12)
     tag = random.randint(1, 28)
-    jahr = random.randint(2000, 2020)
+    jahr = random.randint(1950, 2020)
     datum = f"{jahr}-{monat:02d}-{tag:02d}"
     bestellungen.append((random.choice(kunden_ids), datum, random.choice(status)))
 
