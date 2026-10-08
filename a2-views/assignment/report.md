@@ -129,12 +129,18 @@ Dadurch muss die Datenbank nach dem Durchsuchen des Index nicht mehr auf die eig
 Variante A sucht Zeile für Zeile während Variante B einen durch den Optimizer (Abfrageoptimierer)erstellten Index benutzt und damit deutlich schneller ist.
 
 ---
+### Conclusio
+
+Eine View vereinfacht zwar die Handahbung und Lesbarkeit im Code, aber wie aus den Messungen hervorgeht, jedoch nicht die Komplexität der zugrunde liegenden Abfrage noch deren Perfomanz.
+
+---
+
 
 *auf Wahrscheinlichkeiten beruhend
 
 ---
 ---
-Gesamtarbeitszeit : 12 Stunden
+Gesamtarbeitszeit : 12 Stunden 15 Minuten
 
 
 
