@@ -82,6 +82,11 @@ def main():
     conn = sqlite3.connect(DB)
     cursor = conn.cursor()
     
+    cursor.execute("DELETE FROM kunde")
+    cursor.execute("DELETE FROM produkt")
+    cursor.execute("DELETE FROM bestellposition")
+    cursor.execute("DELETE FROM bestellung")
+
     insert_kunde(cursor, create_kunden())
     insert_produkt(cursor, create_produkt())
     insert_bestellungen (cursor, create_bestellung())
