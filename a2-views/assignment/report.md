@@ -131,7 +131,7 @@ Variante A sucht Zeile für Zeile während Variante B einen durch den Optimizer 
 ---
 ### Conclusio
 
-Eine View vereinfacht zwar die Handahbung und Lesbarkeit im Code, aber wie aus den Messungen hervorgeht, jedoch nicht die Komplexität der zugrunde liegenden Abfrage noch deren Perfomanz.
+Eine View vereinfacht zwar die Handhabung und Lesbarkeit im Code, aber wie aus den Messungen hervorgeht, jedoch nicht die Komplexität der zugrunde liegenden Abfrage noch deren Perfomanz.
 
 ---
 
