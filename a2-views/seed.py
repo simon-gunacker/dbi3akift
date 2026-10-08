@@ -1,5 +1,6 @@
 import sqlite3 
 import random
+import calendar
 
 DB = "shop.db"
 SEED = 42
@@ -42,7 +43,10 @@ def create_kunden():
         vorname = random.choice(VORNAMEN)
         nachname = random.choice(NACHNAMEN)
         email = f"{vorname}.{nachname}{x}@gmail.com".lower()
-        geburtsdatum = f"{random.randint(1980, 2004)}-{random.randint(1,12):02d}-{random.randint(1,28):02d}"
+        jahr = random.randint(1980, 2004)
+        monat = random.randint(1,12)
+        tag = random.randint(1, calendar.monthrange(jahr, monat)[1])
+        geburtsdatum = f"{jahr}-{monat:02d}-{tag:02d}"
         telefon = f"0680{random.randint(1000000, 9999999)}"
         strasse = random.choice(STRASSEN)
         ort = random.choice(ORTE)
@@ -61,7 +65,7 @@ def create_bestellung():
         kunden_id = random.randint(1, ANZAHL_KUNDEN)
         jahr = random.randint(2024, 2025)
         monat = random.randint(1,12)
-        tag = random.randint(1,28)
+        tag = random.randint(1, calendar.monthrange(jahr, monat)[1])
         stunde = random.randint(0, 23)
         minute = random.randint(0, 59)
         sekunde = random.randint(0, 59)
