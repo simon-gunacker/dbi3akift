@@ -196,8 +196,13 @@ if __name__ == "__main__":
         curmain.execute("DROP TABLE IF EXISTS produkt")
         curmain.execute("DROP TABLE IF EXISTS bestellposition")
 
-    filldoc = open("fill.sql", "r")
-    for y in filldoc.read().split(";"):
+    modeldoc = open("model.sql", "r")
+    for y in modeldoc.read().split(";"):
+        curmain.execute(y)
+    dbmain.commit()
+
+    viewsdoc = open("views.sql", "r")
+    for y in viewsdoc.read().split(";"):
         curmain.execute(y)
     dbmain.commit()
 
@@ -238,5 +243,5 @@ if __name__ == "__main__":
     dbmain.commit()
 
     #print(curmain.execute("SELECT COUNT(id), COUNT(DISTINCT(email)) FROM kunde").fetchone())
-    print(curmain.execute(f"SELECT * FROM kunde WHERE email = '{curmain.execute("SELECT DISTINCT(email) FROM kunde").fetchone()[0]}'").fetchall())
+    print(curmain.execute(f"SELECT * from gesamtpreis_bestellung WHERE").fetchmany(10))
 
