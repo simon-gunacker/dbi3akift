@@ -243,6 +243,6 @@ if __name__ == "__main__":
     dbmain.commit()
 
     #print(curmain.execute("SELECT COUNT(id), COUNT(DISTINCT(email)) FROM kunde").fetchone())
-    print(curmain.execute(f"SELECT * from gesamtpreis_bestellung").fetchmany(10))
-    print(curmain.execute(f"SELECT * from join_view").fetchmany(10))
+    [print(f"{row}") for row in curmain.execute("SELECT * from gesamtpreis_bestellung").fetchmany(10)]
+    [print(f"{row}") for row in curmain.execute("SELECT * from join_view").fetchmany(10)]
 
