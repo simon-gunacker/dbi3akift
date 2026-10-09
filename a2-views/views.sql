@@ -30,6 +30,7 @@ WHERE o.order_date = (
     SELECT MAX(o2.order_date)
     FROM orders o2
     WHERE o2.customer_id = o.customer_id
+    LIMIT 10000
 );
 
 CREATE VIEW IF NOT EXISTS letzte_bestellung_b AS
@@ -46,4 +47,6 @@ JOIN (
     GROUP BY customer_id
 ) letzte
     ON letzte.customer_id = o.customer_id
-   AND letzte.order_date = o.order_date;
+    AND letzte.order_date = o.order_date
+    LIMIT 10000
+;
