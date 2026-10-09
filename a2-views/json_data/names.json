@@ -1,3 +1,41 @@
-{   "vorname":  ["Anna", "Emma", "Sophia", "Ulrike", "Lena", "Paul", "Jonas", "Jakob", "Elias", "Lukas"], 
-    "nachname": ["Gruber", "Wagner", "Steiner", "Pichler", "Bauer", "Hofer", "Mayer", "Schmid", "Berger", "Leitner"]
+{
+  "first_names": [
+    "Anna",
+    "Emma",
+    "Sophia",
+    "Ulrike",
+    "Lena",
+    "Paul",
+    "Jonas",
+    "Jakob",
+    "Elias",
+    "Lukas",
+    "Erich",
+    "Karl",
+    "Robert",
+    "Friedrich",
+    "Heinz",
+    "Lieselotte",
+    "Renate",
+    "Carolin",
+    "Katharina",
+    "Franziska"
+  ],
+  "last_names": [
+    "Gruber",
+    "Wagner",
+    "Steiner",
+    "Pichler",
+    "Bauer",
+    "Hofer",
+    "Mayer",
+    "Schmid",
+    "Berger",
+    "Leitner",
+    "Krautwaschl",
+    "Sommer",
+    "Herbst",
+    "Winter",
+    "Ullmann"
+  ]
 }
