@@ -16,7 +16,7 @@ Hierdurch können alle fehlgeschlagenen Bestellungen sehr einfach abgerufen werd
 ## Aufgabe 7 - Untersuchung und Report
 
 ### Views
-* Durch Views können komplexe abfragen als Tabelle gespeichert werden und somit abfragen, die darauf aufbauen, vereinfacht werden. 
+Durch Views können komplexe abfragen als Tabelle gespeichert werden und somit abfragen, die darauf aufbauen, vereinfacht werden. 
 
 Vorteile:
 * vereinfachte Abfragen
@@ -42,12 +42,12 @@ WHERE customer_id = 10000
 LIMIT 10000;
 ```
 
->Der SELECT alle Kunden mit der id 42 von View a dauert im Schnitt:
->        0.05s.
->Der gleiche SELECT von View b dauert durchschnittlich: 
->        0.01s
+**Der SELECT alle Kunden mit der id 42 von View a dauert im Schnitt:**
+        0.05s.
+**Der gleiche SELECT von View b dauert durchschnittlich:**
+        0.01s
 
-Dass die SQL-Abfrage einer View bei weiteren Abfragen nicht sichtbar ist, kann einerseits problematisch sein, da man eventuell auftretende Performanceverluste nicht direkt nachvollziehen kann. Perfomanceverluste könnten aber auch dadurch auftreten, dass man Folgeabfragen nicht direkt darauf anpassen kann. 
+Dass die SQL-Abfrage einer View bei weiteren Abfragen nicht sichtbar ist, kann einerseits problematisch sein, da man eventuell auftretende Performanceverluste nicht direkt nachvollziehen kann. Schlechtere Laufleistung könnte aber auch dadurch auftreten, dass man Folgeabfragen nicht direkt darauf anpassen kann. 
 
 `SUB QUERY PLAN`:  
 * **Bei View A** - Tabelle `orders` wird gescannt (vollständig durchsucht) und die aus dem Subselect entstandene Tabelle wird durchsucht, was heißt, dass nicht die gesamte Tabelle durchsucht wird.
@@ -58,4 +58,4 @@ Bei View A sieht man, dass der innere Select für jeden Datensatz des äußeren 
 
 ## Schlussfolgerung
 
-Die Beispiele der beiden Views zeigen, dass die Komplexität von Abfragen wesentlich vereinfacht werden können. Dies gilt jedoch nicht für die Performance, vor allem, wenn durch die Art der Abfrage wesentliche Verluste gemacht werden, wie es aus den Messungen hervorgeht, braucht View A um das 5-fache länger, als View B.
+Die Beispiele der beiden Views zeigen, dass die Komplexität von Abfragen wesentlich vereinfacht werden können. Dies gilt jedoch nicht für die Performance, vor allem, wenn durch die Art der Abfrage wesentliche Verluste gemacht werden. Wie aus den Messungen hervorgeht, braucht View A um das 5-fache länger, als View B.
