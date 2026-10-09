@@ -123,10 +123,15 @@ def bestellung_bestelldatum():
     
     liste_bestelldatum = [(datum_start + timedelta(seconds=(random.randint(0, sekunden)))) for i in range(100_000)]
         
-    #print(liste_bestelldatum)
-    #print(type(liste_bestelldatum))
     return liste_bestelldatum
 
+def bestellung_status():
+    statusse = ["in_bearbeitung", "unterwegs", "zugestellt", "storniert"]
+    
+    liste_status = []
+    liste_status.extend(random.choices(statusse, k=100_000))
+
+    return liste_status
 
 zipped_kunde = zip(kunde_vornamen(), kunde_nachnamen(), kunde_email(), kunde_geburtsdatum(), kunde_telefonnummer(), kunde_adresse())
 conn.executemany("INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES(?,?,?,?,?,?)", zipped_kunde)
@@ -136,6 +141,8 @@ zipped_produkt = zip(produkt_bezeichnung(), produkt_preis(), produkt_lagerbestan
 conn.executemany("INSERT INTO produkt(bezeichnung, preis, lagerbestand) VALUES(?,?,?)", zipped_produkt)
 conn.commit()
 
+zipped_bestellung = zip(bestellung_kunde_id(), bestellung_bestelldatum(), bestellung_status())
+conn.executemany("INSERT INTO bestellung(kunde_id, bestelldatum, status) VALUES(?,?,?)", zipped_bestellung)
+conn.commit()
 
-#print(bestellung_bestelldatum())
-#print(timedelta(seconds=5))
+#print(bestellung_status())
