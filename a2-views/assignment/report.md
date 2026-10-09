@@ -66,6 +66,8 @@ und bei 10.000 Aufrufen  rund 950,11 Sekunden (ca. 15:50 min).
 View B benötigt bei 1.000 Aufrufen rund 10,21 Sekunden 
 und bei 10.000 Aufrufen rund 107,19 Sekunden(ca. 1:47 Minuten).
 
+Bei 1.000 Aufrufen benötigt View A um circa 9,15 mal und bei 10.000 Aufrufen circa 8,86 mal länger.
+
 ---
 
 ### Warum ist es problematisch, dass die interne SQL-Abfrage einer View bei der Verwendung nicht unmittelbar sichtbar ist?
@@ -131,7 +133,7 @@ Variante A sucht Zeile für Zeile während Variante B einen durch den Optimizer 
 ---
 ### Conclusio
 
-Eine View vereinfacht zwar die Handhabung und Lesbarkeit im Code, aber wie aus den Messungen hervorgeht, jedoch nicht die Komplexität der zugrunde liegenden Abfrage noch deren Perfomanz.
+Eine View vereinfacht zwar die Handhabung und Lesbarkeit im Code, aber wie aus den Messungen hervorgeht(bei 1.000 Aufrufen ist View A um den Faktor 9,15 und bei 10.000 Aufrufen um 8,86 langsamer), jedoch nicht die Komplexität der zugrunde liegenden Abfrage noch deren Perfomanz.
 
 ---
 
@@ -140,7 +142,7 @@ Eine View vereinfacht zwar die Handhabung und Lesbarkeit im Code, aber wie aus d
 
 ---
 ---
-Gesamtarbeitszeit : 12 Stunden 15 Minuten
+Gesamtarbeitszeit : 12 Stunden 20 Minuten
 
 
 
