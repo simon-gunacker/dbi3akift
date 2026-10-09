@@ -17,9 +17,9 @@ def main():
         / 1000
 
     print(
-        "Der SELECT alle Kunden mit der id 42 von view a "
+        "Der SELECT alle Kunden mit der id 42 von View a "
         f"dauert im Schnitt:\n\t{time_a:.2f}s."
-        "\nDer gleiche SELECT von view b dauert "
+        "\nDer gleiche SELECT von View b dauert "
         f"durchschnittlich: \n\t{time_b:.2f}s"
           )
 
