@@ -1,0 +1,61 @@
+{
+  "cities": [
+    {
+      "city": "Wien",
+      "zip": "1010",
+      "country": "Austria"
+    },
+    {
+      "city": "Sankt Poelten",
+      "zip": "3100",
+      "country": "Austria"
+    },
+    {
+      "city": "Eisenstadt",
+      "zip": "7000",
+      "country": "Austria"
+    },
+    {
+      "city": "Linz",
+      "zip": "4020",
+      "country": "Austria"
+    },
+    {
+      "city": "Salzburg",
+      "zip": "5020",
+      "country": "Austria"
+    },
+    {
+      "city": "Graz",
+      "zip": "8010",
+      "country": "Austria"
+    },
+    {
+      "city": "Klagenfurt",
+      "zip": "9020",
+      "country": "Austria"
+    },
+    {
+      "city": "Innsbruck",
+      "zip": "6020",
+      "country": "Austria"
+    },
+    {
+      "city": "Bregenz",
+      "zip": "6900",
+      "country": "Austria"
+    }
+  ],
+  "streets": [
+    "Ringstrasse",
+    "Hauptstrasse",
+    "Bahnhofstrasse",
+    "Schulstrasse",
+    "Kirchengasse",
+    "Parkstrasse",
+    "Gartenstrasse",
+    "Berggasse",
+    "Feldgasse",
+    "Marktstrasse"
+  ]
+}
