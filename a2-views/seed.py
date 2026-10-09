@@ -133,6 +133,27 @@ def bestellung_status():
 
     return liste_status
 
+def bestellposition():
+    # geteilter primärschlüssel, daher zusammen in einer funktion
+    bestellung_ids = []
+    bestell_ids = conn.execute("SELECT id FROM bestellung").fetchall()
+    for i in bestell_ids:
+        bestellung_ids.append(i[0])
+
+    produkt_ids = []
+    prod_ids = conn.execute("SELECT id FROM produkt").fetchall()
+    for i in prod_ids:
+        produkt_ids.append(i[0])
+    
+    ganze_position = []
+    for b in bestellung_ids:
+        produkte = random.sample(produkt_ids, k=5)
+        for p in produkte:
+            menge = random.randint(1,25)
+            ganze_position.append((b, p, menge))
+
+    return ganze_position
+
 zipped_kunde = zip(kunde_vornamen(), kunde_nachnamen(), kunde_email(), kunde_geburtsdatum(), kunde_telefonnummer(), kunde_adresse())
 conn.executemany("INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES(?,?,?,?,?,?)", zipped_kunde)
 conn.commit()
@@ -145,4 +166,7 @@ zipped_bestellung = zip(bestellung_kunde_id(), bestellung_bestelldatum(), bestel
 conn.executemany("INSERT INTO bestellung(kunde_id, bestelldatum, status) VALUES(?,?,?)", zipped_bestellung)
 conn.commit()
 
-#print(bestellung_status())
+conn.executemany("INSERT INTO bestellposition(bestellung_id, produkt_id, menge) VALUES (?,?,?)", bestellposition())
+conn.commit()
+
+conn.close()
