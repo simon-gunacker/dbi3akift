@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS produkt (
     id INTEGER PRIMARY KEY,
     bezeichnung VARCHAR(255),
