@@ -1,12 +1,14 @@
-from sqlite import connect
+#from sqlite import connect
 import random
 import json
 
-DB = "test.db"
+DB = "miniature_shop.db"
 KUNDE_ROWS = 10000
 PRODUKT_ROWS = 10000
 BESTELLUNG_ROWS = 100000
 BESTELLPOS_ROWS = 500000
+
+RANDOM_SEED = 42
 
 """
 kunde: 
@@ -33,29 +35,46 @@ bestellposition:
     - menge: randomint (max 10 maybe)
 """
 
-def create_kunden(kunde_rows):
+# returns the contents of a given JSON file
+def load_json(filepath):
+    with open (filepath, "r") as file: 
+        data = json.load(file)
+    return data
 
-    with open ("./json_data/names.json", "r") as file:
-        names_dict = json.load(file)
 
-    for i in range(kunde_rows): 
+def create_kunden(filepath_names, filepath_addr, rows):
+    name_data = load_json(filepath_names)
+    addr_data = load_json(filepath_addr)
+
+    for i in range(rows):
+
+        first_name = random.choice(name_data["first_names"])
+        last_name = random.choice(name_data["last_names"])
+        mail = first_name.lower() + "." + last_name.lower() + str(i + 1) + "@mail.com"
+        birthdate = str(random.randint(1930, 2005)) + "-" + str(random.randint(1, 12)) + "-" + str(random.randint(1, 28))
+        # random.choices returns a list, list -> string via join
+        phone = "43676" + "".join(random.choices("0123456789", k=7))
+
+        city = random.choice(addr_data["cities"])
+        addr = (random.choice(addr_data["streets"]) + " " +
+                str(random.randint(1, 100)) + ", " +
+                city["city"] + " " +
+                city["zip"] +  " " +
+                city["country"])
+
         yield (
-            random.choice(names_dict["vorname"]), 
-            random.choice(names_dict["nachname"])
+            first_name, 
+            last_name, 
+            mail,
+            birthdate, 
+            phone, 
+            addr
         )
 
-def insert_kunden(cursor, kunden): 
-    cursor.executemany("INSERT INTO kunde (vorname, nachname) VALUES (?, ?)", kunden)
+for kunde in create_kunden("./json_data/names.json", "./json_data/addresses.json", 3):
+    print(kunde)
 
-def main(): 
-    conn = connect(DB)
-    cursor = conn.cursor()
-
-    # create tables
-    create_table_kunde(cursor)
-
-    kunden = create_kunden(KUNDE_ROWS)
-
-
-if __name__ == "__main__"
+"""
+if __name__ == "__main__":
     main()
+"""
