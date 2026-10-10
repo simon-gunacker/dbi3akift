@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS produkt;
 DROP TABLE IF EXISTS kunde;
 
 -- CREATE TABLE
+--Kunde 
 CREATE TABLE IF NOT EXISTS kunde(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     vorname VARCHAR(255),
@@ -17,6 +18,7 @@ CREATE TABLE IF NOT EXISTS kunde(
     hausnummer INTEGER
 );
 
+--Produkt
 CREATE TABLE IF NOT EXISTS produkt(
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
     bezeichnung VARCHAR(255) NOT NULL,
@@ -24,6 +26,7 @@ CREATE TABLE IF NOT EXISTS produkt(
     lagerbestand INTEGER
 );
 
+--Bestellung
 CREATE TABLE IF NOT EXISTS bestellung(
     id INTEGER PRIMARY KEY AUTOINCREMENT, 
     kunde_id INTEGER NOT NULL,
@@ -32,6 +35,7 @@ CREATE TABLE IF NOT EXISTS bestellung(
     FOREIGN KEY (kunde_id) REFERENCES kunde (id)
 );
 
+--Bestellposition
 CREATE TABLE IF NOT EXISTS bestellposition(
     bestellung_id INTEGER,
     produkt_id INTEGER,
