@@ -53,7 +53,6 @@ class Customer:
 
     def setEmail(self):
         self.email = self.genEmail()
-        if (checkDuplicate(self.email, self.db, self.table ,"email")): self.setEmail()
 
     def genBirthdate(self):
         return genDate()
@@ -66,7 +65,6 @@ class Customer:
 
     def setTelNumber(self):
         self.telNumber = self.genTelNumber()
-        if checkDuplicate(self.telNumber, self.cur, self.table, "telefon"): self.setTelNumber()
 
     def genAddress(self):
         return self.addressStreetsPrefix[random.randrange(0, len(self.addressStreetsPrefix))] + self.addressStreetsSuffix[random.randrange(0, len(self.addressStreetsSuffix))] + " " + str(random.randrange(1, 100))
@@ -81,7 +79,10 @@ class Customer:
         self.setBirthdate()
         self.setTelNumber()
         self.setAddress()
-        return [self.firstName, self.lastName, self.email, self.birthdate, self.telNumber, self.address]
+        try:
+            curmain.execute("INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES(?, ?, ? ,? ,? ,?)", [self.firstName, self.lastName, self.email, self.birthdate, self.telNumber, self.address])
+        except:
+             self.getCustomer()
 
 
 class Order:
@@ -209,7 +210,7 @@ if __name__ == "__main__":
     kunde = Customer(dbmain, "kunde")
     for x in range(0, 10000):
         # executemany would violate UNIQUE constraint, due to only checking sql-database for duplicates and not the generated list, possibly solveable by using sets
-        curmain.execute("INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse) VALUES(?, ?, ? ,? ,? ,?)", kunde.getCustomer())
+        kunde.getCustomer()
     dbmain.commit()
     print(curmain.execute("SELECT COUNT(id) FROM kunde").fetchone()[0])
 
@@ -244,5 +245,5 @@ if __name__ == "__main__":
 
     #print(curmain.execute("SELECT COUNT(id), COUNT(DISTINCT(email)) FROM kunde").fetchone())
     [print(f"{row}") for row in curmain.execute("SELECT * from gesamtpreis_bestellung").fetchmany(10)]
-    [print(f"{row}") for row in curmain.execute("SELECT * from join_view").fetchmany(10)]
+    [print(f"{row}") for row in curmain.execute("SELECT * from bestellung_view").fetchmany(10)]
 
