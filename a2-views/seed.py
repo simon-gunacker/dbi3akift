@@ -70,11 +70,19 @@ for i in range(100000):
   """) 
 
 
+combinations = set()
+n = 0
+while n < 500000:
+  bestellung = random.randint(0, 99999)
+  produkt = random.randint(0, 9999)
+  combination = (bestellung, produkt)
 
-for i in range(500000):
-  cursor.execute(f"""
-  INSERT INTO bestellposition VALUES ('{random.randint(1,100000)}', '{random.randint(1,10000)}', '{random.randint(1, 5)}');
-  """) 
+  if not combination in combinations:
+    cursor.execute(f"""
+    INSERT INTO bestellposition VALUES ('{bestellung}', '{produkt}', '{random.randint(1, 5)}');
+    """) 
+    combinations.add(combination) 
+    n += 1
 
 
 connection.commit()
