@@ -36,3 +36,34 @@ LEFT JOIN bestellung AS b ON
     bp.bestellung_id = b.id
 LEFT JOIN kunde AS k ON
     b.kunde_id = k.id;
+
+CREATE VIEW IF NOT EXISTS subselect_view_a AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum
+FROM bestellung b
+WHERE b.bestelldatum = (
+    SELECT MAX(b2.bestelldatum)
+    FROM bestellung b2
+    WHERE b2.kunde_id = b.kunde_id
+    LIMIT 10000
+);
+
+
+CREATE VIEW IF NOT EXISTS joinselect_view_b AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum
+FROM bestellung b
+JOIN (
+    SELECT
+        kunde_id,
+        MAX(bestelldatum) AS bestelldatum
+    FROM bestellung
+    GROUP BY kunde_id
+    LIMIT 10000
+    ) letzte
+        ON letzte.kunde_id = b.kunde_id
+        AND letzte.bestelldatum = b.bestelldatum;
