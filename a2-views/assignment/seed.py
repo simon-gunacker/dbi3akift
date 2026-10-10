@@ -12,8 +12,11 @@ with open("model.sql", "r", encoding="utf-8") as f:
 cursor.executescript(model)
 
 ## kunde
-first = ["Bilal", "Thomas", "Manuel", "Asmir", "Marin", "Diyar", "Mario", "Yusuf", "Jakob", "Yunus"]
-last = ["Anwar", "Ferhat", "Michael", "Ibrahim", "Salah", "Furkan", "Arda", "Mehmet", "Ali", "Bara"]
+first = ["Bilal", "Thomas", "Manuel", "Asmir", "Marin", "Diyar", "Mario", "Yusuf",
+          "Jakob", "Yunus", "Max", "Leon", "Anna", "Laura", "Felix"]
+
+last = ["Anwar", "Ferhat", "Michael", "Ibrahim", "Salah", "Furkan",
+         "Arda", "Mehmet", "Ali", "Bara", "Müller", "Schneider", "Wagner", "Hoffmann", "Bauer"]
 kunde = []
 for i in range(10000):
     first_name = random.choice(first)
@@ -27,7 +30,8 @@ for i in range(10000):
 
     telefon = f"{random.randint(100000000, 999999999)}"
 
-    adress = ["Seestraße", "Blumenstraße", "Sonnenweg", "Birkenstraße", "Waldgasse", "Rosenweg", "Ahornstraße", "Lindenweg", "Fichtenstraße", "Kirschgasse"]
+    adress = ["Seestraße", "Blumenstraße", "Sonnenweg", "Birkenstraße", "Waldgasse",
+               "Rosenweg", "Ahornstraße", "Lindenweg", "Fichtenstraße", "Kirschgasse"]
     adresse = random.choice(adress)
     hausnummer = random.randint(1, 9)
     kunde.append((first_name, last_name, email, geburtsdatum, telefon, adresse, hausnummer))
@@ -38,7 +42,8 @@ cursor.executemany("INSERT INTO kunde (vorname, nachname, email, geburtsdatum, t
 bezeichnung = ["Hammer", "Schraubenzieher", "Zange", "Wasserwaage", "Spachtel",
                 "Kombizange","Bohrmaschine", "Akkuschrauber", "Säge", "Feile", "Maßband",
                   "Schleifpapier", "Schraubendreher-Set", "Handschuhe", "Leiter", "Cuttermesser"]
-preis = [10.00, 20.55, 19.99, 5.45, 33.20, 89.99, 59.99, 24.99, 7.99, 6.49, 3.99, 29.99, 9.99, 119.99, 4.99]
+preis = [10.00, 20.55, 19.99, 5.45, 33.20, 89.99, 59.99, 24.99,
+          7.99, 6.49, 3.99, 29.99, 9.99, 119.99, 4.99]
 lagerbestand = [0, 10, 55, 100, 99, 2, 7, 89, 43]
 produkte = []
 
@@ -72,24 +77,24 @@ cursor.execute("SELECT id FROM bestellung")
 bestellung_id = cursor.fetchall()
 
 cursor.execute("SELECT id FROM produkt")
-produkt_id = cursor.fetchall()
+produkt_ids = cursor.fetchall()
 
 bestellungen_id = []
 for best_id in bestellung_id:
     bestellungen_id.append(best_id[0])
 
-produkte_id = []
-for prodk_id in produkt_id:
-    produkte_id.append(prodk_id[0])
+produkt_id = []
+for prodk_id in produkt_ids:
+    produkt_id.append(prodk_id[0])
 
-menge = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+menge = random.randint(1, 20)
 
 bestellposition = []
 kombinationen = set()
 
 while len(bestellposition) < 500000:
     bestellung = random.choice(bestellungen_id)
-    produkt = random.choice(produkte_id)
+    produkt = random.choice(produkt_id)
 
     # Keine doppelte Bestellung mit demselben Produkt
     if (bestellung, produkt) not in kombinationen:
