@@ -1,0 +1,4 @@
+## View
+Eine View kann man als gespeicherte Abfrage sehen. Will ich zum Beispiel nur die Kontaktdaten der Kunden, rufe ich die View kontakt_kunde auf, ohne das SELECT Statement jedes Mal neu zu schreiben. Wer nur über diese View zugreift, sieht die für den Kontakt nötigen Daten, also Name und E-Mail. Geburtsdatum, Telefon und Adresse bleiben verborgen, was dem Datenschutz dient. Ein weiterer Vorteil zeigt sich bei gesamt_wert: Ohne View müsste ich die Joins und die Berechnung jedes Mal ausschreiben, mit View ist das einmal getippt und danach eine kurze Zeile.
+
+Views haben aber auch Nachteile. Sie hängen von den Tabellen ab: Fällt dort eine Spalte weg, funktioniert die View nicht mehr. Außerdem speichert eine View kein Ergebnis, sondern führt ihre Abfrage bei jedem Aufruf neu aus. Hinter einem harmlos aussehenden SELECT * FROM gesamt_wert stecken Joins über drei Tabellen mit hunderttausenden Zeilen. Diesen Aufwand sieht man der kurzen Zeile nicht an.
