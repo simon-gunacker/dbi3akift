@@ -80,3 +80,14 @@ WHERE kunde_id = 42;
 SELECT *
 FROM letzte_bestellung_b
 WHERE kunde_id = 42;
+
+EXPLAIN QUERY PLAN
+SELECT *
+FROM letzte_bestellung_a
+WHERE kunde_id = 42;
+
+EXPLAIN QUERY PLAN
+SELECT *
+FROM letzte_bestellung_b
+WHERE kunde_id = 42;
+
