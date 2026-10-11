@@ -16,3 +16,11 @@ DROP VIEW IF EXISTS bestell_uebersicht;
 CREATE VIEW bestell_uebersicht AS SELECT b.id AS bestellnummer, b.kunde_id AS kundennummer, b.bestelldatum, b.status AS bestellstatus, k.vorname, k.nachname
                  FROM bestellung b
                  LEFT JOIN kunde k ON b.kunde_id = k.id;
+
+-- Überlege dir anschließend eine konkrete Abfrage, 
+-- bei der diese View die eigentliche SQL-Abfrage deutlich übersichtlicher macht.
+SELECT *
+FROM bestell_uebersicht
+WHERE bestellstatus = "offen"
+ORDER BY bestelldatum
+LIMIT 10;
