@@ -24,3 +24,38 @@ FROM bestell_uebersicht
 WHERE bestellstatus = "offen"
 ORDER BY bestelldatum
 LIMIT 10;
+
+-- Aufgabe 6
+--Variante A
+DROP VIEW IF EXISTS letzte_bestellung_a;
+CREATE VIEW letzte_bestellung_a AS SELECT
+                    b.kunde_id,
+                    b.id AS bestellung_id,
+                    b.bestelldatum
+                FROM bestellung b
+                WHERE b.bestelldatum = (
+                    SELECT MAX(b2.bestelldatum)
+                    FROM bestellung b2
+                    WHERE b2.kunde_id = b.kunde_id
+                    AND b2.id <= 10000
+                )
+                AND b.id <= 10000;
+
+-- Variante B
+DROP VIEW IF EXISTS letzte_bestellung_b;
+CREATE VIEW letzte_bestellung_b AS SELECT 
+                                        b.kunde_id,
+                                        b.id AS bestellung_id,
+                                        b.bestelldatum
+                                    FROM bestellung b
+                                    JOIN (
+                                        SELECT
+                                            kunde_id,
+                                            MAX(bestelldatum) AS bestelldatum
+                                        FROM bestellung
+                                        WHERE id <= 10000  
+                                        GROUP BY kunde_id
+                                    ) letzte
+                                        ON letzte.kunde_id = b.kunde_id
+                                        AND letzte.bestelldatum = b.bestelldatum
+                                    WHERE b.id <= 10000;
