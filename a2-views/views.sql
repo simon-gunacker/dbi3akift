@@ -1,3 +1,7 @@
+DROP VIEW IF EXISTS letzte_bestellung_a;
+DROP VIEW IF EXISTS letzte_bestellung_b;
+
+
 DROP VIEW IF EXISTS kundenview;
 DROP VIEW IF EXISTS bestellungsgesamtwertview;
 DROP VIEW IF EXISTS bestellview;
@@ -19,4 +23,40 @@ LEFT JOIN kunde k ON b.kunde_id = k.id;
 /*
 SELECT kundenvorname, kundennachname, bestellnummer FROM bestellview
 WHERE bestellstatus LIKE 'in Bearbeitung';
+*/
+
+CREATE VIEW letzte_bestellung_a AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum
+FROM bestellung b
+WHERE b.bestelldatum = (
+    SELECT MAX(b2.bestelldatum)
+    FROM bestellung b2
+    WHERE b2.kunde_id = b.kunde_id
+)
+LIMIT 10000;
+
+CREATE VIEW letzte_bestellung_b AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum
+FROM bestellung b
+JOIN (
+    SELECT
+        kunde_id,
+        MAX(bestelldatum) AS bestelldatum
+    FROM bestellung
+    GROUP BY kunde_id
+) letzte
+    ON letzte.kunde_id = b.kunde_id
+   AND letzte.bestelldatum = b.bestelldatum
+LIMIT 10000;
+ 
+/*
+SELECT * FROM letzte_bestellung_a 
+EXCEPT
+SELECT * FROM letzte_bestellung_b;
 */
