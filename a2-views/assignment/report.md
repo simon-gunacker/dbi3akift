@@ -66,7 +66,7 @@ und bei 10.000 Aufrufen  rund 950,11 Sekunden (ca. 15:50 min).
 View B benötigt bei 1.000 Aufrufen rund 10,21 Sekunden 
 und bei 10.000 Aufrufen rund 107,19 Sekunden(ca. 1:47 Minuten).
 
-Bei 1.000 Aufrufen benötigt View A um circa 9,15 mal und bei 10.000 Aufrufen circa 8,86 mal länger.
+Bei 1.000 Aufrufen benötigt View A um circa 9,15 mal und bei 10.000 Aufrufen circa 8,86 mal länger als View B.
 
 ---
 
@@ -89,8 +89,10 @@ SCAN: Es wird  ein Full Table Scan der Tabelle b durchgeführt.
 
 CORRELATED SCALAR SUBQUERY 3:
 
-   *SCALAR: nur ein Wert wird zurückgegeben 
-   *CORRELATED SUBQUERY: die Werte ändern sich in Abhängikeit der aktuellen Zeile der äußeren Abfrage
+
+   SCALAR: nur ein Wert wird zurückgegeben.
+
+   CORRELATED SUBQUERY: die Werte ändern sich in Abhängikeit der aktuellen Zeile der äußeren Abfrage.
 
 SEARCH: sagt das nur ein Subset von Tabellen Zeilen abgesucht wird.
 
