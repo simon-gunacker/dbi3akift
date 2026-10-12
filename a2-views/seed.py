@@ -10,6 +10,11 @@ BESTELLPOS_ROWS = 500000
 
 RANDOM_SEED = 42
 
+NAMES_PATH = "./json_data/names.json"
+ADDR_PATH = "./json_data/addresses.json"
+PRODUCTS_PATH = "./jsond_data/products.json"
+
+STATUS_LIST = ["bestellt", "bezahlt", "versandbereit", "versandt", "erhalten"]
 """
 kunde: 
     - vorname/nachname: List + random choice
@@ -42,9 +47,9 @@ def load_json(filepath):
     return data
 
 
-def create_kunden(filepath_names, filepath_addr, rows):
-    name_data = load_json(filepath_names)
-    addr_data = load_json(filepath_addr)
+def create_kunden(rows):
+    name_data = load_json(NAMES_PATH)
+    addr_data = load_json(ADDR_PATH)
 
     for i in range(rows):
 
@@ -71,8 +76,60 @@ def create_kunden(filepath_names, filepath_addr, rows):
             addr
         )
 
-for kunde in create_kunden("./json_data/names.json", "./json_data/addresses.json", 3):
-    print(kunde)
+def create_produkte(rows): 
+    product_data = load_json(PRODUCTS_PATH)
+
+    for i in range(rows): 
+        desc = random.choice(product_data["products"])
+        price = random.random() * 40
+        inventory = random.randint(0, 100)
+
+        yield ( 
+            desc, 
+            price, 
+            inventory
+        )
+
+def create_bestellung(rows):
+    for i in range(rows): 
+        kunde_id = random.randint(1, KUNDE_ROWS)
+        bestelldatum = str(random.randint(2025, 2026)) + "-" + str(random.randint(1, 12)) + "-" + str(random.randint(1, 28))
+        status = random.choice(STATUS_LIST)
+
+        yield ( 
+            kunde_id, 
+            bestelldatum, 
+            status
+        )
+        
+def create_bestellpos(rows): 
+
+    # need a position_count for every order -> 500k in total
+    position_counts = (
+        [1] * 10000 + 
+        [3] * 20000 +
+        [5] * 42000 +
+        [7] * 20000 +
+        [10] * 8000
+    )
+    random.shuffle(position_counts)
+
+    for i in range(rows): 
+        bestellung_id = i + 1
+        positions = position_counts[i]
+        product_id_list = random.sample(range(1, PRODUKT_ROWS + 1), k=positions)
+        
+
+        for j in range(positions): 
+            produkt_id = product_id_list[j]
+            menge = random.randint(1, 10)
+
+            yield (
+                bestellung_id, 
+                produkt_id,
+                menge
+            )
+
 
 """
 if __name__ == "__main__":
