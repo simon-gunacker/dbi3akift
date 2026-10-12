@@ -258,52 +258,11 @@ def check_view_performance_even(conn) -> bool:
     else:
         return False
 
-@with_connect(":memory:")
-def test_in_memory(conn):
-    with open("model.sql", encoding="utf-8") as file:
-        conn.executescript(file.read())
-    
-    for i in range(10_000):
-        produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
-        preis = random.randint(99, 9999_99) / 100
-        lagerbestand = random.randint(1, 100)
-        insert_produkt(conn, produkt, preis, lagerbestand)
-
-    date = "2016-10-02 10:15"
-    email_end="@maily.com"
-    produkt_list = set()
-    produkt_id = random.randint(1, 10_000)
-    for i in range(10_000):
-        vorname = random_vorname().capitalize()
-        nachname = random_nachname(random.randint(0, 23), random.randint(0, 8))
-        geburstdatum = random_geburtsdatum()
-        telefonnummer = random_telefonummer()
-        adresse = random_adresse(random.randint(0, 35), random.randint(0, 7), random.randint(0, 19))
-        kunde_id = insert_kunde(conn, vorname, nachname, email_end, geburstdatum, telefonnummer, adresse)
-
-        for i in range(10):
-            date = random_datum(date)
-            bestell_id = insert_bestellung(conn, kunde_id, date)
-            for i in range(5):
-                while (produkt_id in produkt_list):
-                    produkt_id = random.randint(1, 10_000)
-                produkt_list.add(produkt_id)
-                insert_bestellpostion(conn, bestell_id, produkt_id, random.randint(1, 12))
-            produkt_list.clear()
-
-    create_view_simple(conn)
-    create_view_sum(conn)
-    create_view_interface(conn)
-    create_view_performance_a(conn)
-    create_view_performance_b(conn)
-    print(check_view_performance_even(conn))
-    conn.commit()
-
-
 @with_connect("shop.db")
 def start_db(conn):
-    create_tables(conn)
-    
+    with open("model.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
+
     for i in range(10_000):
         produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
         preis = random.randint(99, 9999_99) / 100
@@ -332,11 +291,8 @@ def start_db(conn):
                 insert_bestellpostion(conn, bestell_id, produkt_id, random.randint(1, 12))
             produkt_list.clear()
 
-    create_view_simple(conn)
-    create_view_sum(conn)
-    create_view_interface(conn)
-    create_view_performance_a(conn)
-    create_view_performance_b(conn)
+    with open("views.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
     conn.commit()
 
 
@@ -345,10 +301,8 @@ if __name__ == "__main__":
     if os.path.exists("shop.db"):
         os.remove("shop.db")
     if seed == "":
-        #test_in_memory()
         start_db()
     else:
         random.seed(seed)
         start_db()
-        #test_in_memory()
 
