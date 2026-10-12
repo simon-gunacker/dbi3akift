@@ -32,3 +32,17 @@ SELECT
 FROM bestellung b
 JOIN kunde k ON b.kunde_id = k.id;
 
+-- vierte View
+CREATE VIEW IF NOT EXISTS letzte_bestellung_a AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum,
+FROM bestellung b
+WHERE b.bestelldatum = (
+    SELECT MAX(bestelldatum)
+    FROM bestellung b2
+    WHERE b2.kunde_id = b.kunde_id
+    AND b.id <= 10000
+);
+
