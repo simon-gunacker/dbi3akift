@@ -28,47 +28,6 @@ def with_connect(db):
     return decorator
 
 
-def create_tables(conn):
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS produkt(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            bezeichnung varchar,
-            preis decimal,
-            lagerbestand integer
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS bestellung(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            kunde_id INTEGER,
-            bestelldatum datetime,
-            status varchar,
-            FOREIGN KEY (kunde_id) REFERENCES kunde(id)
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS kunde(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            vorname varchar,
-            nachname varchar,
-            email varchar,
-            geburtsdatum date,
-            telefon varchar,
-            adresse varchar
-        )
-    """)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS bestellposition(
-            bestellung_id INTEGER NOT NULL,
-            produkt_id INTEGER NOT NULL,
-            menge INTEGER,
-            PRIMARY KEY (bestellung_id, produkt_id),
-            FOREIGN KEY (bestellung_id) REFERENCES bestellung(id),
-            FOREIGN KEY (produkt_id) REFERENCES produkt(id)
-        )
-    """)
-
-
 def insert_produkt(conn, bezeichnung: str, preis: float, lagerbestand: int) -> int:
     sql = """
         INSERT INTO produkt (bezeichnung, preis, lagerbestand)
@@ -273,66 +232,6 @@ def random_adresse(strassen_staemme: int, strassen_endungen: int, orte: int) -> 
 
     return f"{adressen_dict["strassen_staemme"][strassen_staemme] + adressen_dict["strassen_endungen"][strassen_endungen]} {str(random.randint(1, 999))}, {adressen_dict["orte"][orte]["plz"]} {adressen_dict["orte"][orte]["ort"]}"
 
-def create_view_simple(conn):
-    sql = """
-        CREATE VIEW IF NOT EXISTS v_kunden_kontakt AS
-        SELECT 
-            id AS kundennummer,
-            vorname,
-            nachname,
-            email
-        FROM kunde; 
-    """
-    conn.execute(sql)
-    conn.commit()
-
-def get_view_simple(conn) -> list:
-    sql = """
-        SELECT *
-        FROM v_kunden_kontakt;
-    """
-    cursor = conn.execute(sql)
-    return cursor.fetchall()
-
-def create_view_sum(conn):
-    sql = """
-        CREATE VIEW IF NOT EXISTS v_bestellung_gesamtwert AS
-        SELECT 
-            b.id AS bestellnummer,
-            b.kunde_id AS kundennummer,
-            SUM(bp.menge * p.preis) AS gesamtwert
-        FROM bestellung b
-        JOIN bestellposition bp ON b.id = bp.bestellung_id
-        JOIN produkt p ON bp.produkt_id = p.id
-        GROUP BY b.id, b.kunde_id;
-    """
-    conn.execute(sql)
-    conn.commit()
-
-def get_view_sum(conn) -> list:
-    sql = """
-        SELECT *
-        FROM v_bestellung_gesamtwert;
-    """
-    cursor = conn.execute(sql)
-    return cursor.fetchall()
-
-def create_view_interface(conn):
-    sql = """
-        CREATE VIEW IF NOT EXISTS v_bestelluebersicht AS
-        SELECT 
-            b.id AS bestellnummer,
-            k.id AS kundennummer,
-            b.bestelldatum,
-            b.status AS bestellstatus,
-            k.vorname,
-            k.nachname
-        FROM bestellung b
-        JOIN kunde k ON b.kunde_id = k.id;
-    """
-    conn.execute(sql)
-    conn.commit()
-
 def get_view_interface_status(conn, status: str) -> list:
     sql = f"""
         SELECT 
@@ -345,44 +244,6 @@ def get_view_interface_status(conn, status: str) -> list:
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
-
-def create_view_performance_a(conn):
-    sql = """
-        CREATE VIEW IF NOT EXISTS letzte_bestellung_a AS
-        SELECT
-            b.kunde_id,
-            b.id AS bestellung_id,
-            b.bestelldatum
-        FROM bestellung b
-        WHERE b.bestelldatum = (
-            SELECT MAX(b2.bestelldatum)
-            FROM bestellung b2
-            WHERE b2.kunde_id = b.kunde_id
-        );
-    """
-    conn.execute(sql)
-    conn.commit()
-
-def create_view_performance_b(conn):
-    sql = """
-        CREATE VIEW IF NOT EXISTS letzte_bestellung_b AS
-        SELECT
-            b.kunde_id,
-            b.id AS bestellung_id,
-            b.bestelldatum
-        FROM bestellung b
-        JOIN (
-            SELECT
-                kunde_id,
-                MAX(bestelldatum) AS bestelldatum
-            FROM bestellung
-            GROUP BY kunde_id
-        ) letzte
-            ON letzte.kunde_id = b.kunde_id
-        AND letzte.bestelldatum = b.bestelldatum;
-    """
-    conn.execute(sql)
-    conn.commit()
 
 def check_view_performance_even(conn) -> bool:
     sql = """
@@ -399,7 +260,8 @@ def check_view_performance_even(conn) -> bool:
 
 @with_connect(":memory:")
 def test_in_memory(conn):
-    create_tables(conn)
+    with open("model.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
     
     for i in range(10_000):
         produkt = random_produkt(random.randint(0, 1), random.randint(0, 91))
