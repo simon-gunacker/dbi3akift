@@ -3,6 +3,9 @@ import random
 
 random.seed(1)
 
+# number of customers
+N_CUSTOMERS = 10000
+
 # 20 first names
 FIRST_NAMES = [
     "Emanuel", "Bilal", "Marin", "Asmir", "Elisabeth", "Irina", "Sonja", "Michael", "Michaela", "Max",
@@ -32,8 +35,32 @@ CARRIER_CODES = [
     "676", "664", "680", "699", "677"
 ]
 
+# 10 street names
+STREETS = [
+    "Wienerstraße", "Ibererstraße", "Zanklstraße", "Elisabethstraße", "Heinrichstraße", "Leonhardstraße", "Kärntnerstraße", "Neubaugasse", "Sesamstraße", "Kepplerstraße"
+]
+
 # 5 zip code + cities
 ZIP_CODE_CITIES = [
     "8010 Graz", "8020 Graz", "8200 Gleisdorf", "8311 Markt Hartmannsdorf", "8160 Weiz"
 ]
 
+conn = connect("./onlineshop.db")
+
+def create_customers (conn):
+    counter = 0
+    while counter < N_CUSTOMERS:
+        sql = """ 
+        INSERT INTO kunde(vorname, nachname, email, geburtsdatum, telefon, adresse)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """
+        cursor = conn.cursor()
+        first_name = random.choice(FIRST_NAMES)
+        last_name = random.choice(LAST_NAMES)
+        email = f"{first_name}.{last_name}{random.choice(DOMAINS)}"
+        birthdate = f"{random.randint(1940, 2012)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}"
+        phone = f"{random.choice(COUNTRY_CODES)}{random.choice(CARRIER_CODES)}{random.randint(100000, 9999999)}"
+        address = f"{random.choice(STREETS)} {random.randint(1, 200)}, {random.choice(ZIP_CODE_CITIES)}"
+        cursor.execute(sql, (first_name, last_name, email, birthdate, phone, address))
+        counter += 1
+    conn.commit()
