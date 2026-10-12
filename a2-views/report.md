@@ -22,7 +22,7 @@
 - Spart auch Zeilen, macht den Select übersichtlicher
 
 ## Nachteile von Views
-- Versteckte Komplexität, kann gleich ausschauen aber sehr ineffizient sein.
+- Versteckte Komplexität, kann gleich ausschauen aber sehr ineffizient sein (laufzeit).
 - Keine eigenen Indizes
 - Write-Einschränkungen (read-only => kein insert)
 
@@ -45,13 +45,16 @@ SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42 AND bestellung_id <= 10000
 ```
 
 **Ergebnis**
+```
 View A - Gesamt: 4.7786s | Schnitt pro Aufruf: 0.047786s
 View B - Gesamt: 0.4780s | Schnitt pro Aufruf: 0.004780s
 Sind die Ausgaben vom Performance check identisch: True
 Der Test hat: 77.88 Sekunden gebraucht.
+```
 
 - **Faktor ≈ 10**: Variante A ist etwa zehnmal langsamer als Variante B.
 Von außen sehen die Abfragen identisch aus und liefern dasselbe Ergebnis. Der Unterschied zeigt sich nur an der Laufzeit.
+- **Unterschied**: A führt die Teilabfrage pro Zeile neu aus und durchsucht dabei die Tabelle ohne Index. B aggregiert nur einmal und nutzt einen automatischen Index.
 
 ---
 ## Query Plan
