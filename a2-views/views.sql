@@ -21,3 +21,14 @@ GROUP BY b.id, b.kunde_id;
 
 -- drittes View
 
+CREATE VIEW IF NOT EXISTS bestellungen_mit_kunden AS
+SELECT
+    b.id AS bestellung_id,
+    b.kunde_id,
+    k.vorname,
+    k.nachname,
+    b.bestelldatum,
+    b.status
+FROM bestellung b
+JOIN kunde k ON b.kunde_id = k.id;
+
