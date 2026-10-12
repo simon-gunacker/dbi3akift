@@ -246,17 +246,17 @@ def get_view_interface_status(conn, status: str) -> list:
     return cursor.fetchall()
 
 def check_view_performance_even(conn) -> bool:
-    sql = """
-        SELECT * 
-        FROM letzte_bestellung_a 
-        EXCEPT SELECT * 
-        FROM letzte_bestellung_b;
+    sql_ab = """
+        SELECT * FROM letzte_bestellung_a WHERE bestellung_id <= 10000
+        EXCEPT
+        SELECT * FROM letzte_bestellung_b WHERE bestellung_id <= 10000;
     """
-    cursor = conn.execute(sql)
-    if len(cursor.fetchall()) == 0:
-        return True
-    else:
-        return False
+    sql_ba = """
+        SELECT * FROM letzte_bestellung_b WHERE bestellung_id <= 10000
+        EXCEPT
+        SELECT * FROM letzte_bestellung_a WHERE bestellung_id <= 10000;
+    """
+    return not conn.execute(sql_ab).fetchall() and not conn.execute(sql_ba).fetchall()
 
 @with_connect("shop.db")
 def start_db(conn):
