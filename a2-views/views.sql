@@ -47,7 +47,6 @@ WHERE b.bestelldatum = (
     SELECT MAX(b2.bestelldatum)
     FROM bestellung b2
     WHERE b2.kunde_id = b.kunde_id
-    LIMIT 10000
 );
 
 
@@ -63,7 +62,6 @@ JOIN (
         MAX(bestelldatum) AS bestelldatum
     FROM bestellung
     GROUP BY kunde_id
-    LIMIT 10000
     ) letzte
         ON letzte.kunde_id = b.kunde_id
         AND letzte.bestelldatum = b.bestelldatum;
