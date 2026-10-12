@@ -22,7 +22,7 @@ Ja, ich habe es mit einem Python-Skript verglichen.
 Nein, am `SELECT`-Statement sieht man keinen Unterschied, beide sind gleich aufgebaut. Nur die gemessene Laufzeit zeigt, dass intern etwas anders läuft.
  
 **6. Wie unterscheiden sich die gemessenen Laufzeiten?**
-Durchschnittlich 0,0365 Sekunden bei Variante A, 0,0077 Sekunden bei Variante B. A ist also ca. 4,75-mal langsamer.
+Durchschnittlich 427.4702 Sekunden (7,12 Min) bei Variante A, 0.0688 Sekunden bei Variante B. A ist also ca. 6217.21-mal langsamer.
  
 **7. Warum ist es problematisch, dass die interne SQL-Abfrage einer View nicht sichtbar ist?**
 Weil eine scheinbar einfache Abfrage in Wirklichkeit sehr teuer sein kann. Das macht es schwer, Performance-Probleme vorherzusehen, weil die Komplexität nicht im Code sichtbar ist, sondern in der View versteckt bleibt.
@@ -36,4 +36,4 @@ Variante A wiederholt die Suche nach dem spätesten Datum für jede Bestellung e
 ## Schlussfolgerung
  
 **10. Kann eine View eine Abfrage vereinfachen, ohne dass dadurch die zugrunde liegende Komplexität und deren mögliche Auswirkungen auf die Performance verschwinden?**
-Nein, eine View vereinfacht nur die Schreibweise, nicht die Arbeit dahinter. Obwohl beide Views gleich verwendet werden, unterscheidet sich ihre Laufzeit um den Faktor 4,79. Die Komplexität verschwindet also nicht, sie wird nur unsichtbar, kann aber trotzdem die Performance stark beeinflussen.
+Nein, eine View vereinfacht nur die Schreibweise, nicht die Arbeit dahinter. Obwohl beide Views gleich verwendet werden, unterscheidet sich ihre Laufzeit um den Faktor 6217.21. Die Komplexität verschwindet also nicht, sie wird nur unsichtbar, kann aber trotzdem die Performance stark beeinflussen.
