@@ -3,6 +3,9 @@ import random
 
 random.seed(1)
 
+
+# Customers------------------------------------------------
+
 # number of customers
 N_CUSTOMERS = 10000
 
@@ -45,9 +48,31 @@ ZIP_CODE_CITIES = [
     "8010 Graz", "8020 Graz", "8200 Gleisdorf", "8311 Markt Hartmannsdorf", "8160 Weiz"
 ]
 
+
+
+# Products------------------------------------------------
+# number of products
+N_PRODUCTS = 10000
+
+# 10 product name prefixes
+PRODUCT_PREFIXES = [
+    "super", "ultimate", "red", "blue", "white", "black", "strong", "electric", "diesel powered", "petrol powered"
+]
+
+# 10 product names
+PRODUCT_NAMES = [
+    "A-Class", "B-Class", "C-Class", "CLA-Class", "CLE-Class", "CLS-Class", "E-Class", "G-Class", "S-Class", "X-Class"
+]
+
+# 10 product name suffixes
+PRODUCT_SUFFIXES = [
+    "AMG", "Maybach", "Brabus", "Coupé", "Limousine", "Stationwagon", "Performance", "Convertible", "Allroad", "Limited Edition"
+]
+
+
 conn = connect("./onlineshop.db")
 
-def create_customers (conn):
+def create_customers(conn):
     counter = 0
     while counter < N_CUSTOMERS:
         sql = """ 
@@ -62,5 +87,20 @@ def create_customers (conn):
         phone = f"{random.choice(COUNTRY_CODES)}{random.choice(CARRIER_CODES)}{random.randint(100000, 9999999)}"
         address = f"{random.choice(STREETS)} {random.randint(1, 200)}, {random.choice(ZIP_CODE_CITIES)}"
         cursor.execute(sql, (first_name, last_name, email, birthdate, phone, address))
+        counter += 1
+    conn.commit()
+
+def create_product(conn):
+    counter = 0
+    while counter < N_PRODUCTS:
+        sql = """ 
+        INSERT INTO produkt(bezeichnung, preis, lagerbestand)
+        VALUES (?, ?, ?)
+        """
+        cursor = conn.cursor()
+        product_name = f"{random.choice(PRODUCT_PREFIXES)} {random.choice(PRODUCT_NAMES)} {random.choice(PRODUCT_SUFFIXES)}"
+        price = f"{random.randint(40000, 1000000)}"
+        quantity = f"{random.randint(1, 150)}"
+        cursor.execute(sql, (product_name, price, quantity))
         counter += 1
     conn.commit()
