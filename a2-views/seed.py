@@ -205,7 +205,7 @@ def random_datum(start_datum: str) -> str:
 
 
 def random_geburtsdatum() -> str:
-    year = str(random.randint(1955, 2026))
+    year = str(random.randint(1955, 2008))
     month = str(random.randint(1, 12))
     day = str(random.randint(1, 30))
     return f"{year}-{month.zfill(2)}-{day.zfill(2)}"
