@@ -21,59 +21,59 @@
 - Mit so einem View muss ich nicht wissen wie die Tabelle zusammenhängen. So kann ich ganz einfach die Abfrage erweitern.
 - Spart auch Zeilen, macht den Select übersichtlicher
 
----
-## Performance
-**Funktion von timeit**
-´´´python
-    import timeit
-    laufzeit = timeit.timeit(stmt=..., number=100)
-´´´
-- **stmt** (Statement): Den Code, den ich messen will. Das kann ein String-Befehl sein oder am einfachsten eine lambda-Funktion bzw. eine Funktion ohne Argumente.
-- **number**: Wie oft der Code ausgeführt werden soll (Standard ist $1.000.000$).
-- **Rückgabewert**: Die Gesamtlaufzeit in Sekunden für alle number-Durchläufe zusammen.
-
-**Performance mit LIMIT**
-- Starte Benchmark für kunde_id = 42
-- Wiederholungen = 50000...
-- View A - Gesamt: 61.7019s | Schnitt pro Aufruf: 0.001234s
-- View B - Gesamt: 61.7661s | Schnitt pro Aufruf: 0.001235s
-- Der Test hat: 123.4693 Sekunden gebraucht.
-
-**Performance ohne LIMIT**
-- Starte Benchmark für kunde_id = 42
-- Wiederholungen = 100...
-- View A - Gesamt: 4.8780s | Schnitt pro Aufruf: 0.048780s
-- View B - Gesamt: 0.7519s | Schnitt pro Aufruf: 0.007519s
-- Der Test hat: 5.63 Sekunden gebraucht.
-
----
 ## Nachteile von Views
-- Versteckte Komplexität
+- Versteckte Komplexität, kann gleich ausschauen aber sehr ineffizient sein.
 - Keine eigenen Indizes
 - Write-Einschränkungen (read-only => kein insert)
 
 ---
-## Query plan
-- Bestellung A
-´´´sql 
-EXPLAIN QUERY PLAN 
-SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42;
-QUERY PLAN
-|--SCAN b
+## Performance
+**Funktion von timeit**
+```python
+    import timeit
+    laufzeit = timeit.timeit(stmt=..., number=100)
+```
+- **stmt** (Statement): Den Code, den ich messen will. Das kann ein String-Befehl sein oder am einfachsten eine lambda-Funktion bzw. eine Funktion ohne Argumente.
+- **number**: Wie oft der Code ausgeführt werden soll (Standard ist $1.000.000$).
+- **Rückgabewert**: Die Gesamtlaufzeit in Sekunden für alle number-Durchläufe zusammen.
+
+Die beiden Views `letzte_bestellung_a` und `letzte_bestellung_b` sollen dasselbe liefern. Das habe ich mit `EXCEPT` in beide Richtungen geprüft: Beide Ergebnisse waren leer, also liefern sie dasselbe. (Gezeigt in benchmark.py)
+
+Die Einschränkung auf die ersten 10.000 Bestellungen steht im `SELECT` des Benchmarks:
+```sql
+SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42 AND bestellung_id <= 10000;
+```
+
+**Ergebnis**
+View A - Gesamt: 4.7786s | Schnitt pro Aufruf: 0.047786s
+View B - Gesamt: 0.4780s | Schnitt pro Aufruf: 0.004780s
+Sind die Ausgaben vom Performance check identisch: True
+Der Test hat: 77.88 Sekunden gebraucht.
+
+- **Faktor ≈ 10**: Variante A ist etwa zehnmal langsamer als Variante B.
+Von außen sehen die Abfragen identisch aus und liefern dasselbe Ergebnis. Der Unterschied zeigt sich nur an der Laufzeit.
+
+---
+## Query Plan
+**Variante A**
+```
+EXPLAIN QUERY PLAN SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42 AND bestellung_id <= 10000;
+|--SEARCH b USING INTEGER PRIMARY KEY (rowid<?)
 `--CORRELATED SCALAR SUBQUERY 3
    `--SEARCH b2
-´´´
-    - **CORRELATED SCALAR SUBQUERY**: Das ist das Hauptproblem. Das Wort "CORRELATED" bedeutet, dass die Subquery für jede einzelne Zeile der äußeren Tabelle neu ausgeführt werden muss.
+```
+- *CORRELATED SCALAR SUBQUERY*: Die Subquery hängt von der äußeren Zeile ab und läuft deshalb für jede Zeile neu. Bei `SEARCH b2` steht kein `USING …`, die Subquery nutzt also keinen Index auf `kunde_id`.
 
-- Bestellung B
-´´´sql
-    EXPLAIN QUERY PLAN 
-    SELECT * FROM letzte_bestellung_b WHERE kunde_id = 42;
-    QUERY PLAN
-    |--CO-ROUTINE letzte
-    |  `--SCAN bestellung
-    |--SCAN b
-    |--BLOOM FILTER ON letzte (kunde_id=?)
-    `--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)
-´´´
+**Variante B**
+```
+EXPLAIN QUERY PLAN SELECT * FROM letzte_bestellung_b WHERE kunde_id = 42 AND bestellung_id <= 10000;
+|--CO-ROUTINE letzte
+|  `--SCAN bestellung
+|--SEARCH b USING INTEGER PRIMARY KEY (rowid<?)
+|--BLOOM FILTER ON letzte (kunde_id=?)
+`--SEARCH letzte USING AUTOMATIC PARTIAL COVERING INDEX (kunde_id=?)
+```
+- Die Aggregation (`MAX` je Kunde) läuft **einmal** (`CO-ROUTINE letzte`). SQLite legt für dieses Zwischenergebnis selbst einen Index an (`AUTOMATIC PARTIAL COVERING INDEX`). Der `BLOOM FILTER` sortiert Nichttreffer schnell aus.
 
+## Schlussfolgerung
+Nein. Eine View vereinfacht nur das Schreiben der Abfrage, die Komplexität bleibt bestehen. Bei meinen Messungen war die View mit (A) etwa zehnmal langsamer als die mit dem Join (B), obwohl `SELECT` und Ergebnis identisch sind. **Wer Views benutzt, muss deshalb ihre Definition und ihren Query Plan kennen.**
