@@ -4,7 +4,7 @@ import timeit
 conn = connect("./onlineshop.db")
 
 # number of iterations
-N_ITERATIONS = 100
+N_ITERATIONS = 1000
 
 def select_view_a(conn):
     sql = """
