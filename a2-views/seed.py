@@ -57,7 +57,7 @@ def insert_bestellung(conn, kunde_id: int, bestelldatum: str) -> int:
         INSERT INTO bestellung (kunde_id, bestelldatum, status)
         VALUES (?, ?, ?)
     """
-    status_list = ["versendet", "in Bearbeitun", "neu"]
+    status_list = ["versendet", "in Bearbeitung", "neu"]
     status = status_list[random.randint(0, 2)]
     cursor = conn.execute(
         sql,
