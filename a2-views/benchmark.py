@@ -16,7 +16,7 @@ def measure_view_a(conn, kunde_id: int):
 def measure_view_b(conn, kunde_id: int):
     sql = f"""
         SELECT *
-        FROM letzte_bestellung_a
+        FROM letzte_bestellung_b
         WHERE kunde_id = {kunde_id}
           AND bestellung_id <= 10000;
     """
