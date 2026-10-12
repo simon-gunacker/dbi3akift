@@ -37,7 +37,7 @@ LEFT JOIN bestellung AS b ON
 LEFT JOIN kunde AS k ON
     b.kunde_id = k.id;
 
-CREATE VIEW IF NOT EXISTS subselect_view_a AS
+CREATE VIEW IF NOT EXISTS letzte_bestellung_a AS
 SELECT
     b.kunde_id,
     b.id AS bestellung_id,
@@ -51,7 +51,7 @@ WHERE b.bestelldatum = (
 );
 
 
-CREATE VIEW IF NOT EXISTS joinselect_view_b AS
+CREATE VIEW IF NOT EXISTS letzte_bestellung_b AS
 SELECT
     b.kunde_id,
     b.id AS bestellung_id,
