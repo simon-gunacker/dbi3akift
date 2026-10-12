@@ -297,10 +297,11 @@ def start_db(conn):
 
 
 if __name__ == "__main__":
-    seed = input("Ohne seed Enter: ")
+    seed = input("Default(42) seed Enter: ")
     if os.path.exists("shop.db"):
         os.remove("shop.db")
     if seed == "":
+        random.seed(42)
         start_db()
     else:
         random.seed(seed)
