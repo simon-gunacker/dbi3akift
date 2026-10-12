@@ -2,32 +2,36 @@ import sqlite3
 import timeit
 
 DB = "shop.db"
-WIEDERHOLUNGEN = 1000
-WIEDERHOLUNGEN_ALLE = 5
+WIEDERHOLUNGEN = 100
+WIEDERHOLUNGEN_ALLE = 3
 
 def var_a (cursor):
     sql = """SELECT *
             FROM letzte_bestellung_a
-            WHERE kunde_id = 42; """
+            WHERE kunde_id = 42
+            LIMIT 10000; """
 
     cursor.execute(sql).fetchall()
 
 def var_b (cursor):
     sql = """SELECT *
             FROM letzte_bestellung_b
-            WHERE kunde_id = 42; """
+            WHERE kunde_id = 42
+            LIMIT 10000; """
 
     cursor.execute(sql).fetchall()
 
 def var_a_alle (cursor):
     sql = """SELECT *
-            FROM letzte_bestellung_a;"""
+            FROM letzte_bestellung_a
+            LIMIT 10000;"""
 
     cursor.execute(sql).fetchall()
 
 def var_b_alle (cursor):
     sql = """SELECT *
-            FROM letzte_bestellung_b;"""
+            FROM letzte_bestellung_b
+            LIMIT 10000;"""
 
     cursor.execute(sql).fetchall()
     
@@ -52,6 +56,5 @@ def main():
     print(f"Faktor: {faktor:.2f}")
     conn.close()
 
-    
 if __name__ == "__main__":
     main()
