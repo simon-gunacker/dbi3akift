@@ -47,11 +47,13 @@ WHERE b.bestelldatum = (
     SELECT MAX(b2.bestelldatum)
     FROM bestellung b2
     WHERE b2.kunde_id = b.kunde_id
+    --LIMIT 10000;
 );
 
 SELECT *
 FROM letzte_bestellung_a
-WHERE kunde_id = 42;
+WHERE kunde_id = 42
+LIMIT 10000;
 --42|5212|2026-07-17 06:53:10
 
 --View A Aufrufe = 1000 Zeit = 93.4351860480092sec
@@ -69,6 +71,7 @@ JOIN (
         MAX(bestelldatum) AS bestelldatum
     FROM bestellung
     GROUP BY kunde_id
+    --LIMIT 10000;
 ) letzte
     ON letzte.kunde_id = b.kunde_id
    AND letzte.bestelldatum = b.bestelldatum;
@@ -76,7 +79,10 @@ JOIN (
 
 SELECT *
 FROM letzte_bestellung_b
-WHERE kunde_id = 42;
+WHERE kunde_id = 42
+LIMIT 10000;
+;
+
 --42|5212|2026-07-17 06:53:10
 
 -- View B Aufrufe = 1000 Zeit = 10.218509223981528sec
@@ -97,7 +103,7 @@ WHERE kunde_id = 42;
 -- QUERY PLAN
 -- |--SCAN b    -->vollständiger tabellen scan zeile für zeile
 -- `--CORRELATED SCALAR SUBQUERY 3   -->für jede zeile in b wird eine unterabfrage ausgeführt
---    `--SEARCH b2
+--    `--SEARCH b2  -->"SEARCH" indicates that only a subset of the table rows are visited
 
 
 

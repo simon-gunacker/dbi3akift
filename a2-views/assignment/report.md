@@ -41,8 +41,9 @@ Ja:
 ```sql
 SELECT *
 FROM letzte_bestellung_a
-WHERE kunde_id = 42;
-WHERE kunde_id = 42;
+WHERE kunde_id = 42
+LIMIT 10000;
+;
 ```
 ```text
 --> 42|5212|2026-07-17 06:53:10
@@ -50,7 +51,9 @@ WHERE kunde_id = 42;
 ```sql
 SELECT *
 FROM letzte_bestellung_b
-WHERE kunde_id = 42;
+WHERE kunde_id = 42
+LIMIT 10000;
+;
 ```
 ```text
 --> 42|5212|2026-07-17 06:53:10
