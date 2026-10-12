@@ -1,0 +1,3 @@
+# Überlege, welchen Vorteil eine solche View gegenüber einem direkten Zugriff auf die Tabelle haben kann.
+
+Der wohl größte Vorteil ist hier der Datenschutz, da die Mitarbeiter des Onlineshops, die nur Zugriff auf diese View haben, keine Einsicht auf persönliche Daten wie Geburtsdatum oder Adresse erhalten. Des weiteren kann die Tabelle "Kunde" nicht über die View verändert werden, was Datenmanipulation verhindert.
