@@ -1,6 +1,23 @@
-#erste View
+-- erste View
 
 CREATE VIEW IF NOT EXISTS kunden_oeffentlich AS
 SELECT id, vorname, nachname, email
 FROM kunde;
+
+-- Vorteil: kann wiederverwendet werden, um die Daten zu filtern, ohne die Originaltabellen zu verändern.
+-- Kann auch für Datenschutz und Sicherheit verwendet werden, indem nur bestimmte Spalten für die Öffentlichkeit zugänglich gemacht werden.
+
+
+-- zweite View
+CREATE VIEW IF NOT EXISTS bestellwert AS
+SELECT
+    b.id AS bestallung_id,
+    b.kunde_id,
+    SUM(p.preis * bp.menge) AS gesamtwert
+FROM bestellung b
+JOIN bestellposition bp ON b.id = bp.bestellung_id
+JOIN produkt p ON bp.produkt_id = p.id
+GROUP BY b.id, b.kunde_id;
+
+-- drittes View
 
