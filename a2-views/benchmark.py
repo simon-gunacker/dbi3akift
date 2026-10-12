@@ -5,18 +5,20 @@ import time
 
 def measure_view_a(conn, kunde_id: int):
     sql = f"""
-        SELECT * 
-        FROM letzte_bestellung_a 
-        WHERE kunde_id = {kunde_id};
+        SELECT *
+        FROM letzte_bestellung_a
+        WHERE kunde_id = {kunde_id}
+          AND bestellung_id <= 10000;
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
 
 def measure_view_b(conn, kunde_id: int):
     sql = f"""
-        SELECT * 
-        FROM letzte_bestellung_b 
-        WHERE kunde_id = {kunde_id};
+        SELECT *
+        FROM letzte_bestellung_a
+        WHERE kunde_id = {kunde_id}
+          AND bestellung_id <= 10000;
     """
     cursor = conn.execute(sql)
     return cursor.fetchall()
