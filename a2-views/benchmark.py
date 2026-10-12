@@ -1,4 +1,4 @@
-from seed import with_connect
+from seed import with_connect, check_view_performance_even
 import sqlite3
 import timeit
 import time
@@ -39,6 +39,7 @@ def test(conn, kunde_id: int, repeat: int):
 
     print(f"View A - Gesamt: {time_a:.4f}s | Schnitt pro Aufruf: {avg_a:.6f}s")
     print(f"View B - Gesamt: {time_b:.4f}s | Schnitt pro Aufruf: {avg_b:.6f}s")
+    print(f"Sind die Ausgaben vom Performance check identisch: {check_view_performance_even(conn)}")
 
 if __name__ == "__main__":
     start_time = time.perf_counter()
