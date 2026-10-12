@@ -74,10 +74,14 @@ PRODUCT_SUFFIXES = [
 # number of orders
 N_ORDERS = 100000
 
-# 
+# 5 different status of orders
 ORDER_STATUS = [
     "ordered", "packaged", "shipped", "delivered", "canceled"
 ]
+
+# Order positions------------------------------------------------
+# number of order positions
+N_ORDER_POSITIONS = 500000
 
 
 conn = connect("./onlineshop.db")
@@ -100,7 +104,7 @@ def create_customers(conn):
         counter += 1
     conn.commit()
 
-def create_product(conn):
+def create_products(conn):
     counter = 0
     while counter < N_PRODUCTS:
         sql = """ 
@@ -115,7 +119,7 @@ def create_product(conn):
         counter += 1
     conn.commit()
 
-def create_order(conn):
+def create_orders(conn):
     counter = 0
     while counter < N_ORDERS:
         sql = """ 
@@ -129,3 +133,28 @@ def create_order(conn):
         cursor.execute(sql, (customer_id, date, status))
         counter += 1
     conn.commit()
+
+def create_order_positions(conn):
+    cursor = conn.cursor()
+    sql = """
+    INSERT INTO bestellposition(bestellung_id, produkt_id, menge)
+    VALUES (?, ?, ?)
+    """
+    used = set()
+    while len(used) < N_ORDER_POSITIONS:
+        order_id = random.randint(1, N_ORDERS)
+        product_id = random.randint(1, N_PRODUCTS)
+        key = (order_id, product_id)
+        if key in used:
+            continue
+        used.add(key)
+        quantity = random.randint(1, 20)
+        cursor.execute(sql, (order_id, product_id, quantity))
+
+    conn.commit()
+
+
+create_customers(conn)
+create_products(conn)
+create_orders(conn)
+create_order_positions(conn)
