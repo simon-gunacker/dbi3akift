@@ -34,3 +34,33 @@ SELECT b.id AS bestellnummer, b.kunde_id AS kundennummer,
 SELECT * 
 FROM wichtige_info
 WHERE bestellstatus = 'Versendet';
+
+--Aufgabe 6:
+DROP VIEW IF EXISTS letzte_bestellung_a;
+CREATE VIEW letzte_bestellung_a AS 
+    SELECT
+        b.kunde_id,
+        b.id AS bestellung_id,
+        b.bestelldatum
+    FROM bestellung b
+    WHERE b.bestelldatum = (
+        SELECT MAX(b2.bestelldatum)
+        FROM bestellung b2
+        WHERE b2.kunde_id = b.kunde_id);
+
+DROP VIEW IF EXISTS letzte_bestellung_b;
+CREATE VIEW letzte_bestellung_b AS 
+    SELECT
+        b.kunde_id,
+        b.id AS bestellung_id,
+        b.bestelldatum
+    FROM bestellung b
+    JOIN (
+        SELECT
+            kunde_id,
+            MAX(bestelldatum) AS bestelldatum
+        FROM bestellung
+        GROUP BY kunde_id
+    ) letzte
+        ON letzte.kunde_id = b.kunde_id
+    AND letzte.bestelldatum = b.bestelldatum;
