@@ -22,7 +22,7 @@ print(f"Ergebnis A für 1 Ausführung: {int(minuten_a)} Minuten {sekunden_a:.3f}
 print(f"Ergebnis B für 1 Ausführung: {int(minuten_b)} Minuten {sekunden_b:.3f} Sekunden")
 
 faktor = zeit_a / zeit_b
-print(f"Fakor: {faktor:.3f}")
+print(f"Faktor: {faktor:.3f}")
 
 gesamtzeit_abfrage = time.perf_counter() - startzeit_abfrage
 print(f"Gesamtdauer: {int(gesamtzeit_abfrage // 60)} Minuten {gesamtzeit_abfrage % 60:.3f} Sekunden")
