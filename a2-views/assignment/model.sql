@@ -1,3 +1,5 @@
+-- mit .read in der database erzeugen
+
 CREATE TABLE kunde (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     vorname VARCHAR,
