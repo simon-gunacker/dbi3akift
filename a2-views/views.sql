@@ -37,12 +37,26 @@ CREATE VIEW IF NOT EXISTS letzte_bestellung_a AS
 SELECT
     b.kunde_id,
     b.id AS bestellung_id,
-    b.bestelldatum,
+    b.bestelldatum
 FROM bestellung b
-WHERE b.bestelldatum = (
+WHERE b.id <= 10000 AND b.bestelldatum = (
     SELECT MAX(bestelldatum)
     FROM bestellung b2
     WHERE b2.kunde_id = b.kunde_id
-    AND b.id <= 10000
+    AND b2.id <= 10000
 );
 
+CREATE VIEW IF NOT EXISTS letzte_bestellung_b AS
+SELECT
+    b.kunde_id,
+    b.id AS bestellung_id,
+    b.bestelldatum
+    FROM bestellung b
+JOIN(
+    SELECT kunde_id, MAX(bestelldatum) AS bestelldatum
+    FROM bestellung
+    WHERE id <= 10000
+    GROUP BY kunde_id
+) letzte
+    ON letzte.kunde_id = b.kunde_id AND letzte.bestelldatum = b.bestelldatum
+    WHERE b.id <= 10000;
