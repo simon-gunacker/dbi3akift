@@ -186,7 +186,7 @@ def insert_bestellpos(cursor, bestellpos):
 def main(): 
     random.seed(RANDOM_SEED)
 
-    conn = sqlite3.connect(DB)
+    conn = connect(DB)
     cursor = conn.cursor()
 
     cursor.execute("PRAGMA foreign_keys = ON")
