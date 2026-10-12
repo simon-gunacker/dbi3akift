@@ -1,4 +1,4 @@
-#from sqlite import connect
+from sqlite3 import connect
 import random
 import json
 
@@ -6,15 +6,15 @@ DB = "miniature_shop.db"
 KUNDE_ROWS = 10000
 PRODUKT_ROWS = 10000
 BESTELLUNG_ROWS = 100000
-BESTELLPOS_ROWS = 500000
 
 RANDOM_SEED = 42
 
 NAMES_PATH = "./json_data/names.json"
 ADDR_PATH = "./json_data/addresses.json"
-PRODUCTS_PATH = "./jsond_data/products.json"
+PRODUCTS_PATH = "./json_data/products.json"
 
 STATUS_LIST = ["bestellt", "bezahlt", "versandbereit", "versandt", "erhalten"]
+
 """
 kunde: 
     - vorname/nachname: List + random choice
@@ -130,8 +130,82 @@ def create_bestellpos(rows):
                 menge
             )
 
+def insert_kunden(cursor, kunden):
+    cursor.executemany(
+    """
+        INSERT INTO kunde(
+            vorname, 
+            nachname, 
+            email, 
+            geburtsdatum, 
+            telefon, 
+            adresse
+        )
+        VALUES (?, ?, ?, ?, ?, ?);
+    """,
+    kunden)
 
-"""
+def insert_produkt(cursor, produkte): 
+    cursor.executemany(
+    """
+        INSERT INTO produkt(
+            bezeichnung, 
+            preis, 
+            lagerbestand
+        )
+        VALUES (?, ?, ?);
+    """,
+    produkte)
+
+def insert_bestellung(cursor, bestellungen): 
+    cursor.executemany(
+    """
+        INSERT INTO bestellung(
+            kunde_id, 
+            bestelldatum, 
+            status
+        )
+        VALUES (?, ?, ?);
+    """,
+    bestellungen
+    )
+
+def insert_bestellpos(cursor, bestellpos):
+    cursor.executemany(
+    """
+        INSERT INTO bestellposition(
+            bestellung_id,
+            produkt_id,
+            menge
+        )
+        VALUES (?, ?, ?);
+    """,
+        bestellpos
+    )
+
+def main(): 
+    random.seed(RANDOM_SEED)
+
+    conn = sqlite3.connect(DB)
+    cursor = conn.cursor()
+
+    cursor.execute("PRAGMA foreign_keys = ON")
+
+    kunden = create_kunden(KUNDE_ROWS)
+    insert_kunden(cursor, kunden)
+
+    produkte = create_produkte(PRODUKT_ROWS)
+    insert_produkt(cursor, produkte)
+
+    bestellungen = create_bestellung(BESTELLUNG_ROWS)
+    insert_bestellung(cursor, bestellungen)
+
+    bestellpos = create_bestellpos(BESTELLUNG_ROWS)
+    insert_bestellpos(cursor, bestellpos)
+
+    conn.commit()
+    conn.close()
+
+
 if __name__ == "__main__":
     main()
-"""
