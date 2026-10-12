@@ -70,6 +70,16 @@ PRODUCT_SUFFIXES = [
 ]
 
 
+# Orders------------------------------------------------
+# number of orders
+N_ORDERS = 100000
+
+# 
+ORDER_STATUS = [
+    "ordered", "packaged", "shipped", "delivered", "canceled"
+]
+
+
 conn = connect("./onlineshop.db")
 
 def create_customers(conn):
@@ -102,5 +112,20 @@ def create_product(conn):
         price = f"{random.randint(40000, 1000000)}"
         quantity = f"{random.randint(1, 150)}"
         cursor.execute(sql, (product_name, price, quantity))
+        counter += 1
+    conn.commit()
+
+def create_order(conn):
+    counter = 0
+    while counter < N_ORDERS:
+        sql = """ 
+        INSERT INTO bestellung(kunde_id, bestelldatum, status)
+        VALUES (?, ?, ?)
+        """
+        cursor = conn.cursor()
+        customer_id = random.randint(1, N_CUSTOMERS)
+        date = f"{random.randint(2020, 2026)}-{random.randint(1, 12):02d}-{random.randint(1, 28):02d}"
+        status = f"{random.choice(ORDER_STATUS)}"
+        cursor.execute(sql, (customer_id, date, status))
         counter += 1
     conn.commit()
