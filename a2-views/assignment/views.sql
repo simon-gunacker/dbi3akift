@@ -1,41 +1,39 @@
 
------------3--------------
+-----------3--View für eine vereinfachte Sicht-------
+.mode table
 DROP VIEW IF EXISTS kunde_view;
-CREATE VIEW kunde_view AS
+CREATE VIEW IF NOT EXISTS kunde_view AS
 SELECT id, vorname, nachname, email
 FROM kunde;
 
-----------4---------------------
-DROP VIEW IF EXISTS gesamtwertBestellung;
-CREATE VIEW gesamtwertBestellung AS
-SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id AS Kundennummer, ROUND(sum(bestellposition.menge *produkt.preis),2) as Gesamtwert
-FROM bestellung
-JOIN bestellposition ON bestellung.id = bestellposition.bestellung_id
-JOIN produkt ON bestellposition.produkt_id = produkt.id
-GROUP BY bestellung.id;
+SELECT * FROM kunde_view LIMIT 5;
 
----------5.---------
+----------4--___-View mit zusammengefassten Daten---------View con datos resumidos
+
+DROP VIEW IF EXISTS gesamtwertBestellung;
+CREATE VIEW IF NOT EXISTS gesamtwertBestellung AS SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id, SUM(bestellposition.menge * produkt.preis) AS  Gesamtwert FROM bestellung JOIN bestellposition ON bestellung.id = bestellposition.bestellung_id JOIN produkt ON bestellposition.produkt_id = produkt.id GROUP BY bestellung.id;
+
+SELECT * FROM gesamtwertBestellung LIMIT 5;
+
+
+------5.-----View als vereinfachte Schnittstelle---View como interfaz simplificada
+
 DROP VIEW IF EXISTS bestellungMitKunde;
-CREATE VIEW bestellungMitKunde AS
-SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id AS Kundennummer, bestellung.bestelldatum AS Bestelldatum, bestellung.status AS Bestellstatus,  kunde.vorname AS Vorname, kunde.nachname AS Nachname
-FROM bestellung
-JOIN kunde ON bestellung.kunde_id = kunde.id;
+CREATE VIEW IF NOT EXISTS bestellungMitKunde AS SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id AS Kundennummer, bestellung.bestelldatum AS Bestelldatum, bestellung.status AS Bestellstatus, kunde.vorname AS Vorname, kunde.nachname AS Nachname FROM bestellung JOIN kunde ON bestellung.kunde_id = kunde.id;
+
+SELECT * FROM  bestellungMitKunde LIMIT 5;
+
 
 ---Welche Bestellungen von Anna Gruber sind storniert?
 ----mit view
-SELECT * FROM bestellungMitKunde WHERE Vorname = 'Anna' and Nachname = 'Gruber' and Bestellstatus = 'storniert';
--- Mit der View ist die Abfrage einfacher und kürzer.
+SELECT * FROM bestellungMitKunde WHERE Vorname = 'Anna' AND Nachname = 'Gruber' AND  Bestellstatus = 'storniert' LIMIT 5;
 
 ---ohne view
-SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id AS kundennummer, bestellung.bestelldatum AS Bestelldatum, bestellung.status AS Bestellstatus, kunde.vorname AS Vorname, kunde.nachname AS Nachname
-FROM bestellung
-JOIN kunde ON  bestellung.kunde_id = kunde.id
-WHERE Vorname = 'Anna' and Nachname = 'Gruber' and Bestellstatus = 'storniert';
--- Ohne View muss man jedes Mal die ganze Abfrage mit dem JOIN schreiben.
+SELECT bestellung.id AS Bestellnummer, bestellung.kunde_id AS Kundennummer, bestellung.bestelldatum AS  Bestelldatum, bestellung.status AS  Bestellstatus, kunde.vorname AS Vorname, kunde.nachname AS Nachname FROM bestellung JOIN kunde ON  bestellung.kunde_id = kunde.id WHERE Vorname= 'Anna' AND Nachname = 'Gruber' AND Bestellstatus = 'storniert' LIMIT 5;
 
-
---------6------------
+--------6------------Views und Performance
 ---1. Erstelle die Views letzte_bestellung_a und letzte_bestellung_b
+
 DROP VIEW IF EXISTS letzte_bestellung_a;
 CREATE VIEW letzte_bestellung_a AS
 
@@ -71,27 +69,18 @@ JOIN (
    AND letzte.bestelldatum = b.bestelldatum
 WHERE b.id <= 10000;
 
--- 2.- Überprüfe, dass beide Views dieselben Ergebnisse liefern
+-- 2. Überprüfe, dass beide Views dieselben Ergebnisse liefern
+SELECT * FROM letzte_bestellung_a EXCEPT SELECT * FROM letzte_bestellung_b;
+SELECT * FROM letzte_bestellung_b EXCEPT SELECT * FROM letzte_bestellung_a;
 
 
+.timer on
+SELECT COUNT(*) FROM letzte_bestellung_a;
 
-/*
+SELECT COUNT(*) FROM letzte_bestellung_b;
 
-sqlite> .timer on
-sqlite> SELECT COUNT(*) FROM letzte_bestellung_a;
-+----------+
-| COUNT(*) |
-+----------+
-| 6279     |
-+----------+
-Run Time: real 17.256 user 17.243152 sys 0.007125
-sqlite> SELECT COUNT(*) FROM letzte_bestellung_b;
-+----------+
-| COUNT(*) |
-+----------+
-| 6279     |
-+----------+
-Run Time: real 0.028 user 0.027442 sys 0.000000
+---6---Wichtig----
 
+EXPLAIN QUERY PLAN SELECT * FROM letzte_bestellung_a WHERE kunde_id = 42;
+EXPLAIN QUERY PLAN SELECT * FROM letzte_bestellung_b WHERE kunde_id = 42;
 
-*/

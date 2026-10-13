@@ -9,10 +9,6 @@ def abfrageB(conn):
 
 
 
-
-
-
-
 #------main----
 def main():
 
@@ -26,7 +22,7 @@ def main():
         faktor = AvgA/AvgB
 
         print(f"Average A: {AvgA:.4f} s, Average B: {AvgB:.4f} s ")
-        print (f"A ist {faktor:.1f} mehr langsame als B")
+        print (f"A ist {faktor:.1f} mal langsamer als B")
     conn.close()
 
 if __name__ == "__main__":
