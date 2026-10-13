@@ -12,7 +12,7 @@ id integer PRIMARY KEY AUTOINCREMENT
 CREATE TABLE product(
 id integer PRIMARY KEY AUTOINCREMENT
 ,bezeichnung varchar(255)
-,preis decimal not null
+,preis decimal(10,2) not null-- wichtig festkommazahl festlegen
 ,lagerbestand int
 );
 
