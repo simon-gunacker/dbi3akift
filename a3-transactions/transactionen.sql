@@ -9,12 +9,9 @@ VALUES  (1);
 
 INSERT INTO bestellposition(artikel_id,menge)
 VALUES(1,5)
+,(2,2),
+,(3,50)
 
-INSERT INTO bestellposition(artikel_id,menge)
-VALUES(2,2)
-
-INSERT INTO bestellposition(artikel_id,menge)
-VALUES(3,50)
 
 UPDATE artikel
 SET lagerbestand = lagerbestand -5
@@ -60,6 +57,9 @@ SET aktueller_kredit = aktueller_kredit+(
 )
 WHERE id = 1;
 
+
+-- INSERT INTO lagerbewegung (artikel_id, bestellung_id,menge,)
+-- VALUES  (1);
 
 
 END TRANSACTION
