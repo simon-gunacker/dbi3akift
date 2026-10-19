@@ -7,10 +7,10 @@ FROM kunde
 INSERT INTO bestellung (kunde_id)
 VALUES  (1);
 
-INSERT INTO bestellposition(artikel_id,menge)
-VALUES(1,5)
-,(2,2),
-,(3,50)
+INSERT INTO bestellposition(bestellung_id,artikel_id,menge)
+VALUES(last_insert_rowid(),1,5)
+,(last_insert_rowid(),2,2),
+,(last_insert_rowid(),3,50)
 ;
 
 
@@ -65,6 +65,6 @@ VALUES
 ,(2,1,-2,'verkauf')
 ,(3,1,-50,'verkauf')
 ;
-
+--todo last_insert_rowid()
 
 END TRANSACTION
