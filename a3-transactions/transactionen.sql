@@ -52,7 +52,13 @@ SET gesamtwert =gesamtwert+(
 )
 WHERE id=1;
 
-
+UPDATE kunde
+SET aktueller_kredit = aktueller_kredit+(
+    SELECT gesamtwert
+    FROM bestellung
+    WHERE id = 1
+)
+WHERE id = 1;
 
 
 
