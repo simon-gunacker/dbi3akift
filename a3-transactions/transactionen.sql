@@ -62,9 +62,13 @@ UPDATE kunde
 SET aktueller_kredit = aktueller_kredit+(
     SELECT gesamtwert
     FROM bestellung
-    WHERE id = 1
+    WHERE id = last_insert_rowid()
 )
-WHERE id = 1;
+WHERE id =(
+    SELECT kunde_id
+    FROM bestellung
+    WHERE id = last_insert_rowid()
+);
 
 
 INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
