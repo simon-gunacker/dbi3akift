@@ -34,21 +34,25 @@ SET gesamtwert =(
     FROM bestellposition
     WHERE bestellung_id = 1 AND artikel_id = 1
 )
-WHERE id=1
+WHERE id=1;
+
 UPDATE bestellung 
 SET gesamtwert = gesamtwert+(
     SELECT SUM(MENGE * einzelpreis)
     FROM bestellposition
     WHERE bestellung_id = 1 AND artikel_id =2
 )
-WHERE id=1
+WHERE id=1;
+
 UPDATE bestellung 
 SET gesamtwert =gesamtwert+(
     SELECT SUM(MENGE * einzelpreis)
     FROM bestellposition
     WHERE bestellung_id = 1 AND artikel_id = 3
 )
-WHERE id=1
+WHERE id=1;
+
+
 
 
 
