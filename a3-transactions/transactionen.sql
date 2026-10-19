@@ -59,8 +59,12 @@ SET aktueller_kredit = aktueller_kredit+(
 WHERE id = 1;
 
 
--- INSERT INTO lagerbewegung (artikel_id, bestellung_id,menge,)
--- VALUES  (1);
+INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
+VALUES  
+(1,1,-5,'verkauf')
+,(2,1,-2,'verkauf')
+,(3,1,-50,'verkauf')
+;
 
 
 END TRANSACTION
