@@ -11,6 +11,7 @@ INSERT INTO bestellposition(artikel_id,menge)
 VALUES(1,5)
 ,(2,2),
 ,(3,50)
+;
 
 
 UPDATE artikel
