@@ -47,19 +47,34 @@ def select_all_kunde(conn):
     return cursor.fetchall()
 
 
+def get_id_kunde(conn, name: str) -> int:
+    sql = f"""
+        SELECT id
+        FROM kunde
+        WHERE name = '{name}';
+        """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["id"]
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
-        with open("model.sql", encoding="utf-8") as file:
-            conn.executescript(file.read())
+    with open("model.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
 
-        with open("test_data.sql", encoding="utf-8") as file:
-            conn.executescript(file.read())
+    with open("test_data.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
 
-        for i in select_all_artikel(conn):
-            print(i)
+    for i in select_all_artikel(conn):
+        print(i)
 
-        for i in select_all_kunde(conn):
-            print(i)
+    for i in select_all_kunde(conn):
+        print(i)
+
+    print(get_id_kunde(conn, "TechShop Wien"))
+
+        
 
 
 if __name__ == "__main__":
