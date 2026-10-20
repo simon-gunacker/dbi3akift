@@ -75,10 +75,24 @@ def get_sum_order(conn, article: dict) -> int:
     return result
 
 
+def get_id_article(conn, name: str) -> int:
+    sql = f"""
+        SELECT id
+        FROM artikel
+        WHERE name = '{name}'
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["id"]
+
+
+
+
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
+    sum_of_order = get_sum_order(conn, article)
 
-    print(get_sum_order(conn, article))
+    get_id_article(conn, "Arduino Uno")
 
 
 @with_connect(":memory:")
