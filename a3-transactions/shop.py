@@ -106,7 +106,6 @@ def get_id_article(conn, name: str) -> int:
     return cursor.fetchone()["id"]
 
 
-
 def get_price(conn, name: str) -> double:
     sql = f"""
         SELECT verkaufspreis 
@@ -141,6 +140,16 @@ def insert_order_position(conn, order_id: int, article_id: int, amount: int, pri
              )
 
 
+def update_storage(conn, article_id: int, amount: int):
+    sql = f"""
+        UPDATE artikel
+        SET lagerbestand = lagerbestand - {amount}
+        WHERE id = {article_id}
+    """
+
+    conn.execute(sql)
+
+
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
     sum_of_order = get_sum_order(conn, article)
@@ -148,9 +157,8 @@ def transaction(conn, customer: str, article: dict):
 
     for name, amount in article.items():
         insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
+        update_storage(conn, get_id_article(conn, name), amount)
 
-    print(select_all_bestellung(conn))
-    print(select_all_bestellposition(conn))
 
 
 @with_connect(":memory:")
