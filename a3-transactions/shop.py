@@ -150,6 +150,16 @@ def update_storage(conn, article_id: int, amount: int):
     conn.execute(sql)
 
 
+def update_customer_credit(conn, customer_id: int, sum_of_order: int):
+    sql = f"""
+        UPDATE kunde
+        SET aktueller_kredit = aktueller_kredit + {sum_of_order}
+        WHERE id = {customer_id}
+    """
+
+    conn.execute(sql)
+
+
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
     sum_of_order = get_sum_order(conn, article)
@@ -158,6 +168,8 @@ def transaction(conn, customer: str, article: dict):
     for name, amount in article.items():
         insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
         update_storage(conn, get_id_article(conn, name), amount)
+
+    update_customer_credit(conn, customer_id, sum_of_order)
 
 
 
