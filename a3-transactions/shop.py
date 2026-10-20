@@ -47,7 +47,7 @@ def select_all_kunde(conn):
     return cursor.fetchall()
 
 
-def get_id_kunde(conn, name: str) -> int:
+def get_kunde_id(conn, name: str) -> int:
     sql = f"""
         SELECT id
         FROM kunde
@@ -72,7 +72,7 @@ def test_in_memory(conn):
     for i in select_all_kunde(conn):
         print(i)
 
-    print(get_id_kunde(conn, "TechShop Wien"))
+
 
         
 
