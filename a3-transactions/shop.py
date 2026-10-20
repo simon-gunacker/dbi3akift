@@ -98,7 +98,7 @@ def get_price(conn, name: str) -> double:
     return cursor.fetchone()["verkaufspreis"]
 
 
-def insert_order(conn, customer_id: int, sum_of_order: int):
+def insert_order(conn, customer_id: int, sum_of_order: int) -> int:
     sql = """
         INSERT INTO bestellung (kunde_id, gesamtwert)
         VALUES(?, ?)
@@ -110,13 +110,24 @@ def insert_order(conn, customer_id: int, sum_of_order: int):
     return cursor.lastrowid
 
 
+def insert_order_position(conn, order_id: int, article_id: int, amount: int, price: double):
+    sql = """
+        INSERT INTO bestellposition (bestellung_id, artikel_id, menge, einzelpreis)
+        VALUES(?, ?, ?, ?)
+    """
+
+    conn.execute(sql,
+                 (order_id, article_id, amount, price),
+             )
+
+
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
     sum_of_order = get_sum_order(conn, article)
+    order_id = insert_order(conn, customer_id, sum_of_order)
 
-    get_id_article(conn, "Arduino Uno")
-    get_price(conn, "Arduino Uno")
-    print(insert_order(conn, customer_id, sum_of_order))
+    for name, amount in article.items():
+        insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
 
 
 @with_connect(":memory:")
