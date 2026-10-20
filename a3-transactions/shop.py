@@ -140,6 +140,19 @@ def insert_order_position(conn, order_id: int, article_id: int, amount: int, pri
              )
 
 
+def insert_storage_movement(conn, article_id: int, order_id: int, amount: int):
+    typ = "verkauf"
+    amount *= -1
+    sql = """
+        INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
+        VALUES(?, ?, ?, ?)
+    """
+
+    conn.execute(sql,(
+                     article_id, order_id, amount, typ),
+                 )
+
+
 def update_storage(conn, article_id: int, amount: int):
     sql = f"""
         UPDATE artikel
@@ -168,6 +181,7 @@ def transaction(conn, customer: str, article: dict):
     for name, amount in article.items():
         insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
         update_storage(conn, get_id_article(conn, name), amount)
+        insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
 
     update_customer_credit(conn, customer_id, sum_of_order)
 
