@@ -58,6 +58,12 @@ def get_kunde_id(conn, name: str) -> int:
     return cursor.fetchone()["id"]
 
 
+def transaction(conn, customer: str, article: dict):
+    customer_id = get_kunde_id(conn, customer)
+
+    
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     with open("model.sql", encoding="utf-8") as file:
