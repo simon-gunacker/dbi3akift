@@ -61,11 +61,15 @@ def get_kunde_id(conn, name: str) -> int:
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
 
-    
+
 
 
 @with_connect(":memory:")
 def test_in_memory(conn):
+    customer = "TechShop Wien"
+    article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED rot": 50}
+
+
     with open("model.sql", encoding="utf-8") as file:
         conn.executescript(file.read())
 
@@ -76,11 +80,7 @@ def test_in_memory(conn):
         print(i)
 
     for i in select_all_kunde(conn):
-        print(i)
-
-
-
-        
+        print(i)  
 
 
 if __name__ == "__main__":
