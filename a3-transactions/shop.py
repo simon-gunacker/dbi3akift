@@ -47,6 +47,26 @@ def select_all_kunde(conn):
     return cursor.fetchall()
 
 
+def select_all_bestellung(conn):
+    sql = """
+        SELECT *
+        FROM bestellung
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
+def select_all_bestellposition(conn):
+    sql = """
+        SELECT *
+        FROM bestellposition
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 def get_kunde_id(conn, name: str) -> int:
     sql = f"""
         SELECT id
@@ -128,6 +148,9 @@ def transaction(conn, customer: str, article: dict):
 
     for name, amount in article.items():
         insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
+
+    print(select_all_bestellung(conn))
+    print(select_all_bestellposition(conn))
 
 
 @with_connect(":memory:")
