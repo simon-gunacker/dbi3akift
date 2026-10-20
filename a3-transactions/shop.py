@@ -67,6 +67,16 @@ def select_all_bestellposition(conn):
     return cursor.fetchall()
 
 
+def select_all_lagerbewegung(conn):
+    sql = """
+        SELECT *
+        FROM lagerbewegung
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 def get_kunde_id(conn, name: str) -> int:
     sql = f"""
         SELECT id
@@ -184,7 +194,7 @@ def transaction(conn, customer: str, article: dict):
         insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
 
     update_customer_credit(conn, customer_id, sum_of_order)
-
+    print(select_all_lagerbewegung(conn))
 
 
 @with_connect(":memory:")
