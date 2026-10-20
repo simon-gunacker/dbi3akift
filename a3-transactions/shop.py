@@ -58,16 +58,33 @@ def get_kunde_id(conn, name: str) -> int:
     return cursor.fetchone()["id"]
 
 
+def get_sum_order(conn, article: dict) -> int:
+    result = 0
+    
+    for name, amount in article.items():
+        
+        sql = f"""
+            SELECT {amount} * verkaufspreis AS sum
+            FROM artikel
+            WHERE name = '{name}'
+        """
+
+        cursor = conn.execute(sql)
+        result += cursor.fetchone()["sum"]
+
+    return result
+
+
 def transaction(conn, customer: str, article: dict):
     customer_id = get_kunde_id(conn, customer)
 
-
+    print(get_sum_order(conn, article))
 
 
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
-    article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED rot": 50}
+    article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED 5mm rot": 50}
 
 
     with open("model.sql", encoding="utf-8") as file:
@@ -76,11 +93,7 @@ def test_in_memory(conn):
     with open("test_data.sql", encoding="utf-8") as file:
         conn.executescript(file.read())
 
-    for i in select_all_artikel(conn):
-        print(i)
-
-    for i in select_all_kunde(conn):
-        print(i)  
+    transaction(conn, customer, article_dict)
 
 
 if __name__ == "__main__":
