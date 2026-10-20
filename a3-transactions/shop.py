@@ -25,3 +25,42 @@ def with_connect(db):
         return wrapper
 
     return decorator
+
+
+def select_all_artikel(conn):
+    sql = """
+        SELECT *
+        FROM artikel;
+        """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
+def select_all_kunde(conn):
+    sql = """
+        SELECT *
+        FROM kunde;
+        """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
+@with_connect(":memory:")
+def test_in_memory(conn):
+        with open("model.sql", encoding="utf-8") as file:
+            conn.executescript(file.read())
+
+        with open("test_data.sql", encoding="utf-8") as file:
+            conn.executescript(file.read())
+
+        for i in select_all_artikel(conn):
+            print(i)
+
+        for i in select_all_kunde(conn):
+            print(i)
+
+
+if __name__ == "__main__":
+    test_in_memory()
