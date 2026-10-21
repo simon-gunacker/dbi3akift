@@ -8,5 +8,6 @@ with open("model.sql", "r", encoding="utf-8") as f:
 
 cursor.executescript(model)
 
+print("Datenbank erstellt und mit daten befühlt")
 conn.commit()
 conn.close()
