@@ -2,38 +2,40 @@ import sqlite3
 
 conn = sqlite3.connect("transactions.db")
 cursor = conn.cursor()
+try: 
+    kunde_id = cursor.execute("SELECT id FROM kunde WHERE name LIKE 'TechShop Wien'").fetchone()[0]
 
-kunde_id = cursor.execute("SELECT id FROM kunde WHERE name LIKE 'TechShop Wien'").fetchone()[0]
+    bestellung = [('Arduino Uno', 5), ('Raspberry Pi 4', 2), ('LED 5mm rot', 50)]
 
-bestellung = [('Arduino Uno', 5), ('Raspberry Pi 4', 2), ('LED 5mm rot', 50)]
+    cursor.execute("BEGIN TRANSACTION;")
+    # Bestellung anlegen
+    cursor.execute("INSERT INTO bestellung (kunde_id) VALUES (?)", (kunde_id,))
 
-cursor.execute("BEGIN TRANSACTION;")
-# Bestellung anlegen
-cursor.execute("INSERT INTO bestellung (kunde_id) VALUES (?)", (kunde_id,))
+    bestellung_id = cursor.lastrowid
 
-bestellung_id = cursor.lastrowid
+    for name, menge in bestellung:
+        artikel_id, einzelpreis= cursor.execute("SELECT id, verkaufspreis FROM artikel WHERE name = ?", (name,)).fetchone()
 
-for name, menge in bestellung:
-    artikel_id, einzelpreis= cursor.execute("SELECT id, verkaufspreis FROM artikel WHERE name = ?", (name,)).fetchone()
+        # Bestellpositionen einfügen
+        cursor.execute("INSERT INTO bestellposition (bestellung_id, artikel_id, menge, einzelpreis) VALUES (?,?,?,?)", (bestellung_id, artikel_id, menge, einzelpreis))
 
-    # Bestellpositionen einfügen
-    cursor.execute("INSERT INTO bestellposition (bestellung_id, artikel_id, menge, einzelpreis) VALUES (?,?,?,?)", (bestellung_id, artikel_id, menge, einzelpreis))
+        #Lagerbestand reduziweren 
+        cursor.execute("UPDATE artikel SET lagerbestand = lagerbestand - ? WHERE id = ?", (menge, artikel_id))
 
-    #Lagerbestand reduziweren 
-    cursor.execute("UPDATE artikel SET lagerbestand = lagerbestand - ? WHERE id = ?", (menge, artikel_id))
+        # Lagerbewegungen
+        cursor.execute("INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?,?,?, 'verkauf')", (artikel_id, bestellung_id, -menge),)
 
-    # Lagerbewegungen
-    cursor.execute("INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?,?,?, 'verkauf')", (artikel_id, bestellung_id, -menge),)
+        #Gesamtpreis 
+        gesamtwert = menge * einzelpreis
 
-    #Gesamtpreis 
-    gesamtwert = menge * einzelpreis
+    # Gesamtwert eintragen
+    cursor.execute("UPDATE bestellung SET gesamtwert = ? WHERE id = ?", (gesamtwert, bestellung_id))
 
-# Gesamtwert eintragen
-cursor.execute("UPDATE bestellung SET gesamtwert = ? WHERE id = ?", (gesamtwert, bestellung_id))
+    cursor.execute("END TRANSACTION;")
 
-cursor.execute("END TRANSACTION;")
+    print("alles hat funkuniert")
 
-print("alles hat funkuniert")
+except sqlite3.Error as error:
+    cursor.execute("ROLLBACK;")
 
-conn.commit()
 conn.close()
