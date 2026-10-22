@@ -3,7 +3,7 @@ import sqlite3
 conn = sqlite3.connect("transactions.db")
 cursor = conn.cursor()
 
-kunde_id = cursor.execute("SELECT id FROM kunde WHERE name LIKE 'TechShop Wien'").fetchone()[0]
+kunde_id = cursor.execute("SELECT id FROM kunde WHERE name = 'TechShop Wien'").fetchone()[0]
 
 bestellung = [('Arduino Uno', 5), ('Raspberry Pi 4', 2), ('LED 5mm rot', 50)]
 
@@ -30,6 +30,9 @@ for name, menge in bestellung:
 
 # Gesamtwert eintragen
 cursor.execute("UPDATE bestellung SET gesamtwert = ? WHERE id = ?", (gesamtwert, bestellung_id))
+
+# Kundenkredit erhöhen
+cursor.execute("UPDATE kunde SET kreditlimit = ? WHERE id = ?", (gesamtwert, kunde_id))
 
 cursor.execute("END TRANSACTION;")
 
