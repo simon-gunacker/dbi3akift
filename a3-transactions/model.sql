@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 -- Artikel im Lager
 CREATE TABLE artikel (
     id INTEGER PRIMARY KEY,
