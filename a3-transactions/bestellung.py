@@ -6,6 +6,7 @@ cursor = conn.cursor()
 kunde_id = cursor.execute("SELECT id FROM kunde WHERE name = 'TechShop Wien'").fetchone()[0]
 
 bestellung = [('Arduino Uno', 5), ('Raspberry Pi 4', 2), ('LED 5mm rot', 50)]
+gesamtwert = 0.0
 
 cursor.execute("BEGIN TRANSACTION;")
 # Bestellung anlegen
@@ -26,15 +27,14 @@ for name, menge in bestellung:
     cursor.execute("INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?,?,?, 'verkauf')", (artikel_id, bestellung_id, -menge),)
 
     #Gesamtpreis 
-    gesamtwert = menge * einzelpreis
+    gesamtwert += menge * einzelpreis
 
 # Gesamtwert eintragen
 cursor.execute("UPDATE bestellung SET gesamtwert = ? WHERE id = ?", (gesamtwert, bestellung_id))
 
 # Kundenkredit erhöhen
-cursor.execute("UPDATE kunde SET kreditlimit = ? WHERE id = ?", (gesamtwert, kunde_id))
+cursor.execute("UPDATE kunde SET aktueller_kredit = aktueller_kredit + ?  WHERE id = ?", (gesamtwert, kunde_id))
 
-cursor.execute("END TRANSACTION;")
 
 print("alles hat funkuniert")
 conn.commit()
