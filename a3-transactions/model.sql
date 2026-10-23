@@ -1,7 +1,12 @@
 PRAGMA foreign_keys = ON;
+DROP TABLE IF EXISTS artikel;
+DROP TABLE IF EXISTS kunde;
+DROP TABLE IF EXISTS bestellung;
+DROP TABLE IF EXISTS bestellposition;
+DROP TABLE IF EXISTS lagerbewegung;
 
 -- Artikel im Lager
-CREATE TABLE artikel (
+CREATE TABLE IF NOT EXISTS artikel (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     kategorie TEXT,
@@ -14,7 +19,7 @@ CREATE TABLE artikel (
 );
 
 -- Kunden/Händler
-CREATE TABLE kunde (
+CREATE TABLE IF NOT EXISTS kunde (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     kreditlimit DECIMAL(10,2) DEFAULT 0,
@@ -23,7 +28,7 @@ CREATE TABLE kunde (
 );
 
 -- Bestellungen
-CREATE TABLE bestellung (
+CREATE TABLE IF NOT EXISTS bestellung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     kunde_id INTEGER NOT NULL,
     datum DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -33,7 +38,7 @@ CREATE TABLE bestellung (
 );
 
 -- Einzelne Positionen einer Bestellung
-CREATE TABLE bestellposition (
+CREATE TABLE IF NOT EXISTS bestellposition (
     bestellung_id INTEGER,
     artikel_id INTEGER,
     menge INTEGER,
@@ -45,7 +50,7 @@ CREATE TABLE bestellposition (
 );
 
 -- Lager-Bewegungen (für Nachverfolgung)
-CREATE TABLE lagerbewegung (
+CREATE TABLE IF NOT EXISTS lagerbewegung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     artikel_id INTEGER,
     bestellung_id INTEGER,
