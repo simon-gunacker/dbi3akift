@@ -30,6 +30,7 @@ try:
 
     cursor.execute("UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?", (gesamtwert, kunde_id))
 
+    cursor.execute("UPDATE bestellung SET status = 'storniert' WHERE id = ?", (bestell_id,))
     print("bestellung storniert")
     conn.commit()
 
