@@ -4,7 +4,7 @@ conn = sqlite3.connect("transactions.db")
 cursor = conn.cursor()
 
 
-bestell_id = 11
+bestell_id = 1
 
 try: 
     cursor.execute("BEGIN TRANSACTION;")
