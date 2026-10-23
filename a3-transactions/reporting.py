@@ -7,7 +7,7 @@ cursor = conn.cursor()
 artikel = cursor.execute("""
     SELECT name, kategorie
     FROM artikel
-    WHERE lagerbestand < mindesbestand;
+    WHERE lagerbestand < mindestbestand;
 """).fetchall()
 
 for name, kategorie in artikel:
