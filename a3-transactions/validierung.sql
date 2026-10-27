@@ -3,10 +3,17 @@ BEFORE UPDATE  ON artikel
 FOR EACH ROW
 WHEN new.lagerbestand < 0
 BEGIN
-SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager')
+SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager');
 END;
 
 
+CREATE  TRIGGER  IF NOT EXISTS trigger_kreditlimit
+BEFORE UPDATE  ON kunde
+FOR EACH ROW
+WHEN new.aktueller_kredit > new.kreditlimit
+BEGIN
+SELECT RAISE (ROLLBACK, 'zu geringer Kreditrahmen');
+END;
 
 BEGIN TRANSACTION
 
