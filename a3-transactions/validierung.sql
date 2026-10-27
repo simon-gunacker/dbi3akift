@@ -1,5 +1,6 @@
 CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
 BEFORE UPDATE  ON artikel
+FOR EACH ROW
 WHEN new.lagerbestand < 0
 BEGIN
 SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager')
