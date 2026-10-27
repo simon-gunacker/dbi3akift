@@ -1,5 +1,13 @@
-BEGIN TRANSACTION
+CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
+BEFORE UPDATE  ON artikel
+WHEN new.lagerbestand < 0
+BEGIN
+SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager')
+END;
 
+
+
+BEGIN TRANSACTION
 
 SELECT kreditlimit
 FROM kunde 
