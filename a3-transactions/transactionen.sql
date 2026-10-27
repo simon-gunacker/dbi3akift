@@ -9,7 +9,7 @@ VALUES  (1);
 
 INSERT INTO bestellposition(bestellung_id,artikel_id,menge)
 VALUES(last_insert_rowid(),1,5)
-,(last_insert_rowid(),2,2),
+,(last_insert_rowid(),2,2)
 ,(last_insert_rowid(),3,50)
 ;
 
