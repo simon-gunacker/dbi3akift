@@ -78,4 +78,4 @@ VALUES
 ,(3,last_insert_rowid(),-50,'verkauf')
 ;
 
-END TRANSACTION
+END TRANSACTION;
