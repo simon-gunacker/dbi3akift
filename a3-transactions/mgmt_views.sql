@@ -17,4 +17,12 @@ SELECT
     ,ROUND((aktueller_kredit * 100.0) / kreditlimit, 2) AS kreditlimit_prozent
 FROM kunde
 WHERE kreditlimit > 0 
-  AND (aktueller_kredit * 1.0 / kreditlimit) > 0.90;
+    AND (aktueller_kredit * 1.0 / kreditlimit) > 0.90;
+
+CREATE VIEW v_tagesumsatz AS
+SELECT 
+     DATE(datum)
+    ,SUM(gesamtwert) AS tagesumsatz
+FROM bestellung
+WHERE DATE(datum)= DATE('now')
+    AND status = 'verkauf';
