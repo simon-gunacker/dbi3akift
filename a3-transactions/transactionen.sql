@@ -73,9 +73,9 @@ WHERE id =(
 
 INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
 VALUES  
-(1,last_insert_rowid(),,-5,'verkauf')
-,(2,last_insert_rowid(),,-2,'verkauf')
-,(3,last_insert_rowid(),,-50,'verkauf')
+(1,last_insert_rowid(),-5,'verkauf')
+,(2,last_insert_rowid(),-2,'verkauf')
+,(3,last_insert_rowid(),-50,'verkauf')
 ;
 
 END TRANSACTION
