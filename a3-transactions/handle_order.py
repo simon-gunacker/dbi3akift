@@ -9,12 +9,8 @@ TABLES = [
 
 # bestellung
 kunde_id = 1
-status = "verarbeitet"
-
-# bestellposition
-bestellung_id = -1
 ARTIKEL_MENGE = {
-        1: 5,
+        1: 500,
         2: 2,
         3: 50
     }
@@ -27,8 +23,8 @@ def main():
 
         # bestellung
         gesamtwert = 0
-        bestellung_vals = [kunde_id, status, gesamtwert]
-        bestellung_cols = "('kunde_id', 'status', 'gesamtwert')"
+        bestellung_vals = [kunde_id, gesamtwert]
+        bestellung_cols = "('kunde_id', 'gesamtwert')"
         # update_table returns list of tuple with id - [0][0]
         bestellung_id = insert_table(
             cur, "bestellung", bestellung_cols,
@@ -57,7 +53,7 @@ def main():
 
             # lagerbewegung
             typ = "verkauf"
-            lager_vals = [artikel_id, bestellung_id, menge, typ]
+            lager_vals = [artikel_id, bestellung_id, menge*-1, typ]
             lager_cols = "('artikel_id', 'bestellung_id', 'menge', 'typ')"
             insert_table(
                 cur, "lagerbewegung", lager_cols, lager_vals
@@ -70,7 +66,6 @@ def main():
         cur.execute(
             f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
             )
-
 
         for table in TABLES:
             print(
