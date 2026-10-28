@@ -1,8 +1,11 @@
 from sqlite3 import connect
 
-from transaction import insert_table
+from insert import insert_table
 
 DB = "shop.db"
+TABLES = [
+    "bestellung", "bestellposition", "lagerbewegung", "artikel", "kunde"
+    ]
 
 # bestellung
 kunde_id = 1
@@ -10,17 +13,16 @@ status = "verarbeitet"
 
 # bestellposition
 bestellung_id = -1
-artikel_menge = {
+ARTIKEL_MENGE = {
         1: 5,
         2: 2,
         3: 50
     }
-artikel_id = [1, 2, 3]
 
 def main():
     with connect(DB) as con:
-        cur = con.cursor()
 
+        cur = con.cursor()
         cur.execute("BEGIN TRANSACTION")
 
         # bestellung
@@ -34,7 +36,7 @@ def main():
             )[0][0]
 
         # bestellposition
-        for artikel_id, menge in artikel_menge.items():
+        for artikel_id, menge in ARTIKEL_MENGE.items():
 
             # update lagerbestand
             cur.execute(
@@ -47,7 +49,8 @@ def main():
                 ).fetchall()[0][0]
             gesamtwert += einzelpreis * menge
             bestellpos_vals = [bestellung_id, artikel_id, menge, einzelpreis]
-            bestellpos_cols = "('bestellung_id', 'artikel_id', 'menge', 'einzelpreis')"
+            bestellpos_cols = "('bestellung_id', 'artikel_id', 'menge',"\
+                + "'einzelpreis')"
             insert_table(
                 cur, "bestellposition", bestellpos_cols, bestellpos_vals
                 )
@@ -60,36 +63,23 @@ def main():
                 cur, "lagerbewegung", lager_cols, lager_vals
                 )
 
-        # update gesamtwert
-        cur.execute(f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}")
+        # update gesamtwert & kundenkredit
+        cur.execute(
+            f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}"
+            )
+        cur.execute(
+            f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
+            )
 
-        # update kundenkredit
-        cur.execute(f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}")
 
-
-
-        print(
-            "Bestellung: ",
-            *cur.execute("SELECT * FROM bestellung").fetchall()
-            )
-        print(
-            "Bestellpos: ",
-            *cur.execute("SELECT * FROM bestellposition").fetchall()
-            )
-        print(
-            "Lager: ",
-            *cur.execute("SELECT * FROM lagerbewegung").fetchall()
-            )
-        print(
-            "Artikel: ",
-            *cur.execute("SELECT * FROM artikel").fetchall()
-            )
-        print(
-            "Kunde: ",
-            *cur.execute("SELECT * FROM kunde").fetchall()
-            )
+        for table in TABLES:
+            print(
+                f"{table.capitalize()}:",
+                *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
+                )
 
         cur.execute("END TRANSACTION")
+        # cur.execute("ROLLBACK")
 
 if __name__ == "__main__":
     main()
