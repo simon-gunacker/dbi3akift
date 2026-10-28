@@ -2,8 +2,8 @@ BEGIN TRANSACTION;
 
 
 CREATE TEMP TABLE transaction_article(id INTEGER, amount INTEGER);
-
 CREATE TEMP TABLE transaction_id (id INTEGER);
+
 INSERT INTO temp.transaction_id (id)
 SELECT id
 FROM (
