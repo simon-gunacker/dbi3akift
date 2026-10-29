@@ -11,7 +11,7 @@ BEGIN
         ,'nachlieferung'
     FROM artikel 
     WHERE id = new.artikel_id AND lagerbestand < new.menge;
-    
+
     UPDATE artikel
     SET lagerbestand = lagerbestand + (
         SELECT CASE 
@@ -26,6 +26,21 @@ BEGIN
 
 END;
 
+CREATE TRIGGER IF NOT EXISTS trigger_kreditlimit
+AFTER UPDATE OF gesamtwert ON bestellung
+FOR EACH ROW
+WHEN NEW.status = 'offen'
+BEGIN
+    UPDATE bestellung
+    SET status = 'wartet_auf_zahlung'
+    WHERE id = NEW.id
+      AND (SELECT aktueller_kredit FROM kunde WHERE id = NEW.kunde_id) + NEW.gesamtwert 
+          > (SELECT kreditlimit FROM kunde WHERE id = NEW.kunde_id);
+    UPDATE kunde
+    SET aktueller_kredit = aktueller_kredit + NEW.gesamtwert
+    WHERE id = NEW.kunde_id
+      AND (SELECT status FROM bestellung WHERE id = NEW.id) = 'offen';
+END;
 
 -- CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
 -- BEFORE UPDATE  ON artikel
@@ -37,19 +52,20 @@ END;
 
 
 
-CREATE  TRIGGER  IF NOT EXISTS trigger_kreditlimit
-BEFORE UPDATE  ON kunde
-FOR EACH ROW
-WHEN new.aktueller_kredit > new.kreditlimit
-BEGIN
-SELECT RAISE (ROLLBACK, 'zu geringer Kreditrahmen');
-END;
+-- CREATE  TRIGGER  IF NOT EXISTS trigger_kreditlimit
+-- BEFORE UPDATE  ON kunde
+-- FOR EACH ROW
+-- WHEN new.aktueller_kredit > new.kreditlimit
+-- BEGIN
+-- SELECT RAISE (ROLLBACK, 'zu geringer Kreditrahmen');
+-- END;
 
 BEGIN TRANSACTION
 
 
 INSERT INTO bestellung (kunde_id)
 VALUES  (1);
+
 INSERT INTO bestellposition(bestellung_id,artikel_id,menge,einzelpreis)
 VALUES(last_insert_rowid(),1,5,(SELECT verkaufspreis FROM artikel WHERE id = 1))
 ,(last_insert_rowid(),2,2,(SELECT verkaufspreis FROM artikel WHERE id = 2))
