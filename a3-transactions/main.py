@@ -27,6 +27,10 @@ bestellung2 = {
         1: 110
     }
 
+bestellung3 = {
+        5: 40
+    }
+
 def main():
 
 
@@ -39,12 +43,16 @@ def main():
         fill_db(cur, DB, MODEL, DATA, TABLES)
 
         # bestellung 1
-        # print("Bestellung 1:\n-------------\n")
-        # execute_order(cur, kunde1, bestellung1, TABLES)
+        print("Bestellung 1:\n-------------\n")
+        create_new_order(cur, kunde1, bestellung1, TABLES)
 
         # bestellung 2
         print("Bestellung 2:\n-------------\n")
         create_new_order(cur, kunde2, bestellung2, TABLES)
+
+        # bestellung 3
+        print("Bestellung 3:\n-------------\n")
+        create_new_order(cur, kunde2, bestellung3, TABLES)
 
 if __name__ == "__main__":
     main()

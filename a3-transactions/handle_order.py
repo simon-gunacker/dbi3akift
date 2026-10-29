@@ -69,6 +69,9 @@ def create_new_order(
         cur.execute(
         f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
         )
+        cur.execute(f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}")
+
+
     except:
         handle_constraint(cur, "kreditlimit", kunde_id, bestellung_id=bestellung_id)
 
