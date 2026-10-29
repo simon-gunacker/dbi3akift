@@ -28,5 +28,28 @@ FROM bestellung
 WHERE DATE(datum)= DATE('now')
     AND status = 'verkauf';
 
-
+CREATE VIEW v_lager_konsistenz AS
+SELECT
+id
+,name
+,ist_bestand
+,(start_bestand + sum_bewegungen) AS soll_bestand
+FROM(
+    SELECT 
+    a.id
+    ,a.name
+    ,a.lagerbestand  AS ist_bestand
+    ,CASE a.id
+        WHEN 1 THEN 100 --ARDUINO
+        WHEN 2 THEN 50 --RASPI
+        WHEN 3 THEN 1000 --LED
+        WHEN 4 THEN 5000 --Widerstand
+        WHEN 5 THEN 30 --Breadboard
+        ELSE 0
+    END AS start_bestand  
+    ,COALESCE(SUM(lb.menge),0) AS sum_bewegungen--COALESCE fängt  null ab und wandelt es in 0 um,um  die brechnung zu gewährleisten
+FROM artikel a 
+LEFT JOIN lagerbewegung lb ON a.id =lb.artikel_id
+GROUP BY a.id
+)AS subquery;
 --to do konsistenz prüfung test
