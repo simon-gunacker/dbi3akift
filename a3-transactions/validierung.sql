@@ -29,17 +29,17 @@ END;
 CREATE TRIGGER IF NOT EXISTS trigger_kreditlimit
 AFTER UPDATE OF gesamtwert ON bestellung
 FOR EACH ROW
-WHEN NEW.status = 'offen'
+WHEN new.status = 'offen'
 BEGIN
     UPDATE bestellung
     SET status = 'wartet_auf_zahlung'
-    WHERE id = NEW.id
-      AND (SELECT aktueller_kredit FROM kunde WHERE id = NEW.kunde_id) + NEW.gesamtwert 
-          > (SELECT kreditlimit FROM kunde WHERE id = NEW.kunde_id);
+    WHERE id = new.id
+      AND (SELECT aktueller_kredit FROM kunde WHERE id = new.kunde_id) + new.gesamtwert 
+          > (SELECT kreditlimit FROM kunde WHERE id = new.kunde_id);
     UPDATE kunde
-    SET aktueller_kredit = aktueller_kredit + NEW.gesamtwert
-    WHERE id = NEW.kunde_id
-      AND (SELECT status FROM bestellung WHERE id = NEW.id) = 'offen';
+    SET aktueller_kredit = aktueller_kredit + new.gesamtwert
+    WHERE id = new.kunde_id
+      AND (SELECT status FROM bestellung WHERE id = new.id) = 'offen';
 END;
 
 -- CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
@@ -96,17 +96,17 @@ SET gesamtwert =(
 )
 WHERE id=last_insert_rowid();
 
-UPDATE kunde
-SET aktueller_kredit = aktueller_kredit+(
-    SELECT gesamtwert
-    FROM bestellung
-    WHERE id = last_insert_rowid()
-)
-WHERE id =(
-    SELECT kunde_id
-    FROM bestellung
-    WHERE id = last_insert_rowid()
-);
+-- UPDATE kunde
+-- SET aktueller_kredit = aktueller_kredit+(
+--     SELECT gesamtwert
+--     FROM bestellung
+--     WHERE id = last_insert_rowid()
+-- )
+-- WHERE id =(
+--     SELECT kunde_id
+--     FROM bestellung
+--     WHERE id = last_insert_rowid()
+-- );
 
 
 INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
