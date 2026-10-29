@@ -25,7 +25,7 @@ CREATE TABLE bestellung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     kunde_id INTEGER NOT NULL,
     datum DATETIME DEFAULT CURRENT_TIMESTAMP,
-    status TEXT DEFAULT 'offen',  -- offen, verarbeitet, storniert
+    status TEXT DEFAULT 'offen',  -- offen, verarbeitet, storniert, wartet_auf_zahlung
     gesamtwert DECIMAL(10,2) DEFAULT 0,
     FOREIGN KEY (kunde_id) REFERENCES kunde(id)
 );
