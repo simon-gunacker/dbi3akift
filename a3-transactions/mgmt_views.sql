@@ -25,7 +25,7 @@ SELECT
     ,SUM(gesamtwert) AS tagesumsatz
 FROM bestellung
 WHERE DATE(datum)= DATE('now')
-    AND status = 'verarbeitet';
+    AND status != 'storniert';
 
 CREATE VIEW v_lager_konsistenz AS
 SELECT
