@@ -1,81 +1,77 @@
-from sqlite3 import connect
+from typing import Any
 
-from insert import insert_table
+def insert_table(
+    cur: object, table_name: str, cols: tuple, vals: list,
+    return_id: bool = False
+    ) -> list:
+    if return_id:
+        sql = f"INSERT INTO {table_name}{cols} VALUES "\
+            f"({('?, '*len(vals))[:-2]}) RETURNING id"
+        res = cur.execute(sql, vals)
 
-DB = "shop.db"
-TABLES = [
-    "bestellung", "bestellposition", "lagerbewegung", "artikel", "kunde"
-    ]
+        return res.fetchall()
+    sql = f"INSERT INTO {table_name}{cols} VALUES({('?, '*len(vals))[:-2]})"
+    cur.execute(sql, vals)
 
-# bestellung
-kunde_id = 1
-ARTIKEL_MENGE = {
-        1: 500,
-        2: 2,
-        3: 50
-    }
+def create_transaction(
+    cur: object, kunde_id: int, bestellung: dict,
+    tables: list
+    ) -> None:
 
-def main():
-    with connect(DB) as con:
+    cur.execute("BEGIN TRANSACTION")
 
-        cur = con.cursor()
-        cur.execute("BEGIN TRANSACTION")
+    # bestellung
+    gesamtwert = 0
+    bestellung_vals = [kunde_id, gesamtwert]
+    bestellung_cols = "('kunde_id', 'gesamtwert')"
+    # update_table returns list of tuple with id - [0][0]
+    bestellung_id = insert_table(
+        cur, "bestellung", bestellung_cols,
+        bestellung_vals, return_id = True
+        )[0][0]
 
-        # bestellung
-        gesamtwert = 0
-        bestellung_vals = [kunde_id, gesamtwert]
-        bestellung_cols = "('kunde_id', 'gesamtwert')"
-        # update_table returns list of tuple with id - [0][0]
-        bestellung_id = insert_table(
-            cur, "bestellung", bestellung_cols,
-            bestellung_vals, return_id = True
-            )[0][0]
+    # bestellposition
+    for artikel_id, menge in bestellung.items():
 
-        # bestellposition
-        for artikel_id, menge in ARTIKEL_MENGE.items():
-
-            # update lagerbestand
-            cur.execute(
-                f"UPDATE artikel SET lagerbestand = lagerbestand - {menge} WHERE id = {artikel_id}"
-                )
-
-            # get needed values for bestellpos
-            einzelpreis = cur.execute(
-                f"SELECT verkaufspreis FROM artikel WHERE id={artikel_id}"
-                ).fetchall()[0][0]
-            gesamtwert += einzelpreis * menge
-            bestellpos_vals = [bestellung_id, artikel_id, menge, einzelpreis]
-            bestellpos_cols = "('bestellung_id', 'artikel_id', 'menge',"\
-                + "'einzelpreis')"
-            insert_table(
-                cur, "bestellposition", bestellpos_cols, bestellpos_vals
-                )
-
-            # lagerbewegung
-            typ = "verkauf"
-            lager_vals = [artikel_id, bestellung_id, menge*-1, typ]
-            lager_cols = "('artikel_id', 'bestellung_id', 'menge', 'typ')"
-            insert_table(
-                cur, "lagerbewegung", lager_cols, lager_vals
-                )
-
-        # update gesamtwert & kundenkredit
+        # update lagerbestand
         cur.execute(
-            f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}"
-            )
-        cur.execute(
-            f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
+            f"UPDATE artikel SET lagerbestand = lagerbestand - {menge} WHERE id = {artikel_id}"
             )
 
-        for table in TABLES:
-            print(
-                f"{table.capitalize()}:",
-                *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
-                )
+        # get needed values for bestellpos
+        einzelpreis = cur.execute(
+            f"SELECT verkaufspreis FROM artikel WHERE id={artikel_id}"
+            ).fetchall()[0][0]
+        gesamtwert += einzelpreis * menge
+        bestellpos_vals = [bestellung_id, artikel_id, menge, einzelpreis]
+        bestellpos_cols = "('bestellung_id', 'artikel_id', 'menge',"\
+            + "'einzelpreis')"
+        insert_table(
+            cur, "bestellposition", bestellpos_cols, bestellpos_vals
+            )
 
-        cur.execute("END TRANSACTION")
-        # cur.execute("ROLLBACK")
+        # lagerbewegung
+        typ = "verkauf"
+        lager_vals = [artikel_id, bestellung_id, menge*-1, typ]
+        lager_cols = "('artikel_id', 'bestellung_id', 'menge', 'typ')"
+        insert_table(
+            cur, "lagerbewegung", lager_cols, lager_vals
+            )
 
-if __name__ == "__main__":
-    main()
+    # update gesamtwert & kundenkredit
+    cur.execute(
+        f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}"
+        )
+    cur.execute(
+        f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
+        )
+
+    for table in tables:
+        print(
+            f"{table.capitalize()}:",
+            *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
+            )
+
+    # cur.execute("END TRANSACTION")
+    cur.execute("ROLLBACK")
 
