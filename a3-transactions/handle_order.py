@@ -1,11 +1,12 @@
 from typing import Any
+import sqlite3
 
-from constraints import check_constraint
+from constraints import handle_constraint
 
 def insert_table(
     cur: object, table_name: str, cols: tuple, vals: list,
     return_id: bool = False
-    ) -> list:
+    ) -> Any:
     if return_id:
         sql = f"INSERT INTO {table_name}{cols} VALUES "\
             f"({('?, '*len(vals))[:-2]}) RETURNING id"
@@ -16,16 +17,16 @@ def insert_table(
     cur.execute(sql, vals)
 
 def create_new_order(
-    cur: object, kunde_id: int, bestellung: dict,
-    tables: list, status: str='offen'
+    cur: object, kunde_id: int, bestellung: dict, tables: list
     ) -> None:
 
     cur.execute("BEGIN TRANSACTION")
 
     # bestellung
     gesamtwert = 0
-    bestellung_vals = [kunde_id, gesamtwert, status]
-    bestellung_cols = "('kunde_id', 'gesamtwert', 'status')"
+    status = 'offen'
+    bestellung_vals = [kunde_id, gesamtwert]
+    bestellung_cols = "('kunde_id', 'gesamtwert')"
     # update_table returns list of tuple with id - [0][0]
     bestellung_id = insert_table(
         cur, "bestellung", bestellung_cols,
@@ -36,9 +37,12 @@ def create_new_order(
     for artikel_id, menge in bestellung.items():
 
         # update lagerbestand
-        cur.execute(
+        try:
+            cur.execute(
             f"UPDATE artikel SET lagerbestand = lagerbestand - {menge} WHERE id = {artikel_id}"
             )
+        except:
+            handle_constraint(cur, 'lagerbestand', artikel_id, menge, bestellung_id)
 
         # get needed values for bestellpos
         einzelpreis = cur.execute(
@@ -61,13 +65,14 @@ def create_new_order(
             )
 
     # update gesamtwert & kundenkredit
-    cur.execute(
-        f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}"
-        )
-    cur.execute(
+    try:
+        cur.execute(
         f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
         )
+    except:
+        handle_constraint(cur, "kreditlimit", kunde_id, bestellung_id=bestellung_id)
 
+    print("\n")
     for table in tables:
         print(
             f"{table.capitalize()}:",
@@ -75,21 +80,4 @@ def create_new_order(
             )
 
     cur.execute("END TRANSACTION")
-    # cur.execute("ROLLBACK")
 
-def execute_order(
-    cur: object, kunde: int, bestellung: dict, tables: list
-    ):
-    try:
-        create_new_order(cur, kunde, bestellung, tables)
-    except Exception as e:
-        cur.execute("ROLLBACK")
-
-        error = str(e)
-        if error.find("CHECK constraint failed:") != -1:
-            cur.execute("BEGIN TRANSACTION")
-            check_constraint(cur, error, bestellung)
-            cur.execute("END TRANSACTION")
-            create_new_order(cur, kunde, bestellung, tables)
-        else:
-            print(e)

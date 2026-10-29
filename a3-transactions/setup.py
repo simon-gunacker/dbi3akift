@@ -1,4 +1,3 @@
-import os
 
 
 def fill_db(

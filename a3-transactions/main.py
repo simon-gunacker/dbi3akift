@@ -1,13 +1,12 @@
 from sqlite3 import connect
-import sqlite3
 
-from handle_order import execute_order
+from handle_order import create_new_order
 from setup import fill_db
 
 # config
-DB = "shop.db"
-MODEL = "model.sql"
-DATA = "data.sql"
+DB = "db/shop.db"
+MODEL = "db/model.sql"
+DATA = "db/data.sql"
 TABLES = [
     "bestellung", "bestellposition", "lagerbewegung", "artikel",
     "kunde"
@@ -24,14 +23,17 @@ bestellung1 = {
 
 kunde2 = 2
 bestellung2 = {
-        5: 50
-        # 2: 100
+        5: 40,
+        1: 110
     }
 
 def main():
-    with connect(DB) as con:
-        cur = con.cursor()
 
+
+    with connect(DB) as con:
+
+
+        cur = con.cursor()
 
         # fill db, if it's empty or has no data
         fill_db(cur, DB, MODEL, DATA, TABLES)
@@ -42,9 +44,7 @@ def main():
 
         # bestellung 2
         print("Bestellung 2:\n-------------\n")
-        execute_order(cur, kunde2, bestellung2, TABLES)
-
-
+        create_new_order(cur, kunde2, bestellung2, TABLES)
 
 if __name__ == "__main__":
     main()

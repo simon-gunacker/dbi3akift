@@ -1,39 +1,29 @@
-"""
 
-if lagerbestand < 0 --> refill lager
-
-"""
-
-def get_value(cur: object, col: str, target_id: int) -> str:
-    return cur.execute(
-        f"SELECT {col} FROM artikel WHERE id={target_id}"
-        ).fetchall()[0][0]
-
-def check_constraint(
-    cur: object, error: str, bestellung: dict
-    ) -> None:
-
-    # error = lagerbestand
-    if error.find("lagerbestand") != -1:
-        # find artikel to reorder
-        for artikel_id, menge in bestellung.items():
-            lagerbestand = get_value(
-                cur, 'lagerbestand', artikel_id
+def handle_constraint(
+    cur: object, error_type: str, target_id: int, menge: int=0,
+    bestellung_id: int=0
+    ):
+    # reorder product with amount of order + 10 and create
+    # lagerbewegung
+    if error_type == "lagerbestand":
+        print(
+            f"FEHLER: Lagerbestand von '{target_id}' zu klein - Nachbestellung von {menge+10} wird durchgeführt"
+            )
+        cur.execute(
+                f"INSERT INTO lagerbewegung(artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, ?)", [target_id, bestellung_id, menge, 'nachlieferung']
                 )
-            if menge > lagerbestand:
-                art_name = get_value(cur, 'name', artikel_id)
-                best_art_id = artikel_id
-                art_min_best = get_value(
-                    cur, 'mindestbestand', artikel_id
-                    )
-                best_menge = menge + art_min_best
-        if art_name:
-            print(
-                f"Lagerbestand von {art_name} zu klein, Nachbestellung wird durchgeführt"
-                )
-            cur.execute(
-                f"INSERT INTO lagerbewegung(artikel_id, menge, typ) VALUES (?, ?, ?)", [best_art_id, best_menge, 'nachlieferung']
-                )
-            cur.execute(
-                f"UPDATE artikel SET lagerbestand = {best_menge}"
-                )
+        cur.execute(
+            f"UPDATE artikel SET lagerbestand = {menge + 10} WHERE id={target_id}"
+            )
+
+    # set price of bestellung to 0 and make it a storno
+    elif error_type == "kreditlimit":
+        gesamtwert = 0
+        status = 'storniert'
+        print(status, "FEHLER: Kreditlimit überschritten, bestellung storniert")
+        cur.execute(
+            f"UPDATE bestellung SET gesamtwert={gesamtwert}, status='{status}' WHERE id={bestellung_id}"
+            )
+        cur.execute(f"DELETE FROM lagerbewegung WHERE bestellung_id={bestellung_id}")
+
+
