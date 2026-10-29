@@ -2,6 +2,16 @@ CREATE TRIGGER IF NOT EXISTS trigger_nachbestellung
 BEFORE INSERT ON bestellposition
 FOR EACH ROW
 BEGIN
+
+  INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
+    SELECT 
+        new.artikel_id
+        ,new.bestellung_id
+        ,(new.menge - lagerbestand) 
+        ,'nachlieferung'
+    FROM artikel 
+    WHERE id = new.artikel_id AND lagerbestand < new.menge;
+    
     UPDATE artikel
     SET lagerbestand = lagerbestand + (
         SELECT CASE 
@@ -12,14 +22,7 @@ BEGIN
     )
     WHERE id = new.artikel_id;
 
-    INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
-    SELECT 
-        new.artikel_id
-        ,new.bestellung_id
-        ,(new.menge - lagerbestand) 
-        ,'nachlieferung'
-    FROM artikel 
-    WHERE id = new.artikel_id AND lagerbestand < new.menge;
+  
 
 END;
 
