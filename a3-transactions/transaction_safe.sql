@@ -6,7 +6,6 @@ CREATE TEMP TABLE transaction_id (id INTEGER);
 INSERT INTO bestellung (kunde_id) VALUES(1);
 INSERT INTO temp.transaction_id (id) VALUES (last_insert_rowid());
 
-SAVEPOINT sp;
 
 INSERT INTO temp.transaction_article (id, amount)
 VALUES (1, 5);
@@ -42,8 +41,6 @@ VALUES  ((SELECT id FROM temp.transaction_article), (SELECT id FROM temp.transac
 
 DELETE FROM temp.transaction_article;
 
-SAVEPOINT sp;
-
 
 INSERT INTO temp.transaction_article (id, amount)
 VALUES (2, 2);
@@ -78,8 +75,6 @@ INSERT OR ROLLBACK INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
 VALUES  ((SELECT id FROM temp.transaction_article), (SELECT id FROM temp.transaction_id), -(SELECT amount FROM temp.transaction_article), "verkauf");
 
 DELETE FROM temp.transaction_article;
-
-SAVEPOINT sp;
 
 
 INSERT INTO temp.transaction_article (id, amount)
