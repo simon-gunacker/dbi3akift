@@ -1,10 +1,37 @@
-CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
-BEFORE UPDATE  ON artikel
+CREATE TRIGGER IF NOT EXISTS trigger_nachbestellung
+BEFORE INSERT ON bestellposition
 FOR EACH ROW
-WHEN new.lagerbestand < 0
 BEGIN
-SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager');
+    UPDATE artikel
+    SET lagerbestand = lagerbestand + (
+        SELECT CASE 
+            WHEN lagerbestand < new.menge THEN (new.menge - lagerbestand) 
+            ELSE 0 -- falls genug artikel da da wehn klausel sonst null zurückgibt lagerbestand wäre sonst +null =null
+        END
+        FROM artikel WHERE id = new.artikel_id
+    )
+    WHERE id = new.artikel_id;
+
+    INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
+    SELECT 
+        new.artikel_id
+        ,new.bestellung_id
+        ,(new.menge - lagerbestand) 
+        ,'nachlieferung'
+    FROM artikel 
+    WHERE id = new.artikel_id AND lagerbestand < new.menge;
+
 END;
+
+
+-- CREATE  TRIGGER  IF NOT EXISTS trigger_lagerbestand
+-- BEFORE UPDATE  ON artikel
+-- FOR EACH ROW
+-- WHEN new.lagerbestand < 0
+-- BEGIN
+-- SELECT RAISE (ROLLBACK, 'zu wenige Artikel im Lager');
+-- END;
+
 
 
 CREATE  TRIGGER  IF NOT EXISTS trigger_kreditlimit
@@ -17,17 +44,15 @@ END;
 
 BEGIN TRANSACTION
 
-SELECT kreditlimit
-FROM kunde 
 
 INSERT INTO bestellung (kunde_id)
 VALUES  (1);
-
-INSERT INTO bestellposition(bestellung_id,artikel_id,menge)
-VALUES(last_insert_rowid(),1,5)
-,(last_insert_rowid(),2,2)
-,(last_insert_rowid(),3,50)
+INSERT INTO bestellposition(bestellung_id,artikel_id,menge,einzelpreis)
+VALUES(last_insert_rowid(),1,5,(SELECT verkaufspreis FROM artikel WHERE id = 1))
+,(last_insert_rowid(),2,2,(SELECT verkaufspreis FROM artikel WHERE id = 2))
+,(last_insert_rowid(),3,50,(SELECT verkaufspreis FROM artikel WHERE id = 3))
 ;
+
 
 
 UPDATE artikel
