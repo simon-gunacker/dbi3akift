@@ -1,4 +1,3 @@
-
 """
 
 if lagerbestand < 0 --> refill lager
@@ -13,7 +12,6 @@ def get_value(cur: object, col: str, target_id: int) -> str:
 def check_constraint(
     cur: object, error: str, bestellung: dict
     ) -> None:
-    print("Check constr: ", error)
 
     # error = lagerbestand
     if error.find("lagerbestand") != -1:
@@ -23,12 +21,19 @@ def check_constraint(
                 cur, 'lagerbestand', artikel_id
                 )
             if menge > lagerbestand:
-                artikel = get_value(cur, 'name', artikel_id)
-                order_amount = menge
-        if artikel:
+                art_name = get_value(cur, 'name', artikel_id)
+                best_art_id = artikel_id
+                art_min_best = get_value(
+                    cur, 'mindestbestand', artikel_id
+                    )
+                best_menge = menge + art_min_best
+        if art_name:
             print(
-                f"Lagerbestand von {artikel} zu klein, Nachbestellung wird durchgeführt"
+                f"Lagerbestand von {art_name} zu klein, Nachbestellung wird durchgeführt"
                 )
             cur.execute(
-                f"UPDATE artikel SET lagerbestand = {order_amount}"
+                f"INSERT INTO lagerbewegung(artikel_id, menge, typ) VALUES (?, ?, ?)", [best_art_id, best_menge, 'nachlieferung']
+                )
+            cur.execute(
+                f"UPDATE artikel SET lagerbestand = {best_menge}"
                 )

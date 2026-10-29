@@ -1,5 +1,7 @@
 from typing import Any
 
+from constraints import check_constraint
+
 def insert_table(
     cur: object, table_name: str, cols: tuple, vals: list,
     return_id: bool = False
@@ -15,15 +17,15 @@ def insert_table(
 
 def create_new_order(
     cur: object, kunde_id: int, bestellung: dict,
-    tables: list
+    tables: list, status: str='offen'
     ) -> None:
 
     cur.execute("BEGIN TRANSACTION")
 
     # bestellung
     gesamtwert = 0
-    bestellung_vals = [kunde_id, gesamtwert]
-    bestellung_cols = "('kunde_id', 'gesamtwert')"
+    bestellung_vals = [kunde_id, gesamtwert, status]
+    bestellung_cols = "('kunde_id', 'gesamtwert', 'status')"
     # update_table returns list of tuple with id - [0][0]
     bestellung_id = insert_table(
         cur, "bestellung", bestellung_cols,
@@ -72,8 +74,8 @@ def create_new_order(
             *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
             )
 
-    # cur.execute("END TRANSACTION")
-    cur.execute("ROLLBACK")
+    cur.execute("END TRANSACTION")
+    # cur.execute("ROLLBACK")
 
 def execute_order(
     cur: object, kunde: int, bestellung: dict, tables: list
@@ -81,8 +83,13 @@ def execute_order(
     try:
         create_new_order(cur, kunde, bestellung, tables)
     except Exception as e:
+        cur.execute("ROLLBACK")
+
         error = str(e)
         if error.find("CHECK constraint failed:") != -1:
+            cur.execute("BEGIN TRANSACTION")
             check_constraint(cur, error, bestellung)
+            cur.execute("END TRANSACTION")
+            create_new_order(cur, kunde, bestellung, tables)
         else:
             print(e)
