@@ -4,13 +4,8 @@ BEGIN TRANSACTION;
 CREATE TEMP TABLE transaction_article(id INTEGER, amount INTEGER);
 CREATE TEMP TABLE transaction_id (id INTEGER);
 
-INSERT INTO temp.transaction_id (id)
-SELECT id
-FROM (
-    INSERT INTO bestellung (kunde_id)
-    VALUES (1)
-    RETURNING id
-    );
+INSERT INTO bestellung (kunde_id) VALUES(1);
+INSERT INTO temp.transaction_id (id) VALUES (last_insert_rowid());
 
 INSERT INTO temp.transaction_article (id, amount)
 VALUES (1, 5);
