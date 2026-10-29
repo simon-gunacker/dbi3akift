@@ -13,7 +13,7 @@ def insert_table(
     sql = f"INSERT INTO {table_name}{cols} VALUES({('?, '*len(vals))[:-2]})"
     cur.execute(sql, vals)
 
-def create_transaction(
+def create_new_order(
     cur: object, kunde_id: int, bestellung: dict,
     tables: list
     ) -> None:
@@ -79,7 +79,7 @@ def execute_order(
     cur: object, kunde: int, bestellung: dict, tables: list
     ):
     try:
-        create_transaction(cur, kunde, bestellung, tables)
+        create_new_order(cur, kunde, bestellung, tables)
     except Exception as e:
         error = str(e)
         if error.find("CHECK constraint failed:") != -1:
