@@ -75,3 +75,14 @@ def create_transaction(
     # cur.execute("END TRANSACTION")
     cur.execute("ROLLBACK")
 
+def execute_order(
+    cur: object, kunde: int, bestellung: dict, tables: list
+    ):
+    try:
+        create_transaction(cur, kunde, bestellung, tables)
+    except Exception as e:
+        error = str(e)
+        if error.find("CHECK constraint failed:") != -1:
+            check_constraint(cur, error, bestellung)
+        else:
+            print(e)
