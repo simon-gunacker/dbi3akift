@@ -4,6 +4,7 @@ SELECT
     ,name
     ,lagerbestand
     ,mindestbestand
+    ,(mindestbestand - lagerbestand) AS zubestellende_menge 
 FROM artikel
 WHERE lagerbestand < mindestbestand;
 
@@ -26,3 +27,6 @@ SELECT
 FROM bestellung
 WHERE DATE(datum)= DATE('now')
     AND status = 'verkauf';
+
+
+--to do konsistenz prüfung test
