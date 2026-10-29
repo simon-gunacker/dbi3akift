@@ -42,7 +42,7 @@ def create_new_order(
             f"UPDATE artikel SET lagerbestand = lagerbestand - {menge} WHERE id = {artikel_id}"
             )
         except:
-            handle_constraint(cur, 'lagerbestand', artikel_id, menge, bestellung_id)
+            handle_constraint(cur, 'lagerbestand', artikel_id, menge=menge, bestellung_id=bestellung_id)
 
         # get needed values for bestellpos
         einzelpreis = cur.execute(
@@ -70,17 +70,37 @@ def create_new_order(
         f"UPDATE kunde SET aktueller_kredit = aktueller_kredit + {gesamtwert} WHERE id={kunde_id}"
         )
         cur.execute(f"UPDATE bestellung SET gesamtwert={gesamtwert} WHERE id={bestellung_id}")
-
-
     except:
-        handle_constraint(cur, "kreditlimit", kunde_id, bestellung_id=bestellung_id)
-
-    print("\n")
-    for table in tables:
-        print(
-            f"{table.capitalize()}:",
-            *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
+        handle_constraint(
+            cur, "kreditlimit", kunde_id,
+            bestellung_id=bestellung_id, bestellung=bestellung
             )
-
     cur.execute("END TRANSACTION")
+
+def cancellation(cur: object) -> None:
+    bestellung_id = input("Bestellung_id um Bestellung zu stornieren (Enter zum Beenden): ")
+    if bestellung_id == "":
+        print("Cancellation cancelled")
+        return
+    # bestellung = cur.execute(
+    #     "SELECT * FROM bestellung WHERE id=?", [bestellung_id]
+    #     ).fetchall()
+    cur.execute(
+        "UPDATE bestellung SET status='storniert', gesamtwert=0 WHERE id=?", [bestellung_id]
+        )
+    cur.execute(
+        "DELETE FROM lagerbewegung WHERE id=?", [bestellung_id]
+        )
+    best_pos = cur.execute(
+        "SELECT artikel_id, menge FROM bestellposition WHERE bestellung_id=?", [bestellung_id]
+        ).fetchall()
+
+    bestellung = dict()
+    for line in best_pos:
+        art_id, menge = line[0], line[1]
+        bestellung[art_id] = menge
+    for art_id, art_menge in bestellung.items():
+         cur.execute(
+            f"UPDATE artikel SET lagerbestand = lagerbestand + {art_menge} WHERE id = {art_id}"
+            )
 
