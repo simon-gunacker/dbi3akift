@@ -10,7 +10,6 @@ WHERE lagerbestand < mindestbestand;
 
 CREATE VIEW v_kunden_kreditlimit AS
 SELECT 
-SELECT 
     id AS kunde_id
     ,name
     ,kreditlimit
@@ -52,4 +51,4 @@ FROM artikel a
 LEFT JOIN lagerbewegung lb ON a.id =lb.artikel_id
 GROUP BY a.id
 )AS subquery;
---to do konsistenz prüfung test
+-- test
