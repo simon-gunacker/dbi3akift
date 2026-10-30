@@ -17,6 +17,14 @@ conn.executemany("""INSERT INTO bestellposition(bestellung_id, artikel_id, menge
                    ] 
                 )
 
+conn.executemany("UPDATE artikel SET lagerbestand = lagerbestand - ? WHERE id = ?;",
+                    [
+                        (5, 1),
+                        (2, 2),
+                        (50, 3),
+                    ] 
+                )
+
 conn.execute("END TRANSACTION;")
 
 
