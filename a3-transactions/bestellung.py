@@ -27,7 +27,7 @@ conn.executemany("UPDATE artikel SET lagerbestand = lagerbestand - ? WHERE id = 
 
 conn.execute("""UPDATE bestellung 
                 SET gesamtwert = (SELECT SUM(menge * einzelpreis) 
-                                FROM bestllung_id = ?
+                                FROM bestellposition
                                 WHERE id = ?) 
                 WHERE id = ?;""",
             (bestellung_id, bestellung_id))
