@@ -3,7 +3,7 @@ BEGIN TRANSACTION;
 CREATE TEMP TABLE storno_id (id INTEGER);
 INSERT INTO temp.storno_id (id) VALUES (4);
 
-UPDATE OR ROLLBACK bestellung
+UPDATE bestellung
 SET datum = date("now"), status = "storniert"
 WHERE status = "offen" AND id = (SELECT id FROM temp.storno_id);
 
