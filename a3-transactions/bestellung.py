@@ -37,6 +37,12 @@ conn.execute("""UPDATE kunde
                 WHERE id = ?;""",
             (bestellung_id, 1))
 
+conn.execute("""INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
+                SELECT artikel_id, bestellung_id, -menge, 'verkauf'
+                FROM bestellposition
+                WHERE bestellung_id = ?;""",
+                (bestellung_id,))
+
 conn.execute("END TRANSACTION;")
 
 
