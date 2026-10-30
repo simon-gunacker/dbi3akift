@@ -2,7 +2,7 @@
 
 def fill_db(
     cur: object, db: str, model_file: str, data_file: str,
-    tables: list
+    views: str, tables: list
     ) -> None:
 
     table_count = len(
@@ -14,7 +14,7 @@ def fill_db(
         with open(model_file, "r") as m:
             model = m.read()
             cur.executescript(model)
-            print(f"Created {*tables, } from '{model_file}'")
+            print(f"Created tables from '{model_file}'")
     kunden_count = len(
             cur.execute(
                 "SELECT * FROM kunde"
@@ -26,6 +26,11 @@ def fill_db(
             cur.executescript(data)
             print(f"Data from '{data_file}' inserted\n")
 
+    # create views
+    with open(views, "r") as v:
+        data = v.read()
+        cur.executescript(data)
+        print(f"Views from '{views}' inserted\n")
 
 if __name__ == "__main__":
     main()

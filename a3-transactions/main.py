@@ -8,6 +8,7 @@ from setup import fill_db
 DB = "db/shop.db"
 MODEL = "db/model.sql"
 DATA = "db/data.sql"
+VIEWS = "db/views.sql"
 TABLES = [
     ["kunde", "(id, name, kreditlimit, aktueller_kredit)"],
     ["artikel", "(id, name, kategorie, einkaufspreis, verkaufspreis, lagerbestand, mindestbestand)"],
@@ -46,8 +47,8 @@ def main():
     with connect(DB) as con:
         cur = con.cursor()
 
-        # fill db, if it's empty or has no data
-        fill_db(cur, DB, MODEL, DATA, TABLES)
+        # fill db, if it's empty or has no data and create views
+        fill_db(cur, DB, MODEL, DATA, VIEWS, TABLES)
 
         # bestellung 1 - Aufgabe
         kunde1 = 1
@@ -65,6 +66,12 @@ def main():
         bestellung3 = { 5: 40 }
         print_artikel(cur, bestellung3, 3)
         create_new_order(cur, kunde2, bestellung3, TABLES)
+
+        # bestellung 4 - trigger views
+        kunde3 = 3
+        bestellung4 = { 2: 80, 4: 4950}
+        print_artikel(cur, bestellung4, 4)
+        create_new_order(cur, kunde3, bestellung4, TABLES)
 
         #cancel order
         print(f"\n{'-'*100}\n\nStorno: \n{'-'* 100}")
