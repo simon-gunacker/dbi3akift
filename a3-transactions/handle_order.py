@@ -22,6 +22,7 @@ def create_new_order(
     ) -> None:
 
     cur.execute("BEGIN TRANSACTION")
+    storno = False
 
     # bestellung
     gesamtwert = 0
@@ -35,6 +36,7 @@ def create_new_order(
         )[0][0]
 
     # bestellposition
+    nachbestellung = []
     for artikel_id, menge in bestellung.items():
 
         # update lagerbestand
@@ -44,6 +46,8 @@ def create_new_order(
             )
         except:
             handle_constraint(cur, 'lagerbestand', artikel_id, menge=menge, bestellung_id=bestellung_id)
+            # protocol articles which are beeing reordered
+            nachbestellung.append(artikel_id)
 
         # get needed values for bestellpos
         einzelpreis = cur.execute(
@@ -74,7 +78,14 @@ def create_new_order(
     except:
         handle_constraint(
             cur, "kreditlimit", kunde_id,
-            bestellung_id=bestellung_id, bestellung=bestellung
+            bestellung_id=bestellung_id, bestellung=bestellung,
+            nachbestellung=nachbestellung
             )
+        storno = True
+
+    if storno:
+        print("\nBestellung wurde storniert", end='')
+    else:
+        print("\nBestellung wurde bearbeitet", end='')
 
     cur.execute("END TRANSACTION")

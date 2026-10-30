@@ -9,17 +9,37 @@ DB = "db/shop.db"
 MODEL = "db/model.sql"
 DATA = "db/data.sql"
 TABLES = [
-    "bestellung", "bestellposition", "lagerbewegung", "artikel",
-    "kunde"
+    ["kunde", "(id, name, kreditlimit, aktueller_kredit)"],
+    ["artikel", "(id, name, kategorie, einkaufspreis, verkaufspreis, lagerbestand, mindestbestand)"],
+    ["bestellung", "(id, kunde_id, datum, status, gesamtwert)"],
+    ["bestellposition", "(bestellung_id, artikel_id, menge, einzelpreis)"],
+    ["lagerbewegung", "(id, artikel_id, bestellung_id, menge, typ, datum)"]
     ]
 
-def print_tables(cur, tables: list=TABLES):
-    print("\n")
+def print_tables(cur: object, tables: list=TABLES) -> None:
+
     for table in tables:
-        print(
-            f"{table.capitalize()}:",
-            *cur.execute(f"SELECT * FROM {table}").fetchall(), "\n"
-            )
+        results = cur.execute(
+            f"SELECT * FROM {table[0]}").fetchall()
+        table_str = f"\n{table[0].capitalize()} {table[1]}:"
+        delimiter = "\n" + "-"*len(table_str)
+        print(f"{delimiter}{table_str}{delimiter}")
+        for result in results:
+            print(f"\t{result}")
+
+def print_artikel(
+    cur: object,  bestellung: dict, nr: int
+    ) -> None:
+
+    best_str = f"\nBestellung {nr} - Artikel:"
+    delimiter = "\n" + "-"*100
+    print(f"{delimiter}\n{best_str}{delimiter}")
+    for artikel_id, menge in bestellung.items():
+        name = cur.execute(
+            f"SELECT name FROM artikel WHERE id={artikel_id}"
+            ).fetchone()[0]
+        print(f"{name}: {menge} Stück")
+    print()
 
 def main():
 
@@ -29,29 +49,28 @@ def main():
         # fill db, if it's empty or has no data
         fill_db(cur, DB, MODEL, DATA, TABLES)
 
-        # bestellung 1
+        # bestellung 1 - Aufgabe
         kunde1 = 1
         bestellung1 = { 1: 5, 2: 2, 3: 50 } # artikel_id: menge
-        print("Bestellung 1:\n-------------\n")
+        print_artikel(cur, bestellung1, 1)
         create_new_order(cur, kunde1, bestellung1, TABLES)
-        print_tables(cur)
 
-        # bestellung 2
+        # bestellung 2 - zum testen
         kunde2 = 2
         bestellung2 = { 5: 40, 1: 110 }
-        print("Bestellung 2:\n-------------\n")
+        print_artikel(cur, bestellung2, 2)
         create_new_order(cur, kunde2, bestellung2, TABLES)
-        print_tables(cur)
 
-        # bestellung 3
+        # bestellung 3 - zum testen
         bestellung3 = { 5: 40 }
-        print("Bestellung 3:\n-------------\n")
+        print_artikel(cur, bestellung3, 3)
         create_new_order(cur, kunde2, bestellung3, TABLES)
-        print_tables(cur)
 
         #cancel order
-        print("Storno: \n-------")
+        print(f"\n{'-'*100}\n\nStorno: \n{'-'* 100}")
         cancel_order(cur)
+        print("-"*100)
+
         print_tables(cur)
 
 if __name__ == "__main__":
