@@ -3,6 +3,7 @@ def handle_constraint(
     cur: object, error_type: str, target_id: int,
     bestellung: dict = None, menge: int=0, bestellung_id: int=0
     ) -> None:
+
     # reorder product with amount of order + 10 and create
     # lagerbewegung
     if error_type == "lagerbestand":

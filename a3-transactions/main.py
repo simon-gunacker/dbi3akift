@@ -1,6 +1,7 @@
 from sqlite3 import connect
 
-from handle_order import create_new_order, cancellation
+from handle_order import create_new_order
+from cancellation import cancel_order
 from setup import fill_db
 
 # config
@@ -51,7 +52,7 @@ def main():
 
         #cancel order
         print("Storno: \n-------")
-        cancellation(cur)
+        cancel_order(cur)
         print_tables(cur)
 
 if __name__ == "__main__":
