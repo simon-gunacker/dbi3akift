@@ -32,6 +32,11 @@ conn.execute("""UPDATE bestellung
                 WHERE id = ?;""",
             (bestellung_id, bestellung_id))
 
+conn.execute("""UPDATE kunde 
+                SET aktueller_kredit = aktueller_kredit + (SELECT gesamtwert FROM bestellung WHERE id = ?)
+                WHERE id = ?;""",
+            (bestellung_id, 1))
+
 conn.execute("END TRANSACTION;")
 
 
