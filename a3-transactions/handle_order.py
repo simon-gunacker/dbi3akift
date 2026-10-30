@@ -7,6 +7,7 @@ def insert_into_table(
     cur: object, table_name: str, cols: tuple, vals: list,
     return_id: bool = False
     ) -> Any:
+
     if return_id:
         sql = f"INSERT INTO {table_name}{cols} VALUES "\
             f"({('?, '*len(vals))[:-2]}) RETURNING id"
@@ -75,4 +76,5 @@ def create_new_order(
             cur, "kreditlimit", kunde_id,
             bestellung_id=bestellung_id, bestellung=bestellung
             )
+
     cur.execute("END TRANSACTION")

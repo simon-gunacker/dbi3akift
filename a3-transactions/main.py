@@ -23,7 +23,6 @@ def print_tables(cur, tables: list=TABLES):
 
 def main():
 
-    # creates db if not exists
     with connect(DB) as con:
         cur = con.cursor()
 
