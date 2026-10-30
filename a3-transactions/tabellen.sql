@@ -1,5 +1,11 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS lagerbewegung;
+DROP TABLE IF EXISTS bestellposition;
+DROP TABLE IF EXISTS bestellung;
+DROP TABLE IF EXISTS kunde;
+DROP TABLE IF EXISTS artikel;
+
 -- Artikel im Lager
 CREATE TABLE artikel (
     id INTEGER PRIMARY KEY,
