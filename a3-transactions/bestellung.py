@@ -5,7 +5,9 @@ conn.execute("PRAGMA foreign_keys = ON;")
 
 conn.execute("BEGIN TRANSACTION;")
 
-cursor_bestellung = conn.execute("INSERT INTO bestellung(kunde_id) VALUES(1);")
+kunde = 1
+
+cursor_bestellung = conn.execute("INSERT INTO bestellung(kunde_id) VALUES(?);", (kunde,))
 bestellung_id = cursor_bestellung.lastrowid  # letzte id
 
 conn.executemany("""INSERT INTO bestellposition(bestellung_id, artikel_id, menge, einzelpreis) 
@@ -35,7 +37,7 @@ conn.execute("""UPDATE bestellung
 conn.execute("""UPDATE kunde 
                 SET aktueller_kredit = aktueller_kredit + (SELECT gesamtwert FROM bestellung WHERE id = ?)
                 WHERE id = ?;""",
-            (bestellung_id, 1))
+            (bestellung_id, kunde))
 
 conn.execute("""INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
                 SELECT artikel_id, bestellung_id, -menge, 'verkauf'
