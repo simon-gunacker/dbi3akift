@@ -17,9 +17,10 @@ def report_erstellen(sql, params, dateiname):
 report_erstellen(
     """ SELECT id, name, lagerbestand, mindestbestand-lagerbestand AS fehlmenge
         FROM artikel
-        WHERE lagerbestand < mindestbestand;""",
-        (),
-        "report_mindestbestand.csv"
+        WHERE lagerbestand < mindestbestand;
+        """,
+    (),
+    "report_mindestbestand.csv"
     )
 
 report_erstellen(
@@ -28,8 +29,8 @@ report_erstellen(
                 kreditlimit
         FROM kunde
         WHERE aktueller_kredit > (kreditlimit * 0.9);""",
-        (),
-        "report_kreditlimit_ausgeschoepft.csv"
+    (),
+    "report_kreditlimit_ausgeschoepft.csv"
 )
 
 report_erstellen(
@@ -40,6 +41,16 @@ report_erstellen(
     """,
     (),
     "report_umsatz_aktuell.csv"
+)
+
+report_erstellen(
+    """ SELECT a.id, a.name, a.lagerbestand, SUM(l.menge) AS summe_bewegungen, a.lagerbestand-SUM(l.menge) AS anfangsbestand
+        FROM artikel a
+        LEFT JOIN lagerbewegung l ON l.artikel_id = a.id
+        GROUP BY a.id
+    """,
+    (),
+    "report_konsistenz_lager.csv"
 )
 
 conn.close()
