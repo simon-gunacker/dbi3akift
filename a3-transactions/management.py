@@ -5,8 +5,6 @@ conn = sqlite3.connect("datenbank.db")
 cursor = conn.cursor()
 
 def report_erstellen(sql, params, dateiname):
-    SCHWELLE_FUER_KREDITLIMIT = 0.9
-
     cursor.execute(sql, params)
     rows = cursor.fetchall()
     header = [description[0] for description in cursor.description]
@@ -19,11 +17,21 @@ def report_erstellen(sql, params, dateiname):
 
 
 report_erstellen(
-    """SELECT id, name, lagerbestand, mindestbestand-lagerbestand AS fehlmenge
+    """ SELECT id, name, lagerbestand, mindestbestand-lagerbestand AS fehlmenge
         FROM artikel
         WHERE lagerbestand < mindestbestand;""",
         (),
         "report_mindestbestand.csv"
-        )
+    )
+
+report_erstellen(
+    """ SELECT id, name, aktueller_kredit, 
+                ROUND(aktueller_kredit * 100.0 / kreditlimit, 1) AS auslastung_prozent,
+                kreditlimit
+        FROM kunde
+        WHERE aktueller_kredit > (kreditlimit * 0.9);""",
+        (),
+        "report_kreditlimit_ausgeschoepft.csv"
+)
 
 conn.close()
