@@ -14,8 +14,6 @@ def report_erstellen(sql, params, dateiname):
         writer.writerow(header)
         writer.writerows(rows)
 
-
-
 report_erstellen(
     """ SELECT id, name, lagerbestand, mindestbestand-lagerbestand AS fehlmenge
         FROM artikel
@@ -32,6 +30,16 @@ report_erstellen(
         WHERE aktueller_kredit > (kreditlimit * 0.9);""",
         (),
         "report_kreditlimit_ausgeschoepft.csv"
+)
+
+report_erstellen(
+    """ SELECT DATE('now') AS datum, SUM(gesamtwert) AS umsatz
+        FROM bestellung
+        WHERE status != 'storniert'
+        AND DATE(datum) = DATE('now')
+    """,
+    (),
+    "report_umsatz_aktuell.csv"
 )
 
 conn.close()
