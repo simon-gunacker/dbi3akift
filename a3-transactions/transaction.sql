@@ -46,10 +46,10 @@ INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
 VALUES (1, 1, -5, 'verkauf');
 
 INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
-VALUES (1, 2, -2, 'verkauf');
+VALUES (2, 1, -2, 'verkauf');
 
 INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
-VALUES (1, 3, -50, 'verkauf');
+VALUES (3, 1, -50, 'verkauf');
 
 
 UPDATE artikel
