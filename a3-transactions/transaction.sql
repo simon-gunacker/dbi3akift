@@ -52,7 +52,6 @@ INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
 VALUES (1, 3, -50, 'verkauf');
 
 
-
 UPDATE artikel
 SET lagerbestand = lagerbestand - 5
 WHERE id = 1; 
@@ -76,5 +75,3 @@ SET aktueller_kredit = aktueller_kredit +
 WHERE id = 1; 
 
 COMMIT;
-
-
