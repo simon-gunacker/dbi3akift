@@ -34,7 +34,7 @@ WHERE bestellung_id =1;
 
 UPDATE bestellung 
 SET gesamtwert =0
-    status = 'storniert'
+    ,status = 'storniert'
 WHERE id=1;
 
 END TRANSACTION;
