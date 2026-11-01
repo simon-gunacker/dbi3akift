@@ -9,3 +9,19 @@ INSERT INTO kunde VALUES
 (1, 'TechShop Wien', 5000.00, 1200.00),
 (2, 'MakerSpace Graz', 2000.00, 0.00),
 (3, 'Elektronik Steiner', 10000.00, 3500.00);
+
+
+INSERT INTO lagerbewegung (id, artikel_id, menge, typ)
+VALUES (-1, 1, 100, 'erstlieferung');
+
+INSERT INTO lagerbewegung (id, artikel_id, menge, typ)
+VALUES (-2, 2, 50, 'erstlieferung');
+
+INSERT INTO lagerbewegung (id, artikel_id, menge, typ)
+VALUES (-3, 3, 1000, 'erstlieferung');
+
+INSERT INTO lagerbewegung (id, artikel_id, menge, typ)
+VALUES (-4, 4, 5000, 'erstlieferung');
+
+INSERT INTO lagerbewegung (id, artikel_id, menge, typ)
+VALUES (-5, 5, 30, 'erstlieferung');
