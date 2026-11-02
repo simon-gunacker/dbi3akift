@@ -61,9 +61,15 @@ def insert_order(conn, customer_id, order_sum):
 
 def insert_order_position(conn, order_id, article_id, amount, price):
 
-    sql = "INSERT INTO bestell_position (bestellung_id, artikel_id, menge, einzelpreis) VALUES (?, ?, ?, ?);"
+    sql = "INSERT INTO bestellposition (bestellung_id, artikel_id, menge, einzelpreis) VALUES (?, ?, ?, ?);"
 
-    cursor = conn.execute(sql, (order_id, article_id, amount, price))
+    conn.execute(sql, (order_id, article_id, amount, price))
+
+def reduce_stock(conn, article_id, amount):
+
+    sql = "UPDATE artikel SET lagerbestand = lagerbestand - (?) WHERE id = (?)"
+
+    conn.execute(sql, (amount, article_id))
 
 
 def transaction(conn, customer, article_dict):
@@ -73,6 +79,8 @@ def transaction(conn, customer, article_dict):
     order_id = insert_order(conn, customer_id, order_sum)
 
     for name, amount in article_dict.items():
+        article_id = get_article_id(conn, name)
+
         insert_order_position(
             conn,
             order_id,
@@ -80,9 +88,14 @@ def transaction(conn, customer, article_dict):
             amount,
             get_price(conn, name),
             )
+        reduce_stock(conn, article_id, amount)
+
 
     print(order_id, customer_id, order_sum)
-    print(conn.execute("SELECT * FROM bestellung").fetchall())
+    print(conn.execute("SELECT * FROM bestellung").fetchall(), "\n")
+    print(conn.execute("SELECT * FROM bestellposition").fetchall(), "\n")
+
+    print(conn.execute("SELECT id, lagerbestand FROM artikel").fetchall())
 
 
 
