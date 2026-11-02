@@ -180,9 +180,11 @@ def insert_order_position(
     )
 
 
-def insert_storage_movement(conn, article_id: int, order_id: int, amount: int):
-    typ = "verkauf"
-    amount *= -1
+def insert_storage_movement(
+    conn, article_id: int, order_id: int, amount: int, typ="verkauf"
+):
+    if typ == "verkauf":
+        amount *= -1
     sql = """
         INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ)
         VALUES(?, ?, ?, ?)
@@ -267,12 +269,8 @@ def cancel_order(conn, order_id):
         if not check_order_for_cancel(conn, order_id):
             raise ValueError
 
-        print(select_all_artikel(conn))
-        print("-----")
         for i in get_positions(conn, order_id):
             reset_storage(conn, i["artikel_id"], i["menge"])
-
-        print(select_all_artikel(conn))
 
     except Exception:
         conn.execute("ROLLBACK")
