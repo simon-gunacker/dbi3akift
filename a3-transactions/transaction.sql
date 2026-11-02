@@ -1,6 +1,6 @@
 PRAGMA journal_mode = WAL;
 
-begin transaction;
+BEGIN TRANSACTION;
 
 INSERT INTO bestellung (kunde_id) VALUES (1);
 
@@ -76,4 +76,4 @@ UPDATE kunde SET aktueller_kredit = aktueller_kredit + (
 )
 WHERE id = 1;
 
-commit;
+COMMIT;
