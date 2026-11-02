@@ -187,6 +187,16 @@ def update_customer_credit(conn, customer_id: int, sum_of_order: float):
     conn.execute(sql)
 
 
+def update_order(conn, order_id: int):
+    sql = f"""
+        UPDATE bestellung
+        SET status = 'verarbeitet'
+        WHERE id = {order_id}
+    """
+
+    conn.execute(sql)
+
+
 def transaction(conn, customer: str, article: dict):
     try:
         conn.execute("BEGIN TRANSACTION")
@@ -206,6 +216,7 @@ def transaction(conn, customer: str, article: dict):
             insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
 
         update_customer_credit(conn, customer_id, sum_of_order)
+        update_order(conn, order_id)
 
         conn.execute("COMMIT")
     except Exception:
@@ -239,6 +250,8 @@ def start_db(conn):
         conn.executescript(file.read())
 
     transaction(conn, customer, article_dict)
+    for i in select_all_bestellung(conn):
+        print(i)
 
 
 if __name__ == "__main__":
