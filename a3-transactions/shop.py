@@ -127,6 +127,17 @@ def get_price(conn, name: str) -> float:
     return cursor.fetchone()["verkaufspreis"]
 
 
+def get_positions(conn, order_id: int):
+    sql = f"""
+        SELECT artikel_id, menge
+        FROM bestellposition
+        WHERE bestellung_id = {order_id}
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 def check_order_for_cancel(conn, order_id: int) -> bool:
     try:
         sql = f"""
@@ -246,6 +257,8 @@ def cancel_order(conn, order_id):
         if not check_order_for_cancel(conn, order_id):
             raise ValueError
 
+        print(get_positions(conn, order_id))
+
     except Exception:
         conn.execute("ROLLBACK")
         # raise
@@ -278,7 +291,7 @@ def start_db(conn):
 
     transaction(conn, customer, article_dict)
 
-    cancel_order(conn, 2)
+    cancel_order(conn, 1)
 
 
 if __name__ == "__main__":
