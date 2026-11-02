@@ -5,26 +5,36 @@ PRAGMA journal_mode = DELETE;
 
 BEGIN TRANSACTION;
 
--- Change bestellstatus to 'storniert'
-UPDATE bestellung 
-SET status = 'storniert'
-WHERE id = (SELECT MAX(id) FROM bestellung)
-;
-
 -- Put the wares back:
 UPDATE artikel 
 SET lagerbestand = lagerbestand + 5 
 WHERE id = 1 -- Arduino Uno
+-- Checks if the order has not already been marked as 'storniert'
+AND (SELECT status
+    FROM bestellung
+    WHERE id = (SELECT MAX(id)
+                FROM bestellung)
+    ) != 'storniert'
 ;
 
 UPDATE artikel
 SET lagerbestand = lagerbestand + 2
 WHERE id = 2 -- Raspberry Pi 4
+AND (SELECT status
+    FROM bestellung
+    WHERE id = (SELECT MAX(id)
+                FROM bestellung)
+    ) != 'storniert'
 ; 
 
 UPDATE artikel
 SET lagerbestand = lagerbestand + 50
 WHERE id = 3 --LED 5mm rot
+AND (SELECT status
+    FROM bestellung
+    WHERE id = (SELECT MAX(id)
+                FROM bestellung)
+    ) != 'storniert'
 ;
 
 -- document the movement of the wares
@@ -41,6 +51,11 @@ SELECT
     'storno'
 FROM bestellposition
 WHERE bestellung_id = (SELECT MAX(id) FROM bestellung)
+AND (SELECT status
+    FROM bestellung
+    WHERE id = (SELECT MAX(id)
+                FROM bestellung)
+    ) != 'storniert'
 ;
 
 -- Reset costumer credit
@@ -51,6 +66,18 @@ SET aktueller_kredit = aktueller_kredit - (
     WHERE id = (SELECT MAX(id) FROM bestellung)
 )
 WHERE id = 1 -- TechShop Wien
+AND (SELECT status
+    FROM bestellung
+    WHERE id = (SELECT MAX(id) FROM bestellung)
+    ) != 'storniert'
+;
+
+-- Change bestellstatus to 'storniert'
+-- Change status at the end, so the queries before can check for orders that aren't
+-- marked as 'storniert' yet
+UPDATE bestellung 
+SET status = 'storniert'
+WHERE id = (SELECT MAX(id) FROM bestellung)
 ;
 
 COMMIT;
