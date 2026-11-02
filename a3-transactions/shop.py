@@ -90,9 +90,8 @@ def get_kunde_id(conn, name: str) -> int:
 
 def get_sum_order(conn, article: dict) -> int:
     result = 0
-    
+
     for name, amount in article.items():
-        
         sql = f"""
             SELECT {amount} * verkaufspreis AS sum
             FROM artikel
@@ -116,7 +115,7 @@ def get_id_article(conn, name: str) -> int:
     return cursor.fetchone()["id"]
 
 
-def get_price(conn, name: str) -> double:
+def get_price(conn, name: str) -> float:
     sql = f"""
         SELECT verkaufspreis 
         FROM artikel
@@ -133,21 +132,25 @@ def insert_order(conn, customer_id: int, sum_of_order: int) -> int:
         VALUES(?, ?)
     """
 
-    cursor = conn.execute(sql,
-                          (customer_id, sum_of_order),
-                        )
+    cursor = conn.execute(
+        sql,
+        (customer_id, sum_of_order),
+    )
     return cursor.lastrowid
 
 
-def insert_order_position(conn, order_id: int, article_id: int, amount: int, price: double):
+def insert_order_position(
+    conn, order_id: int, article_id: int, amount: int, price: float
+):
     sql = """
         INSERT INTO bestellposition (bestellung_id, artikel_id, menge, einzelpreis)
         VALUES(?, ?, ?, ?)
     """
 
-    conn.execute(sql,
-                 (order_id, article_id, amount, price),
-             )
+    conn.execute(
+        sql,
+        (order_id, article_id, amount, price),
+    )
 
 
 def insert_storage_movement(conn, article_id: int, order_id: int, amount: int):
@@ -158,9 +161,10 @@ def insert_storage_movement(conn, article_id: int, order_id: int, amount: int):
         VALUES(?, ?, ?, ?)
     """
 
-    conn.execute(sql,(
-                     article_id, order_id, amount, typ),
-                 )
+    conn.execute(
+        sql,
+        (article_id, order_id, amount, typ),
+    )
 
 
 def update_storage(conn, article_id: int, amount: int):
@@ -189,7 +193,9 @@ def transaction(conn, customer: str, article: dict):
     order_id = insert_order(conn, customer_id, sum_of_order)
 
     for name, amount in article.items():
-        insert_order_position(conn, order_id, get_id_article(conn, name), amount, get_price(conn, name))
+        insert_order_position(
+            conn, order_id, get_id_article(conn, name), amount, get_price(conn, name)
+        )
         update_storage(conn, get_id_article(conn, name), amount)
         insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
 
@@ -201,7 +207,6 @@ def transaction(conn, customer: str, article: dict):
 def test_in_memory(conn):
     customer = "TechShop Wien"
     article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED 5mm rot": 50}
-
 
     with open("model.sql", encoding="utf-8") as file:
         conn.executescript(file.read())
