@@ -308,10 +308,9 @@ def cancel_order(conn, order_id):
             )
 
         reset_kredit(conn, get_customer_id(conn, order_id), get_total(conn, order_id))
-        print(select_all_bestellung(conn))
         update_order(conn, order_id, "storno")
-        print(select_all_bestellung(conn))
 
+        conn.execute("COMMIT")
     except Exception:
         conn.execute("ROLLBACK")
         raise
