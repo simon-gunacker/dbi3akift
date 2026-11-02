@@ -27,27 +27,28 @@ def with_connect(db):
 def get_customer(conn, customer):
     sql = "SELECT id FROM kunde WHERE name == (?) "
 
-    cursor = conn.execute(sql, (customer))
+    cursor = conn.execute(sql, (customer, ))
     return cursor.fetchone()["id"]
 
 def get_article_id(conn, name):
     sql = "SELECT id FROM artikel WHERE name == (?); "
 
-    cursor = conn.execute(sql, (name))
+    cursor = conn.execute(sql, (name, ))
     return cursor.fetchone()["id"]
 
 def get_price(conn, name):
     sql = "SELECT verkaufspreis FROM artikel WHERE name == (?); "
-    cursor = conn.execute(sql, (name))
+    cursor = conn.execute(sql, (name, ))
     return cursor.fetchone()["verkaufspreis"]
 
 def get_order_sum(conn, article_dict):
+    result = 0;
 
     for key, value in article_dict.items():
         sql = "SELECT verkaufspreis * (?) AS sum FROM artikel WHERE name == (?);"
 
-    cursor = conn.execute(sql)
-    result += cursor.fetchone()["sum"]
+        cursor = conn.execute(sql, (value, key))
+        result += cursor.fetchone()["sum"]
     return result
 
 
@@ -56,24 +57,23 @@ def insert_order(conn, customer_id, order_sum):
     sql = "INSERT INTO bestellung (kunde_id, gesamtwert) VALUES (?, ?);"
 
     cursor = conn.execute(sql, (customer_id, order_sum))
-    return cursor
-
+    return cursor.lastrowid
 
 
 def transaction(conn, customer, article_dict):
 
     customer_id = get_customer(conn, customer)
     order_sum = get_order_sum(conn, article_dict)
-    make_order = insert_order(conn, customer_id, order_sum)
+    order_id = insert_order(conn, customer_id, order_sum)
 
-    for name, amount in article_dict.items():
-        insert_order_position(
-            conn,
-            make_order,
-            get_article_id(conn, name),
-            amount,
-            get_price(conn, name),
-            )
+    #for name, amount in article_dict.items():
+      #  insert_order_position(
+       #     conn,
+        #    order_id,
+         #   get_article_id(conn, name),
+          #  amount,
+           # get_price(conn, name),
+            #)
 
     print(order_id, customer_id, order_sum)
     print(conn.execute("SELECT * FROM bestellung").fetchall())
