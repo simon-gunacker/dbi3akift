@@ -23,12 +23,15 @@ def with_connect(db):
         return wrapper
     return decorator
 
-def get_customer(conn, customer):
-    conn.executemany(
-    "INSERT INTO kunde (id, name, kreditlimit, aktueller_kredit) VALUES (?, ?, ?, ?)",
-    kunde
-    )
 
+def get_customer(conn, customer):
+    sql = f"SELECT id FROM kunde WHERE id = '{customer}' "
+
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["id"]
+
+
+def
 
 
 
@@ -36,6 +39,7 @@ def get_customer(conn, customer):
 def transaction(conn, customer, article_dict):
     conn.execute("TRANSACTION STARTING")
     customer_id = get_customer()
+
     for
 
 
