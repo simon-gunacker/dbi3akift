@@ -271,6 +271,9 @@ def cancel_order(conn, order_id):
 
         for i in get_positions(conn, order_id):
             reset_storage(conn, i["artikel_id"], i["menge"])
+            insert_storage_movement(
+                conn, i["artikel_id"], order_id, i["menge"], "storno"
+            )
 
     except Exception:
         conn.execute("ROLLBACK")
