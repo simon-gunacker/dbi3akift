@@ -71,6 +71,13 @@ def reduce_stock(conn, article_id, amount):
 
     conn.execute(sql, (amount, article_id))
 
+def increase_credit(conn, customer_id, order_sum):
+
+    sql ) "UPDATE kunde SET aktueller_kredit = aktueller_kredit + (?) WHERE id = (?)"
+
+    conn.execute(sql, (order_sum, amount))
+
+
 
 def transaction(conn, customer, article_dict):
 
@@ -84,7 +91,7 @@ def transaction(conn, customer, article_dict):
         insert_order_position(
             conn,
             order_id,
-            get_article_id(conn, name),
+            article_id,
             amount,
             get_price(conn, name),
             )
