@@ -99,7 +99,7 @@ def cancel_order(conn, order_id):
         if order == None:
             raise ValueError("Bestellung existiert nicht!")
 
-        if order["status"] != offen:
+        if order["status"] != "offen":
             raise ValueError("Bestellung ist nicht offen!")
 
         position = conn.execute("SELECT artikel_id, menge FROM bestellposition WHERE bestellung_id = (?)", (order_id,),).fetchall()
@@ -111,11 +111,11 @@ def cancel_order(conn, order_id):
             conn.execute("INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, 'storno')", (pos["artikel_id"], order_id, pos["menge"]),)
 
 
-            conn.execute("UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?", (order["gesamtwert"], order["kunde_id"]),)
+        conn.execute("UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?", (order["gesamtwert"], order["kunde_id"]),)
 
-            conn.execute("UPDATE bestellung SET status = 'storniert' WHERE id = ?", (order_id,),)
+        conn.execute("UPDATE bestellung SET status = 'storniert' WHERE id = ?", (order_id,),)
 
-            conn.commit()
+        conn.commit()
 
     except (IntegrityError, ValueError):
         conn.rollback()
@@ -146,10 +146,7 @@ def transaction(conn, customer, article_dict):
                 get_price(conn, name),
                 )
             reduce_stock(conn, article_id, amount)
-
-    except IntegrityError:
-        print("Bestellung abgelehnt")
-
+        conn.commit()
 
 
     except IntegrityError as e:
