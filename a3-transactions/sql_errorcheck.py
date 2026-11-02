@@ -3,7 +3,7 @@ from sqlite3 import connect, Error
 DB = "lager.db"
 
 # use an input to select file we want to work with
-sql_file = input("Which SQL file do you want to run? ")
+sql_file = input("Which SQL file do you want to run?").strip
 
 # open sql file and read everything that is inside
 file = open(sql_file, "r", encoding="utf-8")
@@ -16,7 +16,7 @@ conn = connect(DB)
 try:
     # run everything in the file
     conn.executescript(sql)
-    print("It worked!")
+    print("Queries ran successfully, no errors!")
 
 # the CHECK's in the db create errors when their conditions are not met
 # e.g. not enough stock --> CHECK (lagerbestand >= 0) Throws an error
