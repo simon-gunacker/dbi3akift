@@ -308,7 +308,7 @@ def cancel_order(conn, order_id):
             )
 
         reset_kredit(conn, get_customer_id(conn, order_id), get_total(conn, order_id))
-        update_order(conn, order_id, "storno")
+        update_order(conn, order_id, "storniert")
 
         conn.execute("COMMIT")
     except Exception:
