@@ -326,6 +326,14 @@ def check_minimum_stock(conn):
     return cursor.fetchall()
 
 
+def check_customer_kredit(conn):
+    result = []
+    for i in select_all_kunde(conn):
+        if i["kreditlimit"] * 0.9 < i["aktueller_kredit"]:
+            result.append(i["name"])
+    return result
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
@@ -356,6 +364,8 @@ def start_db(conn):
     cancel_order(conn, 1)
 
     print(check_minimum_stock(conn))
+
+    print(check_customer_kredit(conn))
 
 
 if __name__ == "__main__":
