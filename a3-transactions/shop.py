@@ -88,7 +88,7 @@ def get_kunde_id(conn, name: str) -> int:
     return cursor.fetchone()["id"]
 
 
-def get_sum_order(conn, article: dict) -> int:
+def get_sum_order(conn, article: dict) -> float:
     result = 0
 
     for name, amount in article.items():
@@ -126,7 +126,7 @@ def get_price(conn, name: str) -> float:
     return cursor.fetchone()["verkaufspreis"]
 
 
-def insert_order(conn, customer_id: int, sum_of_order: int) -> int:
+def insert_order(conn, customer_id: int, sum_of_order: float) -> int:
     sql = """
         INSERT INTO bestellung (kunde_id, gesamtwert)
         VALUES(?, ?)
@@ -177,7 +177,7 @@ def update_storage(conn, article_id: int, amount: int):
     conn.execute(sql)
 
 
-def update_customer_credit(conn, customer_id: int, sum_of_order: int):
+def update_customer_credit(conn, customer_id: int, sum_of_order: float):
     sql = f"""
         UPDATE kunde
         SET aktueller_kredit = aktueller_kredit + {sum_of_order}
