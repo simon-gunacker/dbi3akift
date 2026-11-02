@@ -25,6 +25,8 @@ def with_connect(db):
     return decorator
 
 
+#Kleine Funktionen die ich brauche
+
 def get_customer(conn, customer):
     sql = "SELECT id FROM kunde WHERE name == (?) "
 
@@ -84,33 +86,43 @@ def log_movement(conn, article_id, order_id, amount):
 
     conn.execute(sql, (article_id, order_id, -amount))
 
-der cancel_order(conn, order_id):
+
+#Storno Funktion
+
+def cancel_order(conn, order_id):
 
     try:
-    order = conn.execute(
+        order = conn.execute(
             "SELECT status, kunde_id, gesamtwert FROM bestellung WHERE id = ?",
             (order_id,)).fetchone()
 
-    if order == None:
-        raise ValueError("Bestellung existiert nicht!")
+        if order == None:
+            raise ValueError("Bestellung existiert nicht!")
 
-    if order["status"] != offen:
-        raise ValueError("Bestellung ist nicht offen!")
+        if order["status"] != offen:
+            raise ValueError("Bestellung ist nicht offen!")
 
-    position = conn.execute("SELECT artikel_id, menge FROM bestellposition WHERE bestellung_id = (?)", (order_id,),).fetchall
+        position = conn.execute("SELECT artikel_id, menge FROM bestellposition WHERE bestellung_id = (?)", (order_id,),).fetchall()
+
+        for pos in position:
+
+            conn.execute("UPDATE artikel SET lagerbestand = lagerbestand + ? WHERE id = ?", (pos["menge"], pos["artikel_id"]),)
+
+            conn.execute("INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, 'storno')", (pos["artikel_id"], order_id, pos["menge"]),)
 
 
+            conn.execute("UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?", (order["gesamtwert"], order["kunde_id"]),)
 
-# Pro Position: Bestand zurück und Lagerbewegung eintragen
-"UPDATE artikel SET lagerbestand = lagerbestand + ? WHERE id = ?"       # (menge, artikel_id)
-"INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, 'storno')"  # (artikel_id, order_id, menge)
+            conn.execute("UPDATE bestellung SET status = 'storniert' WHERE id = ?", (order_id,),)
 
-# Einmal pro Bestellung: Kredit senken, Status setzen
-"UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?" # (gesamtwert, kunde_id)
-"UPDATE bestellung SET status = 'storniert' WHERE id = ?"               # (order_id,)
+            conn.commit()
+
     except (IntegrityError, ValueError):
         conn.rollback()
         raise
+
+
+#Transaktion Funktion
 
 def transaction(conn, customer, article_dict):
 
