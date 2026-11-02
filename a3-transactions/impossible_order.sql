@@ -1,3 +1,6 @@
+-- '.bail on' verwirft das skript, wenn die transaktion fehlerhaft ist
+
+.bail on
 BEGIN TRANSACTION;
 
 -- neue Bestellung anlegen
