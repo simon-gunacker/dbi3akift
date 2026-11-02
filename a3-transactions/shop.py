@@ -149,6 +149,17 @@ def get_total(conn, order_id: int) -> float:
     return cursor.fetchone()["gesamtwert"]
 
 
+def get_customer_id(conn, order_id: int) -> int:
+    sql = f"""
+        SELECT kunde_id AS id
+        FROM bestellung
+        WHERE id = {order_id}
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["id"]
+
+
 def check_order_for_cancel(conn, order_id: int) -> bool:
     try:
         sql = f"""
@@ -297,6 +308,7 @@ def cancel_order(conn, order_id):
             )
 
         print(get_total(conn, order_id))
+        print(get_customer_id(conn, order_id))
 
     except Exception:
         conn.execute("ROLLBACK")
