@@ -25,7 +25,7 @@ def with_connect(db):
 
 
 def get_customer(conn, customer):
-    sql = f"SELECT id FROM kunde WHERE id = '{customer}' "
+    sql = f"SELECT id FROM kunde WHERE id = '{customer}'; "
 
     cursor = conn.execute(sql)
     return cursor.fetchone()["id"]
@@ -35,20 +35,20 @@ def get_order_sum(conn, article_dict):
 
     for key, value in article_dict.items():
         sql =
-        f"""
-        SELECT verkaufspreis * {value} AS sum
-        FROM artikel WHERE name == "{name}"
-        """
+        f"""SELECT verkaufspreis * {value} AS sum FROM artikel WHERE name == "{key}";"""
 
     cursor = conn.execute(sql)
     result += cursor.fetchone()["sum"]
     return result
 
+
 def insert_order(conn, customer_id, order_sum):
 
     sql = f"""
-        INSERT INTO bestellung
+        INSERT INTO bestellung ({customer_id}, {order_sum}) VALUES (?, ?);
         """
+    cursor = conn.execute(sql)
+    return cursor
 
 
 
@@ -63,7 +63,7 @@ def transaction(conn, customer, article_dict):
 @with_connect(":memory:")
 def test(conn):
     customer = "Techshop Wien"
-    article_dict = {"Arduino Uno:" 5, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
+    article_dict = {"Arduino Uno:" : 5, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
 
     with open("table.sql", "r") as f:
         conn.executescript(f.read())
