@@ -160,6 +160,16 @@ def get_customer_id(conn, order_id: int) -> int:
     return cursor.fetchone()["id"]
 
 
+def get_storage_movement(conn, article_id: int) -> int:
+    sql = f"""
+        SELECT COALESCE(SUM(menge), 0) AS sum
+        FROM lagerbewegung
+        WHERE artikel_id = {article_id}
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["sum"]
+
+
 def check_order_for_cancel(conn, order_id: int) -> bool:
     try:
         sql = f"""
@@ -353,6 +363,11 @@ def check_sales_volume_today(conn) -> float:
     return result
 
 
+def check_consistency(conn, start_amount: dict) -> bool:
+    for article_id, amount in start_amount.items():
+        print(get_storage_movement(conn, article_id))
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
@@ -371,6 +386,7 @@ def test_in_memory(conn):
 def start_db(conn):
     customer = "TechShop Wien"
     article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED 5mm rot": 50}
+    START_BESTAND = {1: 100, 2: 50, 3: 1000, 4: 5000, 5: 30}
 
     with open("model.sql", encoding="utf-8") as file:
         conn.executescript(file.read())
@@ -389,6 +405,8 @@ def start_db(conn):
     print(check_customer_kredit(conn))
 
     print(check_sales_volume_today(conn))
+
+    print(check_consistency(conn, START_BESTAND))
 
 
 if __name__ == "__main__":
