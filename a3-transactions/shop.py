@@ -376,9 +376,14 @@ def check_sales_volume_today(conn) -> float:
 
 def check_consistency(conn, start_amount: dict) -> bool:
     for article_id, amount in start_amount.items():
-        print(get_storage_movement(conn, article_id))
-        print("###")
-        print(get_storage(conn, article_id))
+        if (
+            not get_storage_movement(conn, article_id) * -1
+            + get_storage(conn, article_id)
+            == amount
+        ):
+            return False
+
+    return True
 
 
 @with_connect(":memory:")
