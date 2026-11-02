@@ -73,9 +73,15 @@ def reduce_stock(conn, article_id, amount):
 
 def increase_credit(conn, customer_id, order_sum):
 
-    sql ) "UPDATE kunde SET aktueller_kredit = aktueller_kredit + (?) WHERE id = (?)"
+    sql = "UPDATE kunde SET aktueller_kredit = aktueller_kredit + (?) WHERE id = (?)"
 
-    conn.execute(sql, (order_sum, amount))
+    conn.execute(sql, (order_sum, customer_id))
+
+def log_movement(conn, article_id, order_id, amount):
+
+    sql = "INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, 'verkauf')"
+
+    conn.execute(sql, (article_id, order_id, -amount))
 
 
 
@@ -85,8 +91,12 @@ def transaction(conn, customer, article_dict):
     order_sum = get_order_sum(conn, article_dict)
     order_id = insert_order(conn, customer_id, order_sum)
 
+    increase_credit(conn, customer_id, order_sum)
+
+
     for name, amount in article_dict.items():
         article_id = get_article_id(conn, name)
+        log_movement(conn, article_id, order_id, amount)
 
         insert_order_position(
             conn,
@@ -102,7 +112,10 @@ def transaction(conn, customer, article_dict):
     print(conn.execute("SELECT * FROM bestellung").fetchall(), "\n")
     print(conn.execute("SELECT * FROM bestellposition").fetchall(), "\n")
 
-    print(conn.execute("SELECT id, lagerbestand FROM artikel").fetchall())
+    print(conn.execute("SELECT id, lagerbestand FROM artikel").fetchall(), "\n")
+    print(conn.execute("SELECT id, aktueller_kredit FROM kunde").fetchall(), "\n")
+    print(conn.execute("SELECT * FROM lagerbewegung").fetchall(), "\n")
+
 
 
 
