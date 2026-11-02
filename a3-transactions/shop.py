@@ -188,19 +188,29 @@ def update_customer_credit(conn, customer_id: int, sum_of_order: int):
 
 
 def transaction(conn, customer: str, article: dict):
-    customer_id = get_kunde_id(conn, customer)
-    sum_of_order = get_sum_order(conn, article)
-    order_id = insert_order(conn, customer_id, sum_of_order)
+    try:
+        conn.execute("BEGIN TRANSACTION")
+        customer_id = get_kunde_id(conn, customer)
+        sum_of_order = get_sum_order(conn, article)
+        order_id = insert_order(conn, customer_id, sum_of_order)
 
-    for name, amount in article.items():
-        insert_order_position(
-            conn, order_id, get_id_article(conn, name), amount, get_price(conn, name)
-        )
-        update_storage(conn, get_id_article(conn, name), amount)
-        insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
+        for name, amount in article.items():
+            insert_order_position(
+                conn,
+                order_id,
+                get_id_article(conn, name),
+                amount,
+                get_price(conn, name),
+            )
+            update_storage(conn, get_id_article(conn, name), amount)
+            insert_storage_movement(conn, get_id_article(conn, name), order_id, amount)
 
-    update_customer_credit(conn, customer_id, sum_of_order)
-    print(select_all_lagerbewegung(conn))
+        update_customer_credit(conn, customer_id, sum_of_order)
+
+        conn.execute("COMMIT")
+    except Exception:
+        conn.execute("ROLLBACK")
+        raise
 
 
 @with_connect(":memory:")
