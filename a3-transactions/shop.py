@@ -227,5 +227,23 @@ def test_in_memory(conn):
     transaction(conn, customer, article_dict)
 
 
+@with_connect("storage.db")
+def start_db(conn):
+    customer = "TechShop Wien"
+    article_dict = {"Arduino Uno": 5, "Raspberry Pi 4": 2, "LED 5mm rot": 50}
+
+    with open("model.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
+
+    with open("test_data.sql", encoding="utf-8") as file:
+        conn.executescript(file.read())
+
+    transaction(conn, customer, article_dict)
+
+
 if __name__ == "__main__":
-    test_in_memory()
+    if os.path.exists("storage.db"):
+        os.remove("storage.db")
+
+    start_db()
+    # test_in_memory()
