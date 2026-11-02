@@ -1,7 +1,6 @@
 from sqlite3 import connect
 import json
 import os
-from sqlite3.dbapi2 import Cursor
 
 
 def conver_to_dict(cursor, row):
@@ -316,6 +315,17 @@ def cancel_order(conn, order_id):
         raise
 
 
+def check_minimum_stock(conn):
+    sql = f"""
+        SELECT id, name lagerbestand, mindestbestand
+        FROM artikel
+        WHERE lagerbestand < mindestbestand
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchall()
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
@@ -344,6 +354,8 @@ def start_db(conn):
     transaction(conn, customer, article_dict)
 
     cancel_order(conn, 1)
+
+    print(check_minimum_stock(conn))
 
 
 if __name__ == "__main__":
