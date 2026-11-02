@@ -31,16 +31,33 @@ def get_customer(conn, customer):
     return cursor.fetchone()["id"]
 
 
-def
+def get_order_sum(conn, article_dict):
 
+    for key, value in article_dict.items():
+        sql =
+        f"""
+        SELECT verkaufspreis * {value} AS sum
+        FROM artikel WHERE name == "{name}"
+        """
+
+    cursor = conn.execute(sql)
+    result += cursor.fetchone()["sum"]
+    return result
+
+def insert_order(conn, customer_id, order_sum):
+
+    sql = f"""
+        INSERT INTO bestellung
+        """
 
 
 
 def transaction(conn, customer, article_dict):
     conn.execute("TRANSACTION STARTING")
     customer_id = get_customer()
+    order_sum = get_order_sum()
+    make_order = insert_order(conn, customer_id, order_sum)
 
-    for
 
 
 @with_connect(":memory:")
