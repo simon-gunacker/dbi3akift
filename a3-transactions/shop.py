@@ -23,9 +23,20 @@ def with_connect(db):
         return wrapper
     return decorator
 
+def get_customer(conn, customer):
+    conn.executemany(
+    "INSERT INTO kunde (id, name, kreditlimit, aktueller_kredit) VALUES (?, ?, ?, ?)",
+    kunde
+    )
+
+
+
+
 
 def transaction(conn, customer, article_dict):
-
+    conn.execute("TRANSACTION STARTING")
+    customer_id = get_customer()
+    for
 
 
 @with_connect(":memory:")
@@ -38,6 +49,7 @@ def test(conn):
 
     with open("insert.sql", "r") as f:
         conn.executescript(f.read())
+
 
 if __name__ == "__main__":
     test()
