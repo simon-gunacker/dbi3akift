@@ -138,6 +138,17 @@ def get_positions(conn, order_id: int):
     return cursor.fetchall()
 
 
+def get_total(conn, order_id: int) -> float:
+    sql = f"""
+        SELECT gesamtwert
+        FROM bestellung
+        WHERE id = {order_id}
+    """
+
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["gesamtwert"]
+
+
 def check_order_for_cancel(conn, order_id: int) -> bool:
     try:
         sql = f"""
@@ -274,6 +285,8 @@ def cancel_order(conn, order_id):
             insert_storage_movement(
                 conn, i["artikel_id"], order_id, i["menge"], "storno"
             )
+
+        print(get_total(conn, order_id))
 
     except Exception:
         conn.execute("ROLLBACK")
