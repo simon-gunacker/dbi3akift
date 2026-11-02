@@ -1,6 +1,7 @@
 from sqlite3 import connect
 import json
 import os
+from datetime import date
 
 
 def conver_to_dict(cursor, row):
@@ -334,6 +335,24 @@ def check_customer_kredit(conn):
     return result
 
 
+def check_sales_volume_today(conn) -> float:
+    today = date.today().isoformat()
+    result = 0
+
+    sql = f"""
+        SELECT gesamtwert
+        FROM bestellung
+        WHERE datum LIKE '{today}%'
+        AND status = 'verarbeitet'
+    """
+
+    cursor = conn.execute(sql)
+    for i in cursor.fetchall():
+        result += i["gesamtwert"]
+
+    return result
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
@@ -363,9 +382,13 @@ def start_db(conn):
 
     cancel_order(conn, 1)
 
+    transaction(conn, customer, article_dict)
+
     print(check_minimum_stock(conn))
 
     print(check_customer_kredit(conn))
+
+    print(check_sales_volume_today(conn))
 
 
 if __name__ == "__main__":
