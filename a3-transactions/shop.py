@@ -339,7 +339,7 @@ def cancel_order(conn, order_id):
 
 def check_minimum_stock(conn):
     sql = f"""
-        SELECT id, name lagerbestand, mindestbestand
+        SELECT id, name, lagerbestand, mindestbestand
         FROM artikel
         WHERE lagerbestand < mindestbestand
     """
