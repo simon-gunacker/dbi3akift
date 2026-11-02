@@ -224,6 +224,16 @@ def update_order(conn, order_id: int):
     conn.execute(sql)
 
 
+def reset_storage(conn, article_id: int, amount: int):
+    sql = f"""
+        UPDATE artikel
+        SET lagerbestand = lagerbestand + {amount}
+        WHERE id = {article_id}
+    """
+
+    conn.execute(sql)
+
+
 def transaction(conn, customer: str, article: dict):
     try:
         conn.execute("BEGIN TRANSACTION")
@@ -257,11 +267,16 @@ def cancel_order(conn, order_id):
         if not check_order_for_cancel(conn, order_id):
             raise ValueError
 
-        print(get_positions(conn, order_id))
+        print(select_all_artikel(conn))
+        print("-----")
+        for i in get_positions(conn, order_id):
+            reset_storage(conn, i["artikel_id"], i["menge"])
+
+        print(select_all_artikel(conn))
 
     except Exception:
         conn.execute("ROLLBACK")
-        # raise
+        raise
 
 
 @with_connect(":memory:")
