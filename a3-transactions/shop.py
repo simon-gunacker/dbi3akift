@@ -2,6 +2,7 @@ from sqlite3 import connect
 import json
 import os
 from datetime import date
+from sqlite3.dbapi2 import Cursor
 
 
 def conver_to_dict(cursor, row):
@@ -168,6 +169,16 @@ def get_storage_movement(conn, article_id: int) -> int:
     """
     cursor = conn.execute(sql)
     return cursor.fetchone()["sum"]
+
+
+def get_storage(conn, article_id: int) -> int:
+    sql = f"""
+        SELECT lagerbestand
+        FROM artikel
+        WHERE id = {article_id}
+    """
+    cursor = conn.execute(sql)
+    return cursor.fetchone()["lagerbestand"]
 
 
 def check_order_for_cancel(conn, order_id: int) -> bool:
@@ -366,6 +377,8 @@ def check_sales_volume_today(conn) -> float:
 def check_consistency(conn, start_amount: dict) -> bool:
     for article_id, amount in start_amount.items():
         print(get_storage_movement(conn, article_id))
+        print("###")
+        print(get_storage(conn, article_id))
 
 
 @with_connect(":memory:")
