@@ -307,8 +307,11 @@ def cancel_order(conn, order_id):
                 conn, i["artikel_id"], order_id, i["menge"], "storno"
             )
 
-        print(get_total(conn, order_id))
-        print(get_customer_id(conn, order_id))
+        for i in select_all_kunde(conn):
+            print(i)
+        reset_kredit(conn, get_customer_id(conn, order_id), get_total(conn, order_id))
+        for i in select_all_kunde(conn):
+            print(i)
 
     except Exception:
         conn.execute("ROLLBACK")
