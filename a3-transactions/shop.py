@@ -59,6 +59,12 @@ def insert_order(conn, customer_id, order_sum):
     cursor = conn.execute(sql, (customer_id, order_sum))
     return cursor.lastrowid
 
+def insert_order_position(conn, order_id, article_id, amount, price):
+
+    sql = "INSERT INTO bestell_position (bestellung_id, artikel_id, menge, einzelpreis) VALUES (?, ?, ?, ?);"
+
+    cursor = conn.execute(sql, (order_id, article_id, amount, price))
+
 
 def transaction(conn, customer, article_dict):
 
@@ -66,14 +72,14 @@ def transaction(conn, customer, article_dict):
     order_sum = get_order_sum(conn, article_dict)
     order_id = insert_order(conn, customer_id, order_sum)
 
-    #for name, amount in article_dict.items():
-      #  insert_order_position(
-       #     conn,
-        #    order_id,
-         #   get_article_id(conn, name),
-          #  amount,
-           # get_price(conn, name),
-            #)
+    for name, amount in article_dict.items():
+        insert_order_position(
+            conn,
+            order_id,
+            get_article_id(conn, name),
+            amount,
+            get_price(conn, name),
+            )
 
     print(order_id, customer_id, order_sum)
     print(conn.execute("SELECT * FROM bestellung").fetchall())
