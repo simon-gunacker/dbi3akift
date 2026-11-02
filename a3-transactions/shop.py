@@ -224,6 +224,15 @@ def transaction(conn, customer: str, article: dict):
         raise
 
 
+def cancel_order(conn, order_id):
+    try:
+        conn.execute("BEGIN TRANSACTION")
+
+    except Exception:
+        conn.execute("ROLLBACK")
+        raise
+
+
 @with_connect(":memory:")
 def test_in_memory(conn):
     customer = "TechShop Wien"
