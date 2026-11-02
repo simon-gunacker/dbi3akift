@@ -238,10 +238,10 @@ def update_customer_credit(conn, customer_id: int, sum_of_order: float):
     conn.execute(sql)
 
 
-def update_order(conn, order_id: int):
+def update_order(conn, order_id: int, typ="verarbeitet"):
     sql = f"""
         UPDATE bestellung
-        SET status = 'verarbeitet'
+        SET status = '{typ}'
         WHERE id = {order_id}
     """
 
@@ -307,11 +307,10 @@ def cancel_order(conn, order_id):
                 conn, i["artikel_id"], order_id, i["menge"], "storno"
             )
 
-        for i in select_all_kunde(conn):
-            print(i)
         reset_kredit(conn, get_customer_id(conn, order_id), get_total(conn, order_id))
-        for i in select_all_kunde(conn):
-            print(i)
+        print(select_all_bestellung(conn))
+        update_order(conn, order_id, "storno")
+        print(select_all_bestellung(conn))
 
     except Exception:
         conn.execute("ROLLBACK")
