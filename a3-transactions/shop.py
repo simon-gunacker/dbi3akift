@@ -247,6 +247,16 @@ def reset_storage(conn, article_id: int, amount: int):
     conn.execute(sql)
 
 
+def reset_kredit(conn, customer_id: int, total: float):
+    sql = f"""
+        UPDATE kunde
+        SET aktueller_kredit = aktueller_kredit - {total}
+        WHERE id = {customer_id}
+    """
+
+    conn.execute(sql)
+
+
 def transaction(conn, customer: str, article: dict):
     try:
         conn.execute("BEGIN TRANSACTION")
