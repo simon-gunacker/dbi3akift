@@ -1,4 +1,5 @@
 from sqlite3 import connect
+from sqlite3 import IntegrityError
 
 def convert_dict(cursor, row):
     result_dict = {}
@@ -87,26 +88,32 @@ def log_movement(conn, article_id, order_id, amount):
 
 def transaction(conn, customer, article_dict):
 
-    customer_id = get_customer(conn, customer)
-    order_sum = get_order_sum(conn, article_dict)
-    order_id = insert_order(conn, customer_id, order_sum)
+    try:
+        customer_id = get_customer(conn, customer)
+        order_sum = get_order_sum(conn, article_dict)
+        order_id = insert_order(conn, customer_id, order_sum)
 
-    increase_credit(conn, customer_id, order_sum)
+        increase_credit(conn, customer_id, order_sum)
 
 
-    for name, amount in article_dict.items():
-        article_id = get_article_id(conn, name)
-        log_movement(conn, article_id, order_id, amount)
+        for name, amount in article_dict.items():
+            article_id = get_article_id(conn, name)
+            log_movement(conn, article_id, order_id, amount)
 
-        insert_order_position(
-            conn,
-            order_id,
-            article_id,
-            amount,
-            get_price(conn, name),
-            )
-        reduce_stock(conn, article_id, amount)
+            insert_order_position(
+                conn,
+                order_id,
+                article_id,
+                amount,
+                get_price(conn, name),
+                )
+            reduce_stock(conn, article_id, amount)
 
+
+    except IntegrityError as e:
+        print("Fehler:", e)
+        conn.rollback()
+        raise
 
     print(order_id, customer_id, order_sum)
     print(conn.execute("SELECT * FROM bestellung").fetchall(), "\n")
@@ -118,12 +125,10 @@ def transaction(conn, customer, article_dict):
 
 
 
-
-
 @with_connect(":memory:")
 def test(conn):
-    customer = "TechShop Wien"
-    article_dict = {"Arduino Uno" : 5, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
+    customer = "Elektronik Steiner"
+    article_dict = {"Arduino Uno" : 200, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
 
     with open("table.sql", "r") as f:
         conn.executescript(f.read())
@@ -131,9 +136,14 @@ def test(conn):
     with open("insert.sql", "r") as f:
         conn.executescript(f.read())
 
-    transaction(conn, customer, article_dict)
+    try:
+        transaction(conn, customer, article_dict)
+    except IntegrityError:
+        print("Bestellung abgelehnt")
 
 
 
 if __name__ == "__main__":
     test()
+
+
