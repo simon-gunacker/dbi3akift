@@ -25,17 +25,26 @@ def with_connect(db):
 
 
 def get_customer(conn, customer):
-    sql = f"SELECT id FROM kunde WHERE id = '{customer}'; "
+    sql = "SELECT id FROM kunde WHERE name == (?) "
 
-    cursor = conn.execute(sql)
+    cursor = conn.execute(sql, (customer))
     return cursor.fetchone()["id"]
 
+def get_article_id(conn, name):
+    sql = "SELECT id FROM artikel WHERE name == (?); "
+
+    cursor = conn.execute(sql, (name))
+    return cursor.fetchone()["id"]
+
+def get_price(conn, name):
+    sql = "SELECT verkaufspreis FROM artikel WHERE name == (?); "
+    cursor = conn.execute(sql, (name))
+    return cursor.fetchone()["verkaufspreis"]
 
 def get_order_sum(conn, article_dict):
 
     for key, value in article_dict.items():
-        sql =
-        f"""SELECT verkaufspreis * {value} AS sum FROM artikel WHERE name == "{key}";"""
+        sql = "SELECT verkaufspreis * (?) AS sum FROM artikel WHERE name == (?);"
 
     cursor = conn.execute(sql)
     result += cursor.fetchone()["sum"]
@@ -44,32 +53,47 @@ def get_order_sum(conn, article_dict):
 
 def insert_order(conn, customer_id, order_sum):
 
-    sql = f"""
-        INSERT INTO bestellung ({customer_id}, {order_sum}) VALUES (?, ?);
-        """
-    cursor = conn.execute(sql)
+    sql = "INSERT INTO bestellung (kunde_id, gesamtwert) VALUES (?, ?);"
+
+    cursor = conn.execute(sql, (customer_id, order_sum))
     return cursor
 
 
 
 def transaction(conn, customer, article_dict):
-    conn.execute("TRANSACTION STARTING")
-    customer_id = get_customer()
-    order_sum = get_order_sum()
+
+    customer_id = get_customer(conn, customer)
+    order_sum = get_order_sum(conn, article_dict)
     make_order = insert_order(conn, customer_id, order_sum)
+
+    for name, amount in article_dict.items():
+        insert_order_position(
+            conn,
+            make_order,
+            get_article_id(conn, name),
+            amount,
+            get_price(conn, name),
+            )
+
+    print(order_id, customer_id, order_sum)
+    print(conn.execute("SELECT * FROM bestellung").fetchall())
+
 
 
 
 @with_connect(":memory:")
 def test(conn):
-    customer = "Techshop Wien"
-    article_dict = {"Arduino Uno:" : 5, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
+    customer = "TechShop Wien"
+    article_dict = {"Arduino Uno" : 5, "Raspberry Pi 4" : 2, "LED 5mm rot" : 50}
 
     with open("table.sql", "r") as f:
         conn.executescript(f.read())
 
     with open("insert.sql", "r") as f:
         conn.executescript(f.read())
+
+    transaction(conn, customer, article_dict)
+
 
 
 if __name__ == "__main__":
