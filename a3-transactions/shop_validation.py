@@ -84,7 +84,33 @@ def log_movement(conn, article_id, order_id, amount):
 
     conn.execute(sql, (article_id, order_id, -amount))
 
+der cancel_order(conn, order_id):
 
+    try:
+    order = conn.execute(
+            "SELECT status, kunde_id, gesamtwert FROM bestellung WHERE id = ?",
+            (order_id,)).fetchone()
+
+    if order == None:
+        raise ValueError("Bestellung existiert nicht!")
+
+    if order["status"] != offen:
+        raise ValueError("Bestellung ist nicht offen!")
+
+    position = conn.execute("SELECT artikel_id, menge FROM bestellposition WHERE bestellung_id = (?)", (order_id,),).fetchall
+
+
+
+# Pro Position: Bestand zurück und Lagerbewegung eintragen
+"UPDATE artikel SET lagerbestand = lagerbestand + ? WHERE id = ?"       # (menge, artikel_id)
+"INSERT INTO lagerbewegung (artikel_id, bestellung_id, menge, typ) VALUES (?, ?, ?, 'storno')"  # (artikel_id, order_id, menge)
+
+# Einmal pro Bestellung: Kredit senken, Status setzen
+"UPDATE kunde SET aktueller_kredit = aktueller_kredit - ? WHERE id = ?" # (gesamtwert, kunde_id)
+"UPDATE bestellung SET status = 'storniert' WHERE id = ?"               # (order_id,)
+    except (IntegrityError, ValueError):
+        conn.rollback()
+        raise
 
 def transaction(conn, customer, article_dict):
 
@@ -109,6 +135,10 @@ def transaction(conn, customer, article_dict):
                 )
             reduce_stock(conn, article_id, amount)
 
+    except IntegrityError:
+        print("Bestellung abgelehnt")
+
+
 
     except IntegrityError as e:
         print("Fehler:", e)
@@ -122,6 +152,8 @@ def transaction(conn, customer, article_dict):
     print(conn.execute("SELECT id, lagerbestand FROM artikel").fetchall(), "\n")
     print(conn.execute("SELECT id, aktueller_kredit FROM kunde").fetchall(), "\n")
     print(conn.execute("SELECT * FROM lagerbewegung").fetchall(), "\n")
+
+
 
 
 
