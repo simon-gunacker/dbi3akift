@@ -1,6 +1,7 @@
 from sqlite3 import connect
 import json
 import os
+from sqlite3.dbapi2 import Cursor
 
 
 def conver_to_dict(cursor, row):
@@ -126,6 +127,21 @@ def get_price(conn, name: str) -> float:
     return cursor.fetchone()["verkaufspreis"]
 
 
+def check_order_for_cancel(conn, order_id: int) -> bool:
+    try:
+        sql = f"""
+            SELECT status
+            FROM bestellung
+            WHERE id = {order_id}
+        """
+
+        cursor = conn.execute(sql)
+        return cursor.fetchone()["status"] == "verarbeitet"
+    except Exception:
+        print(f"Die Bestellung mit der ID: {order_id} ist nicht vorhanden")
+        return False
+
+
 def insert_order(conn, customer_id: int, sum_of_order: float) -> int:
     sql = """
         INSERT INTO bestellung (kunde_id, gesamtwert)
@@ -227,10 +243,12 @@ def transaction(conn, customer: str, article: dict):
 def cancel_order(conn, order_id):
     try:
         conn.execute("BEGIN TRANSACTION")
+        if not check_order_for_cancel(conn, order_id):
+            raise ValueError
 
     except Exception:
         conn.execute("ROLLBACK")
-        raise
+        # raise
 
 
 @with_connect(":memory:")
@@ -259,8 +277,8 @@ def start_db(conn):
         conn.executescript(file.read())
 
     transaction(conn, customer, article_dict)
-    for i in select_all_bestellung(conn):
-        print(i)
+
+    cancel_order(conn, 2)
 
 
 if __name__ == "__main__":
