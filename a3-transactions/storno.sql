@@ -1,7 +1,7 @@
 BEGIN TRANSACTION;
 
 CREATE TEMP TABLE storno_id (id INTEGER);
-INSERT INTO temp.storno_id (id) VALUES (4);
+INSERT INTO temp.storno_id (id) VALUES (2);
 
 UPDATE bestellung
 SET datum = date("now"), status = "storniert"

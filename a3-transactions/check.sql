@@ -7,9 +7,9 @@ FROM kunde
 WHERE kreditlimit * 0.9 <= aktueller_kredit;
 
 SELECT SUM(lb.menge * a.verkaufspreis)
-FROM lagerbestand as lb
-JOIN artikel on a.id = lb.artikel_id
-WHERE lb.datum = CURRENT_DATE;
+FROM lagerbewegung as lb
+JOIN artikel AS a on a.id = lb.artikel_id
+WHERE lb.datum > CURRENT_DATE - 1 AND lb.bestellung_id != 1;
 
 WITH total_amount AS (
     SELECT SUM(menge) as amount, artikel_id
