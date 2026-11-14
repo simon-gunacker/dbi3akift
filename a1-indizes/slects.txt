@@ -1,0 +1,23 @@
+WITH cte_name AS(
+    SELECT first_name, COUNT(*) AS count
+    FROM PERSON
+    GROUP BY first_name 
+    ORDER BY count DESC
+)
+
+SELECT MIN(count), MAX(count), AVG(count)
+FROM cte_name ;
+
+
+
+
+-- Ohne INDEX 
+SELECT * FROM PERSON WHERE first_name = 'Michael';
+
+-- Mit INDEX
+CREATE INDEX idx_first_name ON PERSON(first_name);
+SELECT * FROM PERSON WHERE first_name = 'Michael';
+
+
+(DROP INDEX idx_first_name; 
+VACUUM;)
