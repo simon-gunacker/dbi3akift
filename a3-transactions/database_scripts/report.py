@@ -28,7 +28,7 @@ def run_reports(db="warehouse.db"):
         cursor.execute(
             """
             SELECT id, name, kreditlimit, aktueller_kredit, 
-                ROUND((aktueller_kredit * 100.0 / kreditlimit), 2) AS auslastung
+                ROUND((aktueller_kredit * 100.0 / kreditlimit), 2) AS utilization
             FROM kunde
             WHERE kreditlimit > 0 AND (aktueller_kredit * 1.0 / kreditlimit) >= 0.9;
             """
