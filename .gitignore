@@ -1,1 +1,5 @@
+# Databank
 *.db
+
+# Python specific
+__pycache__/
