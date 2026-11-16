@@ -1,5 +1,3 @@
-BEGIN TRANSACTION;
-
 -- Min stock
 SELECT id, name, kategorie, lagerbestand, mindestbestand
 FROM artikel
@@ -26,5 +24,3 @@ SELECT
 FROM artikel a
 LEFT JOIN lagerbewegung lb ON a.id = lb.artikel_id
 GROUP BY a.id, a.name, a.lagerbestand;
-
-COMMIT;

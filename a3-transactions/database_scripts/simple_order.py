@@ -57,6 +57,10 @@ def execute_simple_order(kunde_id, items, db="warehouse.db"):
             cursor.execute("COMMIT")
             print(f"Order created successfully! Order value: {total_value:.2f}")
 
+    except sqlite3.IntegrityError as err: # Integrity error triggerd by sql (CHECK)
+        cursor.execute("ROLLBACK")
+        raise
+
     except sqlite3.Error as err:
         cursor.execute("ROLLBACK")
         print(f"Transfare failed. Rolled back changes. Error: {err}")
@@ -69,5 +73,12 @@ if __name__ == '__main__':
             (2, 2, 75.00), # 2x Raspberry Pi
             (3, 50, 0.25)  # 50x led
         ]
-    
+    test_advance = [
+        (2, 500, 75.00),
+        (2, 100, 75.00)
+    ]
+    # Simple order
     execute_simple_order(kunde_id=1, items=items)
+    # Advanced order
+    execute_simple_order(kunde_id=2, items=test_advance) # Invalid Stock
+    execute_simple_order(kunde_id=1, items=test_advance) #Invalid Credit
