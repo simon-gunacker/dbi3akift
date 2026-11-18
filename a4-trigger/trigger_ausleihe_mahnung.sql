@@ -15,3 +15,11 @@ BEGIN
         );
 END;
 
+CREATE TRIGGER trg_guthaben_pruefen
+BEFORE INSERT ON ausleihe
+BEGIN
+    SELECT RAISE(ABORT, 'Guthaben zu niedrig – keine neue Ausleihe möglich!')
+    WHERE (SELECT konto_guthaben FROM nutzer WHERE id = NEW.nutzer_id) < 0;
+END;
+
+
