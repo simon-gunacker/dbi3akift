@@ -6,4 +6,5 @@ PRAGMA foreign_keys = ON;
 .mode column
 .timer on
 .read create_tables.sql
+.read insert_data.sql
 EOF
