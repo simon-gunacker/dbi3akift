@@ -19,3 +19,15 @@ BEGIN
             'Medium ' || NEW.medium_id || ' ausgeliehen von Nutzer ' || NEW.nutzer_id
         );
 END;
+
+CREATE TRIGGER trg_bestand_erhoehen
+AFTER UPDATE OF status ON ausleihe
+WHEN NEW.status = 'beendet'
+AND OLD.status != 'beendet'
+AND (SELECT typ FROM medium WHERE id = NEW.medium_id) != 'ebook'
+BEGIN
+    UPDATE medium SET bestand = bestand + 1 WHERE id = NEW.medium_id;
+    INSERT INTO system_log (aktion, info) VALUES 
+        ('Rückgabe', 'Medium ' || NEW.medium_id || ' zurückgegeben');
+END;
+
