@@ -4,12 +4,16 @@ CREATE TABLE nutzer (
     konto_guthaben DECIMAL(10,2) DEFAULT 0 CHECK (konto_guthaben >= 0)
 );
 
+SELECT '--- Nutzer ---' AS 'Tabelle erstellt';
+
 CREATE TABLE medium (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titel TEXT NOT NULL,
     typ TEXT CHECK (typ IN ('buch', 'ebook')),
     bestand INTEGER DEFAULT 0 CHECK (bestand >= 0)
 );
+
+SELECT '--- Medium ---' AS 'Tabelle erstellt';
 
 CREATE TABLE ausleihe (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,6 +26,8 @@ CREATE TABLE ausleihe (
     FOREIGN KEY (medium_id) REFERENCES medium(id)
 );
 
+SELECT '--- Ausleihe ---' AS 'Tabelle erstellt';
+
 CREATE TABLE mahnung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ausleihe_id INTEGER,
@@ -30,9 +36,14 @@ CREATE TABLE mahnung (
     FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
 );
 
+
+SELECT '--- Mahnung ---' AS 'Tabelle erstellt';
+
 CREATE TABLE system_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     aktion TEXT,
     info TEXT,
     datum DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+SELECT '--- System Log ---' AS 'Tabelle erstellt';
