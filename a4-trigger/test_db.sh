@@ -9,4 +9,5 @@ PRAGMA foreign_keys = ON;
 .read insert_data.sql
 .read trigger_bestandsverwaltung.sql
 .read trigger_ausleihe_mahnung.sql
+.read trigger_e_book.sql
 EOF
