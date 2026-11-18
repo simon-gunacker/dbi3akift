@@ -12,4 +12,5 @@ PRAGMA foreign_keys = ON;
 .read trigger_e_book.sql
 .read trigger_aufraeumen.sql
 .read trigger_logging.sql
+.read tests.sql
 EOF
