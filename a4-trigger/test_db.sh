@@ -7,4 +7,5 @@ PRAGMA foreign_keys = ON;
 .timer on
 .read create_tables.sql
 .read insert_data.sql
+.read trigger_bestandsverwaltung.sql
 EOF

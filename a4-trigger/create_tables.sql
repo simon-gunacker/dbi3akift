@@ -36,7 +36,6 @@ CREATE TABLE mahnung (
     FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
 );
 
-
 SELECT '--- Mahnung ---' AS 'Tabelle erstellt';
 
 CREATE TABLE system_log (
