@@ -15,8 +15,8 @@ CREATE TABLE ausleihe (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nutzer_id INTEGER,
     medium_id INTEGER,
-    startdatum DATE DEFAULT DATE('now'),
-    rueckgabedatum DATE DEFAULT DATE('now', '+14 day'),
+    startdatum DATE DEFAULT (DATE('now')),
+    rueckgabedatum DATE DEFAULT (DATE('now', '+14 day')),
     status TEXT DEFAULT 'aktiv',  -- aktiv, beendet, gemahnt, gesperrt
     FOREIGN KEY (nutzer_id) REFERENCES nutzer(id),
     FOREIGN KEY (medium_id) REFERENCES medium(id)
@@ -26,7 +26,7 @@ CREATE TABLE mahnung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ausleihe_id INTEGER,
     betrag DECIMAL(10,2),
-    datum DATE DEFAULT DATE('now'),
+    datum DATE DEFAULT (DATE('now')),
     FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
 );
 
