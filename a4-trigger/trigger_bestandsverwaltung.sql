@@ -1,3 +1,5 @@
+SELECT '--- Bestandsverwaltung ---' AS 'Trigger erstellen';
+
 CREATE TRIGGER trg_bestand_pruefen
 BEFORE INSERT ON ausleihe
 WHEN NEW.medium_id IS NOT NULL
