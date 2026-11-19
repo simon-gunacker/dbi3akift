@@ -4,3 +4,10 @@ BEGIN
     SELECT RAISE(ROLLBACK, 'Bestand zu klein')
     WHERE NEW.bestand < 0;
 END;
+
+
+CREATE TRIGGER IF NOT EXISTS delete_user
+AFTER DELETE ON nutzer
+BEGIN
+
+END;
