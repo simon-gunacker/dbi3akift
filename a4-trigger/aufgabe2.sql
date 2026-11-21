@@ -2,7 +2,7 @@
 -- Lass vorher Aufgabe 1 laufen!
 -- Dafür habe ich im Tabellen Schema den CHECK beim konto_guthaben entfernt
 -- das Guthaben könnte sonst nie negativ werden
-CREATE TRIGGER mahnung_erfassen
+CREATE TRIGGER mahnung_verfassen
 AFTER UPDATE OF status ON ausleihe
 FOR EACH ROW
 WHEN NEW.status = 'gemahnt'
