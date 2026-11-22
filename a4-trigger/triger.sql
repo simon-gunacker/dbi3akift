@@ -74,3 +74,18 @@ BEGIN
     );
 END;
 
+-- 4. Automatische Aufräumarbeiten
+CREATE TRIGGER nutzer_before_delete
+BEFORE DELETE ON nutzer
+BEGIN
+  -- Mahnungen löschen
+  DELETE FROM mahnung
+  WHERE ausleihe_id IN (SELECT id FROM ausleihe WHERE nutzer_id = OLD.id);
+
+  -- Ausleihen löschen
+  DELETE FROM ausleihe WHERE nutzer_id = OLD.id;
+
+  -- Eintrag schreiben
+  INSERT INTO system_log (aktion, info)
+  VALUES ('NUTZER_GELOESCHT', 'Nutzer ' || OLD.id || ' (' || OLD.name || ') gelöscht');
+END;
