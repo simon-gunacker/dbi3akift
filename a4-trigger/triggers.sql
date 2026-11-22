@@ -165,7 +165,7 @@ BEGIN
     DELETE FROM ausleihe
         WHERE nutzer_id = OLD.id;
     INSERT INTO system_log (aktion, info)
-        VALUES('Nutzer geloescht', CONCAT('nutzer_id ', OLD.id));
+        VALUES('Nutzer geloescht', CONCAT('Name: ', OLD.name));
 END;
 
 -- TEST:
@@ -180,11 +180,53 @@ DELETE FROM nutzer
 -- das Löschen von Medien oder Nutzern.
 -- Diese Informationen sollen später auswertbar sein, um Abläufe nachvollziehen zu können.
 --
+
+CREATE TRIGGER ausleihe_log
+AFTER INSERT ON ausleihe
+WHEN
+    NEW.status='aktiv'
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('Ausleihe', 'ausleih_id ' || NEW.id);
+END;
+
+CREATE TRIGGER rueckgabe_log
+AFTER INSERT ON ausleihe
+WHEN
+    NEW.status='beendet'
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('Rueckgabe', 'ausleih_id ' || NEW.id);
+END;
+
+CREATE TRIGGER mahnung_log
+AFTER INSERT ON mahnung
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('Mahnung', 'mahnung_id ' || NEW.id);
+END;
+
+
+-- TEST:
+INSERT INTO ausleihe(nutzer_id, medium_id) VALUES (2, 1);
+INSERT INTO ausleihe(nutzer_id, medium_id, status)
+    VALUES (2, 1, 'beendet');
+
+-- triggers mahnung
+INSERT INTO ausleihe(
+    nutzer_id, medium_id, rueckgabedatum
+    )
+    VALUES (2, 1, '2000-01-01');
+
+
+
+
 -- 6. Plausibilitätsprüfung
 -- Es darf nicht möglich sein, Mahngebühren mit 0 € oder negativen Beträgen zu erfassen.
 
 --LÖSUNG: CHECK CONSTRAINT bei table mahnung spalte
 -- betrag
+
 -- TEST:
 -- INSERT INTO mahnung (betrag) VALUES (0);
 -- INSERT INTO mahnung (betrag) VALUES (-10);
