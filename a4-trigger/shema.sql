@@ -25,7 +25,7 @@ CREATE TABLE ausleihe (
 CREATE TABLE mahnung (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ausleihe_id INTEGER,
-    betrag DECIMAL(10,2),
+    betrag DECIMAL(10,2) NOT NULL CHECK (betrag > 0),
     datum DATE DEFAULT (DATE('now')),
     FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
 );
