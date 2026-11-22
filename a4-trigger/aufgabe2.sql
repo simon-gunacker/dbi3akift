@@ -2,7 +2,7 @@
 -- Lass vorher Aufgabe 1 laufen!
 -- Dafür habe ich im Tabellen Schema den CHECK beim konto_guthaben entfernt
 -- das Guthaben könnte sonst nie negativ werden
-CREATE TRIGGER IF NOT EXISTS mahnung_verfassen
+CREATE TRIGGER mahnung_verfassen
 AFTER UPDATE OF status ON ausleihe
 FOR EACH ROW
 WHEN NEW.status = 'gemahnt'
@@ -15,14 +15,20 @@ BEGIN
     -- aufzeichnung der Mahnung
     INSERT INTO mahnung (ausleihe_id, betrag)
     VALUES (NEW.id, 10);
+
+    -- Aufgabe 5 
+    INSERT INTO system_log (aktion, info)
+    VALUES ('MAHNUNG', (SELECT name 
+                            FROM nutzer 
+                            WHERE id = NEW.nutzer_id) || ' - Ausleihe ' || NEW.id);
 END;
 
 -- wenn das Guthaben neagtiv wird soll dieser Trigger beim vesuch etwas erneut zum ausleihen
-CREATE TRIGGER IF NOT EXISTS sperre_negatives_guthaben
+CREATE TRIGGER sperre_negatives_guthaben
 BEFORE INSERT ON ausleihe
 FOR EACH ROW
 WHEN (SELECT konto_guthaben FROM nutzer
-      WHERE id = NEW.nutzer_id) < 0
+    WHERE id = NEW.nutzer_id) < 0
 BEGIN
     SELECT RAISE (ABORT, 'Guthaben negativ! Keine neuen Ausleihen möglich');
 END;

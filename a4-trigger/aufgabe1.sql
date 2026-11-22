@@ -1,5 +1,6 @@
 -- Aufgabe 1
-CREATE TRIGGER IF NOT EXISTS verfuegbarkeit_ausleihen
+-- nach shema.sql und test_data.sql ausführen 
+CREATE TRIGGER verfuegbarkeit_ausleihen
 BEFORE INSERT ON ausleihe
 FOR EACH ROW
 BEGIN
@@ -10,12 +11,21 @@ BEGIN
         WHERE id = NEW.medium_id ) <= 0;
 END;
 
-CREATE TRIGGER IF NOT EXISTS bestands_verringerung
+CREATE TRIGGER bestands_verringerung
 AFTER INSERT ON ausleihe
 FOR EACH ROW
 BEGIN
     UPDATE medium SET bestand = bestand - 1
     WHERE id = NEW.medium_id;
+
+    --Aufgabe 5
+    INSERT INTO system_log (aktion, info)
+    VALUES ('AUSLEIHE', (SELECT name
+                                FROM nutzer
+                                WHERE id = NEW.nutzer_id) || '-' || 
+                                (SELECT titel
+                                FROM medium
+                                WHERE id = NEW.medium_id));
 END;
 
 
