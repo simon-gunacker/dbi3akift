@@ -16,18 +16,26 @@ BEFORE INSERT ON ausleihe
 
 CREATE TRIGGER decrement_bestand
 AFTER INSERT ON ausleihe
+    WHEN (
+        SELECT COUNT(*) FROM medium
+            WHERE id = NEW.medium_id
+            AND typ = 'buch'
+    )
     BEGIN
         UPDATE medium SET bestand = bestand - 1
         WHERE id = NEW.medium_id;
     END;
 
 -- TEST: should trigger, check_bestand as book nr. 2 is
--- only stocked once
+-- only stocked once, and also show that e-books are not
+-- changed in bestand
 
 INSERT INTO ausleihe (nutzer_id, medium_id)
 VALUES (2, 2);
 -- INSERT INTO ausleihe (nutzer_id, medium_id)
 -- VALUES (2, 2);
+INSERT INTO ausleihe (nutzer_id, medium_id)
+VALUES (2, 3);
 
 -- 2. Überfällige Ausleihen und Mahngebühren
 -- Wird eine Ausleihe überfällig, soll automatisch eine Mahnung im System erfasst werden. Gleichzeitig soll dem betroffenen Nutzer der entsprechende Betrag sofort vom Guthaben abgezogen werden. Wird das Guthaben dadurch negativ, darf der Nutzer vorerst keine neuen Ausleihen mehr tätigen.
@@ -114,9 +122,36 @@ VALUES(1, 3, '2025-01-01', '2025-01-15');
 -- VALUES(1, 3);
 
 
+
+
+
 -- 3. Vereinfachte Ausleihe von E-Books
 -- Für digitale Medien (E-Books) soll die Ausleihe besonders bequem funktionieren: Wenn ein Eintrag mit Nutzername, Titel und gewünschter Dauer gemacht wird, soll das System automatisch alle weiteren notwendigen Informationen ergänzen, sodass der Ausleihvorgang vollständig ist.
 --
+
+CREATE VIEW ebook_v AS
+SELECT n.name, m.titel, 0 AS dauer FROM nutzer n
+JOIN medium m WHERE typ='ebook';
+
+
+CREATE TRIGGER ebook_v
+INSTEAD OF INSERT ON ebook_v
+BEGIN
+    INSERT INTO ausleihe(
+        nutzer_id, medium_id, rueckgabedatum
+        ) VALUES (
+            (SELECT id FROM nutzer
+                WHERE name=NEW.name)
+            , (SELECT id FROM medium
+                WHERE titel=NEW.titel)
+            , (DATE('now', CONCAT(NEW.dauer, ' days')))
+        );
+END;
+
+--TEST:
+-- INSERT INTO ebook_v VALUES('Ben Beispiel', 'Digitale Welten', 30);
+
+
 -- 4. Automatische Aufräumarbeiten
 -- Wenn ein Nutzer gelöscht wird, sollen gleichzeitig alle zugehörigen offenen Ausleihen, Mahnungen oder Gebühren entfernt werden. Im System soll dabei eine nachvollziehbare Notiz oder ein Eintrag entstehen, der zeigt, dass dieser Löschvorgang stattgefunden hat.
 --
