@@ -4,3 +4,7 @@ file.md
 repo_uebersiedelt.md
 *.db
 *.db-journal
+*.csv
+uebung_1_test/
+.venv/
+mitschrift.md
