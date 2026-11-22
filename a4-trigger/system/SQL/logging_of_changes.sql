@@ -11,6 +11,26 @@ Ich finde, dass auch das Hinzufügen eines neuen Mediums gelogged werden muss, d
 Ausleihen, Rückgaben, Mahnungen und das Löschen von Nutzern werden aus den vorherigen Übungen bereits korrekt protokolliert, alos fehlen nur mehr die Medienlöschungen.
 */
 
+-- Logging der Mahnungen
+CREATE TRIGGER log_overdue
+AFTER INSERT ON mahnung
+FOR EACH ROW
+BEGIN
+
+    INSERT INTO system_log
+    (
+        aktion,
+        info
+    )
+    VALUES
+    (
+        'Mahnung',
+        'Die Ausleihung mit der ID ' || NEW.ausleihe_id || ' wurde nicht rechtzeitig zurückgebracht.'
+    );
+
+END;
+
+
 -- Logging des Hinzufügen eines Mediums
 CREATE TRIGGER log_medium_addition
 AFTER INSERT ON medium
