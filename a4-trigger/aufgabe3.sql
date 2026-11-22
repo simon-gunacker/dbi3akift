@@ -7,7 +7,7 @@ JOIN nutzer n ON n.id = a.nutzer_id
 JOIN medium m ON m.id = a.medium_id
 WHERE m.typ = 'ebook';
 
-CREATE TRIGGER ebook_ausleihe_einfuegen
+CREATE TRIGGER IF NOT EXISTS ebook_ausleihe_einfuegen
 INSTEAD OF INSERT ON ebook_ausleihe 
 FOR EACH ROW
 BEGIN

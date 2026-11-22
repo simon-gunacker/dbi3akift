@@ -1,5 +1,5 @@
 -- Aufgabe 1
-CREATE TRIGGER verfuegbarkeit_ausleihen
+CREATE TRIGGER IF NOT EXISTS verfuegbarkeit_ausleihen
 BEFORE INSERT ON ausleihe
 FOR EACH ROW
 BEGIN
@@ -10,7 +10,7 @@ BEGIN
         WHERE id = NEW.medium_id ) <= 0;
 END;
 
-CREATE TRIGGER bestands_verringerung
+CREATE TRIGGER IF NOT EXISTS bestands_verringerung
 AFTER INSERT ON ausleihe
 FOR EACH ROW
 BEGIN
