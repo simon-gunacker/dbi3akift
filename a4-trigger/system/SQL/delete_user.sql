@@ -26,7 +26,7 @@ BEGIN
     );
 END;
 
--- Logging des Löschungsprozesses
+-- Logging des Nutzerlöschungsprozesses
 CREATE TRIGGER log_user_deletion
 AFTER DELETE ON nutzer
 FOR EACH ROW
