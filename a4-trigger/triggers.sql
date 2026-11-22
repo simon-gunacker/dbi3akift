@@ -4,6 +4,7 @@
 
 CREATE TRIGGER check_bestand
 BEFORE INSERT ON ausleihe
+    -- 0 = false, 1 = true
     WHEN (
         SELECT bestand FROM medium
         WHERE id = NEW.medium_id
@@ -22,14 +23,97 @@ AFTER INSERT ON ausleihe
 
 -- TEST: should trigger, check_bestand as book nr. 2 is
 -- only stocked once
-INSERT INTO ausleihe (nutzer_id, medium_id)
-VALUES (1, 2);
+
 INSERT INTO ausleihe (nutzer_id, medium_id)
 VALUES (2, 2);
+-- INSERT INTO ausleihe (nutzer_id, medium_id)
+-- VALUES (2, 2);
 
 -- 2. Überfällige Ausleihen und Mahngebühren
 -- Wird eine Ausleihe überfällig, soll automatisch eine Mahnung im System erfasst werden. Gleichzeitig soll dem betroffenen Nutzer der entsprechende Betrag sofort vom Guthaben abgezogen werden. Wird das Guthaben dadurch negativ, darf der Nutzer vorerst keine neuen Ausleihen mehr tätigen.
 --
+
+CREATE TRIGGER create_mahnung
+AFTER INSERT ON ausleihe
+FOR EACH ROW
+WHEN (
+    SELECT rueckgabedatum FROM ausleihe
+    WHERE nutzer_id = NEW.nutzer_id
+    AND rueckgabedatum < DATE('now')
+) BEGIN
+    INSERT INTO mahnung (ausleihe_id, betrag)
+    VALUES (NEW.id, 5);
+END;
+
+CREATE TRIGGER decrement_guthaben
+AFTER INSERT ON mahnung
+WHEN (
+    SELECT n.konto_guthaben FROM nutzer n
+        JOIN ausleihe a
+        ON n.id = a.nutzer_id
+            JOIN mahnung m
+            ON a.id = m.ausleihe_id
+    WHERE n.konto_guthaben - NEW.betrag > 0
+    AND a.id = NEW.ausleihe_id
+    )
+BEGIN
+    UPDATE nutzer
+        SET konto_guthaben = konto_guthaben - NEW.betrag
+        WHERE id = (
+            SELECT nutzer_id FROM ausleihe
+            WHERE id = NEW.ausleihe_id
+        );
+    UPDATE ausleihe
+        SET status = 'gemahnt'
+        WHERE id = NEW.ausleihe_id;
+END;
+
+CREATE TRIGGER sperr_nutzer
+AFTER INSERT ON mahnung
+WHEN (
+        SELECT n.konto_guthaben FROM nutzer n
+        JOIN ausleihe a
+        ON n.id = a.nutzer_id
+            JOIN mahnung m
+            ON a.id = m.ausleihe_id
+    WHERE n.konto_guthaben - NEW.betrag <= 0
+    AND a.id = NEW.ausleihe_id
+)
+BEGIN
+    UPDATE ausleihe
+        SET status='gesperrt'
+        WHERE id = NEW.ausleihe_id;
+END;
+
+CREATE TRIGGER check_gesperrt
+BEFORE INSERT ON ausleihe
+WHEN (
+    -- string > 0 = false
+    SELECT COUNT(status) FROM ausleihe
+        WHERE nutzer_id = NEW.nutzer_id
+        AND status = 'gesperrt'
+)
+BEGIN
+    SELECT RAISE(
+        ABORT
+        , 'Keine Ausleihe möglich - Nutzer ist gesperrt'
+    );
+END;
+
+-- TEST:
+-- Trigger create_mahnung and decrement_guthaben
+INSERT INTO ausleihe(nutzer_id, medium_id, startdatum, rueckgabedatum)
+VALUES(1, 3, '2025-01-01', '2025-01-15');
+
+-- Trigger create_mahnung and sperr_nutzer
+INSERT INTO ausleihe(nutzer_id, medium_id, startdatum, rueckgabedatum)
+VALUES(1, 3, '2025-01-01', '2025-01-15');
+
+-- Trigger check_gesperrt
+-- INSERT INTO ausleihe(nutzer_id, medium_id)
+-- VALUES(1, 3);
+
+
 -- 3. Vereinfachte Ausleihe von E-Books
 -- Für digitale Medien (E-Books) soll die Ausleihe besonders bequem funktionieren: Wenn ein Eintrag mit Nutzername, Titel und gewünschter Dauer gemacht wird, soll das System automatisch alle weiteren notwendigen Informationen ergänzen, sodass der Ausleihvorgang vollständig ist.
 --
