@@ -5,14 +5,14 @@ BEGIN
     -- Prüfung 1: Bestand > 0?
     SELECT CASE
         WHEN (SELECT bestand FROM medium WHERE id = NEW.medium_id) <= 0
-            THEN RAISE(ABORT, 'Ausleihe: Bestand nicht ausreichend!') -- ABROT gibt fehler aus, unterbricht alles und führt nichts aus 
-        END;
+        THEN RAISE(ABORT, 'Ausleihe: Bestand nicht ausreichend!') -- ABROT gibt fehler aus, unterbricht alles und führt nichts aus 
+    END;
 
   -- Prüfung 2: Guthaben >= 0?
     SELECT CASE
         WHEN (SELECT konto_guthaben FROM nutzer WHERE id = NEW.nutzer_id) < 0
-          THEN RAISE(ABORT, 'Ausleihe: Guthaben negativ!')
-        END;
+        THEN RAISE(ABORT, 'Ausleihe: Guthaben negativ!')
+    END;
 END;
 
 -- Bestand Reduzieren
@@ -29,12 +29,6 @@ END;
 CREATE TRIGGER IF NOT EXISTS mahnung_before_insert
 BEFORE INSERT ON mahnung
 BEGIN
-  -- Prüfung: Betrag muss > 0 sein
-    SELECT CASE
-        WHEN NEW.betrag <= 0
-          THEN RAISE(ABORT, 'Mahnung: Betrag muss größer als 0 sein!')
-        END;
-
     -- Guthaben Reduzieren    
     UPDATE nutzer
     SET konto_guthaben = konto_guthaben - NEW.betrag
@@ -78,14 +72,46 @@ END;
 CREATE TRIGGER nutzer_before_delete
 BEFORE DELETE ON nutzer
 BEGIN
-  -- Mahnungen löschen
-  DELETE FROM mahnung
-  WHERE ausleihe_id IN (SELECT id FROM ausleihe WHERE nutzer_id = OLD.id);
+    -- Mahnungen löschen
+    DELETE FROM mahnung
+    WHERE ausleihe_id IN (SELECT id FROM ausleihe WHERE nutzer_id = OLD.id);
 
-  -- Ausleihen löschen
-  DELETE FROM ausleihe WHERE nutzer_id = OLD.id;
+    -- Ausleihen löschen
+    DELETE FROM ausleihe WHERE nutzer_id = OLD.id;
 
-  -- Eintrag schreiben
-  INSERT INTO system_log (aktion, info)
-  VALUES ('NUTZER_GELOESCHT', 'Nutzer ' || OLD.id || ' (' || OLD.name || ') gelöscht');
+    -- Eintrag schreiben
+    INSERT INTO system_log (aktion, info)
+    VALUES ('NUTZER_GELOESCHT', 'Nutzer ' || OLD.id || ' (' || OLD.name || ') gelöscht');
+END;
+
+-- 5. Nachvollziehbarkeit von Änderungen
+CREATE TRIGGER IF NOT EXISTS log_ausleihe
+AFTER INSERT ON ausleihe
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('AUSLEIHE', 'Ausleihe ' || NEW.id || ': Nutzer ' || NEW.nutzer_id || ', Medium ' || NEW.medium_id);
+END;
+
+CREATE TRIGGER IF NOT EXISTS log_mahnung
+AFTER INSERT ON mahnung
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('MAHNUNG', 'Mahnung ' || NEW.id || ' für Ausleihe ' || NEW.ausleihe_id || ', Betrag ' || NEW.betrag);
+END;
+
+CREATE TRIGGER IF NOT EXISTS log_medium_delete
+BEFORE DELETE ON medium
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('MEDIUM_GELOESCHT', 'Medium ' || OLD.id || ' (' || OLD.titel || ')');
+END;
+
+-- 6. Plausibilitätsprüfung
+CREATE TRIGGER IF NOT EXISTS mahnung_betrag_check
+BEFORE INSERT ON mahnung
+BEGIN
+    SELECT CASE
+        WHEN NEW.betrag <= 0
+        THEN RAISE(ABORT, 'Mahnung: Betrag muss größer als 0 sein!')
+    END;
 END;
