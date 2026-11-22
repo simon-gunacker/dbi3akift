@@ -1,7 +1,7 @@
 CREATE TABLE nutzer (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    konto_guthaben DECIMAL(10,2) DEFAULT 0 CHECK (konto_guthaben >= 0)
+    konto_guthaben DECIMAL(10,2) DEFAULT 0 -- CHECK (konto_guthaben >= 0) sonst können werte nicht negativ werdne
 );
 
 CREATE TABLE medium (
