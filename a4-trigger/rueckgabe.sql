@@ -1,11 +1,11 @@
---BEGIN TRANSACTION;
+BEGIN TRANSACTION;
     UPDATE ausleihe
-    SET typ = 'beendet'
+    SET status = 'beendet'
     WHERE id = (SELECT id
                 FROM ausleihe
-                WHERE typ = 'aktiv' OR 'gemahnt'
+                WHERE (status = 'aktiv' OR status = 'gemahnt')
                 AND nutzer_id = (SELECT kunde_id FROM var_ids)
                 AND medium_id = (SELECT medium_id FROM var_ids)
                 ORDER by startdatum ASC
                 LIMIT 1);
---COMMIT;
+COMMIT;
