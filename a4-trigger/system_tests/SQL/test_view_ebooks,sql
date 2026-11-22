@@ -1,0 +1,12 @@
+/*
+Testcsae 1: Nutzer 2 borgt ein E-Book aus, der Insert läuft über die View 'borrow_ebook'
+*/
+
+INSERT INTO borrow_ebook
+VALUES
+('Ben Beispiel', 'Digitale Welten');
+
+/* 
+OUTPUT ausleihe: 6|2|3|2026-11-22|2026-12-06|aktiv
+OUTPUT system_log: 10|Ausleihe|Medium 3 wurde von Nutzer 2 ausgeliehen|2026-11-22 12:29:22
+*/
