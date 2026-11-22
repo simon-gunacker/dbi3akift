@@ -154,7 +154,24 @@ END;
 
 -- 4. Automatische Aufräumarbeiten
 -- Wenn ein Nutzer gelöscht wird, sollen gleichzeitig alle zugehörigen offenen Ausleihen, Mahnungen oder Gebühren entfernt werden. Im System soll dabei eine nachvollziehbare Notiz oder ein Eintrag entstehen, der zeigt, dass dieser Löschvorgang stattgefunden hat.
---
+
+CREATE TRIGGER loeschen
+BEFORE DELETE ON nutzer
+BEGIN
+    DELETE FROM mahnung
+        WHERE ausleihe_id IN
+        (SELECT id FROM ausleihe
+        WHERE nutzer_id = OLD.id);
+    DELETE FROM ausleihe
+        WHERE nutzer_id = OLD.id;
+    INSERT INTO system_log (aktion, info)
+        VALUES('Nutzer geloescht', CONCAT('nutzer_id ', OLD.id));
+END;
+
+-- TEST:
+DELETE FROM nutzer
+    WHERE id=1;
+
 -- 5. Nachvollziehbarkeit von Änderungen
 -- Das System soll jede wichtige Änderung automatisch dokumentieren, etwa:
 --
