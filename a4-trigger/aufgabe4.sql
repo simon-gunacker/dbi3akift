@@ -1,6 +1,6 @@
 -- Aufgabe 4
 
-CREATE TRIGGER IF NOT EXISTS loeschen_user
+CREATE TRIGGER loeschen_user
 AFTER DELETE ON nutzer
 FOR EACH ROW
 BEGIN
@@ -17,7 +17,7 @@ BEGIN
 
     -- Eintrag ins systemlog von den daten 
     INSERT INTO system_log (aktion, info) 
-    VALUES ('nutzer gelöscht', OLD.name);
+    VALUES ('NUTZER_GELÖSCHT', OLD.name);
 END;
 
 --Test:

@@ -1,5 +1,6 @@
 --Aufgabe 3
-CREATE VIEW IF NOT EXISTS ebook_ausleihe AS
+
+CREATE VIEW ebook_ausleihe AS
 SELECT n.name  AS nutzername, m.titel AS titel,
     CAST(julianday(a.rueckgabedatum) - julianday(a.startdatum) AS INTEGER) AS dauer
 FROM ausleihe a
@@ -7,14 +8,14 @@ JOIN nutzer n ON n.id = a.nutzer_id
 JOIN medium m ON m.id = a.medium_id
 WHERE m.typ = 'ebook';
 
-CREATE TRIGGER IF NOT EXISTS ebook_ausleihe_einfuegen
+CREATE TRIGGER ebook_ausleihe_einfuegen
 INSTEAD OF INSERT ON ebook_ausleihe 
 FOR EACH ROW
 BEGIN
     -- nur ebooks sind erlaubt
     SELECT RAISE (ABORT, 'Kein E-Book mit diesem Titel gefunden')
     WHERE NOT EXISTS (SELECT 1 FROM medium
-                      WHERE titel = NEW.titel AND typ = 'ebook');
+                    WHERE titel = NEW.titel AND typ = 'ebook');
     
     -- der Nutzer muss existieren 
     SELECT RAISE (ABORT, 'Nutzer nicht gefunden')
