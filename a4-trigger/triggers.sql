@@ -183,5 +183,9 @@ DELETE FROM nutzer
 -- 6. Plausibilitätsprüfung
 -- Es darf nicht möglich sein, Mahngebühren mit 0 € oder negativen Beträgen zu erfassen.
 
-
+--LÖSUNG: CHECK CONSTRAINT bei table mahnung spalte
+-- betrag
+-- TEST:
+-- INSERT INTO mahnung (betrag) VALUES (0);
+-- INSERT INTO mahnung (betrag) VALUES (-10);
 
