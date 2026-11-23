@@ -5,6 +5,7 @@ Logs werden immer in Table system_log festgehalten.
 
 ## Anforderung 1:
 **Verwendete sql-Statements:** user_handling.sql, ausleihen.sql
+
 **Ablauf:**
     
 1. Nutzer-Id und Medium-Id in var_ids inserted
@@ -16,7 +17,8 @@ Logs werden immer in Table system_log festgehalten.
 7. Trigger log_ausleihe logt nach dem Insert erfolgreiche Ausleihe.
 
 ## Anforderung 2:
-**Verwendete sql-Statements:** mahnung.sql    
+**Verwendete sql-Statements:** mahnung.sql
+
 **Ablauf:**
     
 1. Update in mahnung.sql wird manuell oder automatisiert ausgeführt, alle überfälligen Ausleihen werden auf gemahnt gesetzt
@@ -29,6 +31,7 @@ Logs werden immer in Table system_log festgehalten.
 
 ## Anforderung 3:
 **Verwendete sql-Statements:** user_handling.sql, ausleihen.sql
+
 **Ablauf:**
 
 1. var_ids wird als Temp-Table erstellt
@@ -40,6 +43,7 @@ Logs werden immer in Table system_log festgehalten.
         
 ## Anforderung 4:
 **Verwendete sql-Statements:** trigger.sql
+
 **Ablauf:**
     
 1. DELETE wird auf einen bestehenden Nutzer ausgeführt
@@ -51,7 +55,9 @@ Logs werden immer in Table system_log festgehalten.
         
 ## Anforderung 5:
 Anforderungen 1-4  loggen bereits eigenständig ihre Aktionen.
+
 **Verwendete sql-Statements:** user_handling.sql, rueckgabe.sql
+
 **Ablauf:**
     
 1. Update in rueckgabe.sql wird mit Werten für Nuter_id und Medium_id aus user_handling.sql ausgeführt

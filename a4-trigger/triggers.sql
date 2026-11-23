@@ -8,7 +8,7 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS mahnung
 AFTER UPDATE ON ausleihe
-WHEN NEW.status = 'gemahnt'
+WHEN NEW.status = 'gemahnt' AND OLD.status = 'aktiv'
 BEGIN
     INSERT INTO mahnung (ausleihe_id, betrag)
     VALUES(NEW.id, 5);
