@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 ---------------------------
 -- 1. Bestandsverwaltung --
 ---------------------------
@@ -25,3 +27,54 @@ BEGIN
     UPDATE medium SET bestand = bestand + 1 WHERE id = NEW.medium_id;
 END;
 
+---------------------------------------------------
+-- 2. Überfällige Ausleihen und Mahngebühren     --
+--    Mahngebühr 0.30€/Tag wie bei Stadtbib Graz --
+--    bzw. Mahngebühr fix 10.00 Euro             --
+---------------------------------------------------
+
+-- Ausleihe überfällig, dann Mahnung
+
+CREATE TRIGGER trigger_ausleihe_mahnung
+AFTER UPDATE OF status ON ausleihe
+WHEN NEW.status = 'gemahnt' AND OLD.status != 'gemahnt'
+BEGIN
+    INSERT INTO mahnung (ausleihe_id, betrag) 
+    VALUES (NEW.id, 10.00);
+
+    UPDATE nutzer 
+    SET konto_guthaben = konto_guthaben - 10.00
+    WHERE id = NEW.nutzer_id;
+End;
+
+/* Mit flexibler Gebühr würds auch gehen, aber dafür müsste regelmäßig von außen ein Update angestoßen werden.
+So würds also nur sobald die Mahnung geschrieben wird, zB 10 Tage nach Rückgabefrist individuell berechnen:
+
+CREATE TRIGGER trigger_ausleihe_mahnung
+AFTER UPDATE OF status ON ausleihe
+WHEN NEW.status = 'gemahnt' AND OLD.status != 'gemahnt'
+BEGIN
+    INSERT INTO mahnung (ausleihe_id, betrag) 
+    VALUES (NEW.id, ROUND(CAST((julianday('now') - julianday(NEW.rueckgabedatum))AS INTEGER) * 0.30, 2));
+
+    UPDATE nutzer 
+    SET konto_guthaben = konto_guthaben - ROUND((CAST((julianday('now') - julianday(NEW.rueckgabedatum))AS INTEGER) * 0.30), 2)
+    WHERE id = NEW.nutzer_id;
+End;
+
+Statt Datum doppelt holen würds auch so gehen:
+
+CREATE TRIGGER trigger_ausleihe_mahnung
+AFTER UPDATE OF status ON ausleihe
+WHEN NEW.status = 'gemahnt' AND OLD.status != 'gemahnt'
+BEGIN
+    INSERT INTO mahnung (ausleihe_id, betrag)
+    VALUES (NEW.id, ROUND(CAST(julianday('now') - julianday(NEW.rueckgabedatum) AS INTEGER) * 0.30), 2));
+
+    UPDATE nutzer
+    SET konto_guthaben = konto_guthaben - (SELECT betrag
+                                           FROM mahnung
+                                           WHERE id = last_insert_rowid())
+    WHERE id = NEW.nutzer_id;
+
+*/
