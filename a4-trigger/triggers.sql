@@ -1,49 +1,11 @@
+
+
+-- Ausleihe-Logik
 CREATE TRIGGER IF NOT EXISTS bestandsprüfung_medium
 BEFORE UPDATE ON medium
 BEGIN
     SELECT RAISE(ROLLBACK, 'Bestand zu niedrig')
     WHERE NEW.bestand < 0;
-END;
-
-
-CREATE TRIGGER IF NOT EXISTS betrag_insert_mahnung
-AFTER INSERT ON mahnung
-BEGIN
-    SELECT RAISE(ROLLBACK, 'Betrag zu niedrig')
-    WHERE NEW.betrag <= 0;
-
-    INSERT INTO system_log(aktion, info)
-    SELECT 'Zahlung', 'Nutzer mit ID: ' || n.id || ' zahlte ' || CASE WHEN n.konto_guthaben - NEW.betrag < 0 THEN n.konto_guthaben || '€ statt ' || NEW.betrag
-                                                                    ELSE NEW.betrag
-                                                                    END || '€ für eine Mahnung.'
-                                                                    FROM nutzer n WHERE n.id =
-                                                                    (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
-
-    UPDATE nutzer
-    SET konto_guthaben = CASE
-                            WHEN konto_guthaben - NEW.betrag < 0 THEN 0
-                            ELSE konto_guthaben - NEW.betrag
-                         END
-    WHERE id = (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
-END;
-
-
-CREATE TRIGGER IF NOT EXISTS block_update_mahnung
-BEFORE UPDATE ON mahnung
-BEGIN
-    SELECT RAISE(ROLLBACK, 'Manuelle Updates von Mahnungen sind nicht vorgesehen');
-END;
-
-
-CREATE TRIGGER IF NOT EXISTS mahnung
-AFTER UPDATE ON ausleihe
-WHEN NEW.status = 'gemahnt' AND OLD.status = 'aktiv'
-BEGIN
-    INSERT INTO system_log(aktion, info)
-    VALUES('Mahnung', 'Nutzer mit ID: ' || NEW.nutzer_id || ' wurde gemahnt');
-
-    INSERT INTO mahnung (ausleihe_id, betrag)
-    VALUES(NEW.id, 5);
 END;
 
 CREATE TRIGGER IF NOT EXISTS sperrprüfung_ausleihe
@@ -53,7 +15,6 @@ BEGIN
     SELECT RAISE(ROLLBACK, 'Nutzer gesperrt');
 END;
 
-
 CREATE TRIGGER IF NOT EXISTS log_ausleihe
 AFTER INSERT ON ausleihe
 BEGIN
@@ -62,6 +23,7 @@ BEGIN
 END;
 
 
+-- Rückgabe-Logik
 CREATE TRIGGER IF NOT EXISTS log_rueckgabe
 AFTER UPDATE ON ausleihe
 WHEN NEW.status = 'beendet'
@@ -75,6 +37,46 @@ BEGIN
 END;
 
 
+
+-- Mahnungs-Logik
+CREATE TRIGGER IF NOT EXISTS block_update_mahnung
+BEFORE UPDATE ON mahnung
+BEGIN
+    SELECT RAISE(ROLLBACK, 'Manuelle Updates von Mahnungen sind nicht vorgesehen');
+END;
+
+CREATE TRIGGER IF NOT EXISTS mahnung
+AFTER UPDATE ON ausleihe
+WHEN NEW.status = 'gemahnt' AND OLD.status = 'aktiv'
+BEGIN
+    INSERT INTO system_log(aktion, info)
+    VALUES('Mahnung', 'Nutzer mit ID: ' || NEW.nutzer_id || ' wurde gemahnt');
+
+    INSERT INTO mahnung (ausleihe_id, betrag)
+    VALUES(NEW.id, 5);
+END;
+
+CREATE TRIGGER IF NOT EXISTS betrag_insert_mahnung
+AFTER INSERT ON mahnung
+BEGIN
+    SELECT RAISE(ROLLBACK, 'Betrag zu niedrig')
+    WHERE NEW.betrag <= 0;
+
+    INSERT INTO system_log(aktion, info)
+    SELECT 'Zahlung', 'Nutzer mit ID: ' || n.id || ' zahlte ' || CASE WHEN n.konto_guthaben - NEW.betrag < 0 THEN n.konto_guthaben || '€ statt ' || NEW.betrag
+                                                                    ELSE NEW.betrag
+                                                                    END || '€ für Mahnung mit ID: ' || NEW.id
+                                                                    FROM nutzer n WHERE n.id =
+                                                                    (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
+
+    UPDATE nutzer
+    SET konto_guthaben = CASE
+                            WHEN konto_guthaben - NEW.betrag < 0 THEN 0
+                            ELSE konto_guthaben - NEW.betrag
+                         END
+    WHERE id = (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
+END;
+
 CREATE TRIGGER IF NOT EXISTS sperrung_nutzer
 AFTER UPDATE ON nutzer
 WHEN NEW.konto_guthaben = 0 AND EXISTS (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND DATE('now') > a.rueckgabedatum) AND OLD.konto_guthaben < betrag)
@@ -87,6 +89,28 @@ BEGIN
     VALUES('Sperrung', 'Nutzer mit ID: ' || NEW.id || ' wurde fürs Überziehen gesperrt');
 END;
 
+
+CREATE TRIGGER IF NOT EXISTS block_update_mahnung
+BEFORE UPDATE ON mahnung
+BEGIN
+    SELECT RAISE(ROLLBACK, 'Manuelle Updates von Mahnungen sind nicht vorgesehen');
+END;
+
+
+
+-- Löschungs-Logik
+CREATE TRIGGER IF NOT EXISTS loeschung_nutzer
+BEFORE DELETE ON nutzer
+BEGIN
+    DELETE FROM mahnung
+    WHERE ausleihe_id IN (SELECT id FROM ausleihe WHERE nutzer_id = OLD.id);
+
+    DELETE FROM ausleihe
+    WHERE nutzer_id = OLD.id;
+
+    INSERT INTO system_log(aktion, info)
+    VALUES('Loeschung', 'Nutzer mit ID: ' || OLD.id || ' wurde gelöscht');
+END;
 
 CREATE TRIGGER IF NOT EXISTS loeschung_ausleihe
 BEFORE DELETE ON ausleihe
@@ -102,18 +126,3 @@ BEGIN
     INSERT INTO system_log(aktion, info)
     VALUES('Loeschung', 'Mahnung mit ID: ' || OLD.id || ' wurde mit einem Betrag von: ' || OLD.betrag || '€ gelöscht.');
 END;
-
-
-CREATE TRIGGER IF NOT EXISTS loeschung_nutzer
-BEFORE DELETE ON nutzer
-BEGIN
-    DELETE FROM mahnung
-    WHERE ausleihe_id IN (SELECT id FROM ausleihe WHERE nutzer_id = OLD.id);
-
-    DELETE FROM ausleihe
-    WHERE nutzer_id = OLD.id;
-
-    INSERT INTO system_log(aktion, info)
-    VALUES('Loeschung', 'Nutzer mit ID: ' || OLD.id || ' wurde gelöscht');
-END;
-
