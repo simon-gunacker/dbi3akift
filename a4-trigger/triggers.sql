@@ -1,7 +1,12 @@
--- 1. Bestandsverwaltung
--- Wenn jemand ein Medium ausleiht, soll der verfügbare Bestand dieses Mediums automatisch angepasst werden. Es darf nicht vorkommen, dass mehr Exemplare ausgeliehen werden, als tatsächlich vorhanden sind.
---
+-- NOTE: Manche test-statements sind auskommentiert, da
+-- sie (gewollt) Fehler verursachen
 
+-- NOTE: run.py erstellt datenbank (im Projektordner),
+-- tabellen, daten und führt triggers.sql aus
+
+
+
+-- 1. Bestandsverwaltung
 CREATE TRIGGER check_bestand
 BEFORE INSERT ON ausleihe
     -- 0 = false, 1 = true
@@ -38,9 +43,10 @@ INSERT INTO ausleihe (nutzer_id, medium_id)
 VALUES (2, 3);
 -- TEST END
 
+
+
+
 -- 2. Überfällige Ausleihen und Mahngebühren
--- Wird eine Ausleihe überfällig, soll automatisch eine Mahnung im System erfasst werden. Gleichzeitig soll dem betroffenen Nutzer der entsprechende Betrag sofort vom Guthaben abgezogen werden. Wird das Guthaben dadurch negativ, darf der Nutzer vorerst keine neuen Ausleihen mehr tätigen.
---
 
 CREATE TRIGGER create_mahnung
 AFTER INSERT ON ausleihe
@@ -127,10 +133,7 @@ VALUES(1, 3, '2025-01-01', '2025-01-15');
 
 
 
-
 -- 3. Vereinfachte Ausleihe von E-Books
--- Für digitale Medien (E-Books) soll die Ausleihe besonders bequem funktionieren: Wenn ein Eintrag mit Nutzername, Titel und gewünschter Dauer gemacht wird, soll das System automatisch alle weiteren notwendigen Informationen ergänzen, sodass der Ausleihvorgang vollständig ist.
---
 
 CREATE VIEW ebook_v AS
 SELECT n.name, m.titel, 0 AS dauer FROM nutzer n
@@ -155,8 +158,10 @@ END;
 -- INSERT INTO ebook_v VALUES('Ben Beispiel', 'Digitale Welten', 30);
 -- TEST END
 
+
+
+
 -- 4. Automatische Aufräumarbeiten
--- Wenn ein Nutzer gelöscht wird, sollen gleichzeitig alle zugehörigen offenen Ausleihen, Mahnungen oder Gebühren entfernt werden. Im System soll dabei eine nachvollziehbare Notiz oder ein Eintrag entstehen, der zeigt, dass dieser Löschvorgang stattgefunden hat.
 
 CREATE TRIGGER loeschen
 BEFORE DELETE ON nutzer
@@ -176,14 +181,10 @@ DELETE FROM nutzer
     WHERE id=1;
 -- TEST END
 
+
+
+
 -- 5. Nachvollziehbarkeit von Änderungen
--- Das System soll jede wichtige Änderung automatisch dokumentieren, etwa:
---
--- Ausleihen oder Rückgaben,
--- Mahnungen,
--- das Löschen von Medien oder Nutzern.
--- Diese Informationen sollen später auswertbar sein, um Abläufe nachvollziehen zu können.
---
 
 CREATE TRIGGER ausleihe_log
 AFTER INSERT ON ausleihe
@@ -232,11 +233,14 @@ DELETE FROM medium
 WHERE id=3;
 -- TEST END
 
+
+
+
 -- 6. Plausibilitätsprüfung
--- Es darf nicht möglich sein, Mahngebühren mit 0 € oder negativen Beträgen zu erfassen.
+
 
 --LÖSUNG: CHECK CONSTRAINT bei table mahnung spalte
--- betrag
+-- betrag hinzugefügt
 
 -- TEST:
 -- INSERT INTO mahnung (betrag) VALUES (0);
