@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS  mahnung (
     ausleihe_id INTEGER,
     betrag DECIMAL(10,2),
     datum DATE DEFAULT (DATE('now')),
-    CHECK(betrag > 0),
     FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
 );
 

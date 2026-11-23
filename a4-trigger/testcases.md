@@ -22,12 +22,15 @@ Logs werden immer in Table system_log festgehalten.
 **Ablauf:**
     
 1. Update in mahnung.sql wird manuell oder automatisiert ausgeführt, alle überfälligen Ausleihen werden auf gemahnt gesetzt
-2. Trigger mahnung wird ausgeführt nach dem Update für alle Ausleihen, die auf 'gemahnt' gesetzt wurden.
-3. Trigger mahnung dekrementiert 5€ vom Kontoguthaben des Nutzers oder setzt das Kontoguthaben auf 0, wenn das Kontoguthaben weniger als 5€ beträgt
-4. Trigger mahnung logt diese Mahnung.
-5. Trigger sperrung_nutzer wird ausgeführt nach dem Update für alle Nutzer ausgeführt wenn das alte Guthaben weniger als 5€ betragen hat 6 und das neue Guthaben 0€ beträgt.
-6. Trigger sperrung_nutzer setzt alle Ausleihen auf gesperrt und logt die Sperrung des Nutzers.
-7. Trigger sperrprüfung_ausleihe prüft, ob der Nutzer bereits gesperrt ist und löst einen ROLLBACK in der dazugehörigen Transaktion aus wenn ja.
+2. Trigger mahnung wird ausgeführt nach dem Update für alle Ausleihen, die auf 'gemahnt' gesetzt wurden und davor 'aktiv' waren.
+3. Trigger mahnung inserted eine mahnung mit dem fixen Betrag von 5€
+4. Trigger betrag_insert_mahnung dekrementiert Betrag der Mahnung vom Kontoguthaben des Nutzers oder setzt das Kontoguthaben auf 0, wenn das Kontoguthaben weniger als Betrag der Mahnung beträgt
+5. Trigger sperrung_nutzer wird ausgeführt nach dem Update für alle Nutzer ausgeführt wenn das alte Guthaben weniger als der Mahn-Betragen beträgt und das neue Guthaben 0€ beträgt
+6. Trigger sperrung_nutzer setzt alle Ausleihen auf gesperrt, wenn bei einem Update des Nutzers eine Mahnung exisiert, die das Kontoguthaben des Nutzers übersteigt und das Kontoguthaben 0 ist.
+7. Trigger sperrung_nutzer logt die Sperrung des Nutzers
+8. Trigger betrag_insert_mahnung logt den abgezogenen Mahnbetrag
+9. Trigger betrag_insert_mahnung logt bewusst Mahnungen bei bereits gesperrten Nutzern
+10. Trigger sperrprüfung_ausleihe prüft, ob der Nutzer bereits gesperrt ist und löst einen ROLLBACK in der dazugehörigen Transaktion aus wenn ja.
 
 ## Anforderung 3:
 **Verwendete sql-Statements:** user_handling.sql, ausleihen.sql
@@ -66,5 +69,12 @@ Anforderungen 1-4  loggen bereits eigenständig ihre Aktionen.
 4. Trigger log_rueckgabe logt die Rückgabe.
     
 ## Anforderung 6:
-    Statt einen Trigger zu verwenden, wurde einfach ein CHECK beim Table Mahnungen hinzugefügt.
+Enthalten in Anforderung 2
+
+**Ablauf:**
+
+1. Insert auf Mahnung wird ausgeführt
+2. Trigger betrag_insert_mahnungen prüft, ob der Betrag größer als 0 ist, führt ROLLBACK aus wenn nicht
+4. Trigger betrag_insert_mahnungen setzt das Kontoguthaben des Nutzers um den angegebenen Betrag -, oder 0, wenn der Betrag größer als das Kontoguthaben ist
+3. Trigger block_update_mahnung blockiert alle Updates für mahnung, da mahnungen nachträglich nicht verändert werden sollen
        

@@ -6,23 +6,41 @@ BEGIN
 END;
 
 
+CREATE TRIGGER IF NOT EXISTS betrag_insert_mahnung
+BEFORE INSERT ON mahnung
+BEGIN
+    SELECT RAISE(ROLLBACK, 'Betrag zu niedrig')
+    WHERE NEW.betrag <= 0;
+
+    UPDATE nutzer
+    SET konto_guthaben = CASE
+                            WHEN konto_guthaben - NEW.betrag < 0 THEN 0
+                            ELSE konto_guthaben - NEW.betrag
+                         END
+    WHERE id = (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
+
+    INSERT INTO system_log(aktion, info)
+    SELECT 'Zahlung', 'Nutzer mit ID: ' || n.id || ' zahlte ' || CASE WHEN n.konto_guthaben - NEW.betrag < 0 THEN n.konto_guthaben || '€ statt ' || NEW.betrag
+                                                                    ELSE NEW.betrag
+                                                                    END || '€ für eine Mahnung.'
+                                                                    FROM nutzer n WHERE n.id =
+                                                                    (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
+END;
+
+
+CREATE TRIGGER IF NOT EXISTS block_update_mahnung
+BEFORE UPDATE ON mahnung
+BEGIN
+    SELECT RAISE(ROLLBACK, 'Manuelle Updates von Mahnungen sind nicht vorgesehen');
+END;
+
+
 CREATE TRIGGER IF NOT EXISTS mahnung
 AFTER UPDATE ON ausleihe
 WHEN NEW.status = 'gemahnt' AND OLD.status = 'aktiv'
 BEGIN
     INSERT INTO mahnung (ausleihe_id, betrag)
     VALUES(NEW.id, 5);
-
-      /* UPDATE mahnung
-       SET betrag = (julianday('now') - julianday(NEW.rueckgabedatum))
-       WHERE ausleihe_id = NEW.id;*/
-
-    UPDATE nutzer
-    SET konto_guthaben = CASE
-                            WHEN konto_guthaben - 5 < 0 THEN 0
-                            ELSE konto_guthaben - 5
-                         END
-    WHERE id = NEW.nutzer_id;
 
     INSERT INTO system_log(aktion, info)
     VALUES('Mahnung', 'Nutzer mit ID: ' || NEW.nutzer_id || ' wurde gemahnt');
@@ -60,7 +78,7 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS sperrung_nutzer
 AFTER UPDATE ON nutzer
-WHEN NEW.konto_guthaben = 0 AND OLD.konto_guthaben < 5
+WHEN NEW.konto_guthaben = 0 AND (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND a.status = 'gemahnt') AND OLD.konto_guthaben - betrag < 0)
 BEGIN
     UPDATE ausleihe
     SET status = 'gesperrt'
