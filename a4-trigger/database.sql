@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS  system_log (
 
 INSERT INTO nutzer (name, konto_guthaben) VALUES
 ('Anna Muster', 10.00),
-('Ben Beispiel', 5.00);
+('Ben Beispiel', 4.00);
 
 INSERT INTO medium (titel, typ, bestand) VALUES
 ('Der Zauberberg', 'buch', 3),

@@ -9,7 +9,8 @@ BEGIN TRANSACTION;
                 WHEN (SELECT typ FROM medium WHERE id = medium_id) = 'ebook' AND dauer > 0 AND dauer IS NOT NULL THEN DATE('now', '+' || dauer || ' days')
                 ELSE DATE('now', '+14 day')
             END as rueckgabedatum
-        FROM var_ids;
+        FROM var_ids
+        WHERE (SELECT 1 FROM nutzer WHERE id = kunde_id) AND (SELECT 1 FROM medium WHERE id = medium_id);
 
 COMMIT;
 

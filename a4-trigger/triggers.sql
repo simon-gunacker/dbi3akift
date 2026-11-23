@@ -7,17 +7,10 @@ END;
 
 
 CREATE TRIGGER IF NOT EXISTS betrag_insert_mahnung
-BEFORE INSERT ON mahnung
+AFTER INSERT ON mahnung
 BEGIN
     SELECT RAISE(ROLLBACK, 'Betrag zu niedrig')
     WHERE NEW.betrag <= 0;
-
-    UPDATE nutzer
-    SET konto_guthaben = CASE
-                            WHEN konto_guthaben - NEW.betrag < 0 THEN 0
-                            ELSE konto_guthaben - NEW.betrag
-                         END
-    WHERE id = (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
 
     INSERT INTO system_log(aktion, info)
     SELECT 'Zahlung', 'Nutzer mit ID: ' || n.id || ' zahlte ' || CASE WHEN n.konto_guthaben - NEW.betrag < 0 THEN n.konto_guthaben || '€ statt ' || NEW.betrag
@@ -25,6 +18,13 @@ BEGIN
                                                                     END || '€ für eine Mahnung.'
                                                                     FROM nutzer n WHERE n.id =
                                                                     (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
+
+    UPDATE nutzer
+    SET konto_guthaben = CASE
+                            WHEN konto_guthaben - NEW.betrag < 0 THEN 0
+                            ELSE konto_guthaben - NEW.betrag
+                         END
+    WHERE id = (SELECT nutzer_id FROM ausleihe WHERE id = NEW.ausleihe_id);
 END;
 
 
@@ -39,23 +39,18 @@ CREATE TRIGGER IF NOT EXISTS mahnung
 AFTER UPDATE ON ausleihe
 WHEN NEW.status = 'gemahnt' AND OLD.status = 'aktiv'
 BEGIN
-    INSERT INTO mahnung (ausleihe_id, betrag)
-    VALUES(NEW.id, 5);
-
     INSERT INTO system_log(aktion, info)
     VALUES('Mahnung', 'Nutzer mit ID: ' || NEW.nutzer_id || ' wurde gemahnt');
-END;
 
+    INSERT INTO mahnung (ausleihe_id, betrag)
+    VALUES(NEW.id, 5);
+END;
 
 CREATE TRIGGER IF NOT EXISTS sperrprüfung_ausleihe
 BEFORE INSERT ON ausleihe
+WHEN EXISTS (SELECT 1 FROM ausleihe a WHERE a.nutzer_id = NEW.nutzer_id AND a.status = 'gesperrt')
 BEGIN
-    UPDATE ausleihe
-    SET status = 'gemahnt'
-    WHERE status = 'aktiv' AND DATE('now') > rueckgabedatum;
-
-    SELECT RAISE(ROLLBACK, 'Nutzer gesperrt')
-    WHERE (SELECT 1 FROM nutzer WHERE id = NEW.nutzer_id AND konto_guthaben = 0);
+    SELECT RAISE(ROLLBACK, 'Nutzer gesperrt');
 END;
 
 
@@ -63,7 +58,7 @@ CREATE TRIGGER IF NOT EXISTS log_ausleihe
 AFTER INSERT ON ausleihe
 BEGIN
     INSERT INTO system_log(aktion, info)
-    VALUES('Ausleihe', 'Nutzer mit ID: ' || NEW.nutzer_id || ' leit Medium mit ID: ' || NEW.medium_id || ' aus bis zum ' || NEW.rueckgabedatum || '.');
+    VALUES('Ausleihe', 'Nutzer mit ID: ' || NEW.nutzer_id || ' leiht Medium mit ID: ' || NEW.medium_id || ' aus bis zum ' || NEW.rueckgabedatum || '.');
 END;
 
 
@@ -82,7 +77,7 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS sperrung_nutzer
 AFTER UPDATE ON nutzer
-WHEN NEW.konto_guthaben = 0 AND (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND a.status = 'gemahnt') AND OLD.konto_guthaben - betrag < 0)
+WHEN NEW.konto_guthaben = 0 AND 1 = (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND DATE('now') > a.rueckgabedatum) AND OLD.konto_guthaben < betrag)
 BEGIN
     UPDATE ausleihe
     SET status = 'gesperrt'
