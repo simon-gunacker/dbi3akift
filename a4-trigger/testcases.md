@@ -13,9 +13,8 @@ Logs werden immer in Table system_log festgehalten.
 3. Update dekrementiert Bestand des Mediums
 4. Trigger bestandsprüfung_medium prüft vor dem Update des Mediums, ob der Bestand ausreicht, sonst wird ein ROLLBACK ausgeführt.
 5. Insert legt eine neue Ausleihe mit den Werten aus var_ids an. Wenn eine Dauer > 0 übergeben wird und der Medien-Typ 'ebook' ist wird das Rückgabedatum auf Dauer-Tage von heute gesetzt
-6. Trigger sperrprüfung_ausleihe führt bei einem Insert auf ausleihe automatisch die Event-Reihe aus Anforderung 2 aus.
-7. Trigger sperrprüfung_ausleihe prüft, ob der Nutzer gesperrt ist und löst einen ROLLBACK aus wenn ja.
-8. Trigger log_ausleihe logt nach dem Insert erfolgreiche Ausleihe.
+6. Trigger sperrprüfung_ausleihe prüft, ob der Nutzer gesperrt ist und löst einen ROLLBACK aus wenn ja.
+7. Trigger log_ausleihe logt nach dem Insert erfolgreiche Ausleihe.
 
 ## Anforderung 2:
 **Verwendete sql-Statements:** mahnung.sql
