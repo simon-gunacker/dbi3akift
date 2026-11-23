@@ -24,3 +24,4 @@ WHEN NEW.status = 'beendet' AND OLD.status != 'beendet'
 BEGIN
     UPDATE medium SET bestand = bestand + 1 WHERE id = NEW.medium_id;
 END;
+
