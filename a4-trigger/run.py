@@ -1,10 +1,13 @@
 from sqlite3 import connect
 
+SRC_PATH = 'db/'
+
 DB = 'bibliothek.db'
-TABLES = 'tables.sql'
-DATA = 'data.sql'
+
+TABLES = SRC_PATH + 'tables.sql'
+DATA = SRC_PATH + 'data.sql'
 TRIGGERS = 'triggers.sql'
-VIEWS = 'views.sql'
+VIEWS = SRC_PATH + 'views.sql'
 
 with open(DB, "w"):
     pass
@@ -17,6 +20,10 @@ with open(TABLES,"r") as tab, open(DATA, "r") as dat\
         views=view.read()
         with connect(DB) as con:
             con.executescript(tables)
+            print(f'{TABLES} executed')
             con.executescript(data)
-            con.executescript(triggers)
+            print(f'{DATA} executed')
             con.executescript(views)
+            print(f'{VIEWS} executed')
+            con.executescript(triggers)
+            print(f'{TRIGGERS} executed')
