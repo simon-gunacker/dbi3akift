@@ -163,7 +163,7 @@ END;
 
 -- 4. Automatische Aufräumarbeiten
 
-CREATE TRIGGER loeschen
+CREATE TRIGGER nutzer_loeschen_trigger
 BEFORE DELETE ON nutzer
 BEGIN
     DELETE FROM mahnung
@@ -176,9 +176,26 @@ BEGIN
         VALUES('Nutzer geloescht', CONCAT('Name: ', OLD.name));
 END;
 
+-- Optionale Lösung
+
+CREATE VIEW nutzer_loeschen
+AS SELECT name FROM nutzer;
+
+CREATE TRIGGER nutzer_loeschen_t_opt
+INSTEAD OF INSERT ON nutzer_loeschen
+-- WHEN ausleihe offen?
+BEGIN
+    UPDATE nutzer
+    SET name = 'deleted user'
+    WHERE name = NEW.name;
+END;
+
 -- TEST:
-DELETE FROM nutzer
-    WHERE id=1;
+-- DELETE FROM nutzer
+--     WHERE id=1;
+
+INSERT INTO nutzer_loeschen VALUES('Anna Muster');
+
 -- TEST END
 
 
