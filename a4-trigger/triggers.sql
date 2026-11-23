@@ -36,6 +36,7 @@ VALUES (2, 2);
 -- VALUES (2, 2);
 INSERT INTO ausleihe (nutzer_id, medium_id)
 VALUES (2, 3);
+-- TEST END
 
 -- 2. Überfällige Ausleihen und Mahngebühren
 -- Wird eine Ausleihe überfällig, soll automatisch eine Mahnung im System erfasst werden. Gleichzeitig soll dem betroffenen Nutzer der entsprechende Betrag sofort vom Guthaben abgezogen werden. Wird das Guthaben dadurch negativ, darf der Nutzer vorerst keine neuen Ausleihen mehr tätigen.
@@ -121,6 +122,8 @@ VALUES(1, 3, '2025-01-01', '2025-01-15');
 -- INSERT INTO ausleihe(nutzer_id, medium_id)
 -- VALUES(1, 3);
 
+-- TEST END
+
 
 
 
@@ -150,7 +153,7 @@ END;
 
 --TEST:
 -- INSERT INTO ebook_v VALUES('Ben Beispiel', 'Digitale Welten', 30);
-
+-- TEST END
 
 -- 4. Automatische Aufräumarbeiten
 -- Wenn ein Nutzer gelöscht wird, sollen gleichzeitig alle zugehörigen offenen Ausleihen, Mahnungen oder Gebühren entfernt werden. Im System soll dabei eine nachvollziehbare Notiz oder ein Eintrag entstehen, der zeigt, dass dieser Löschvorgang stattgefunden hat.
@@ -171,6 +174,7 @@ END;
 -- TEST:
 DELETE FROM nutzer
     WHERE id=1;
+-- TEST END
 
 -- 5. Nachvollziehbarkeit von Änderungen
 -- Das System soll jede wichtige Änderung automatisch dokumentieren, etwa:
@@ -206,6 +210,12 @@ BEGIN
     VALUES ('Mahnung', 'mahnung_id ' || NEW.id);
 END;
 
+CREATE TRIGGER medium_geloescht_log
+BEFORE DELETE ON medium
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('Medium geloescht', 'medium_id ' || OLD.id);
+END;
 
 -- TEST:
 INSERT INTO ausleihe(nutzer_id, medium_id) VALUES (2, 1);
@@ -218,8 +228,9 @@ INSERT INTO ausleihe(
     )
     VALUES (2, 1, '2000-01-01');
 
-
-
+DELETE FROM medium
+WHERE id=3;
+-- TEST END
 
 -- 6. Plausibilitätsprüfung
 -- Es darf nicht möglich sein, Mahngebühren mit 0 € oder negativen Beträgen zu erfassen.
