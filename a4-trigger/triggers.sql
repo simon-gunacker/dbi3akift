@@ -50,6 +50,10 @@ END;
 CREATE TRIGGER IF NOT EXISTS sperrprüfung_ausleihe
 BEFORE INSERT ON ausleihe
 BEGIN
+    UPDATE ausleihe
+    SET status = 'gemahnt'
+    WHERE status = 'aktiv' AND DATE('now') > rueckgabedatum;
+
     SELECT RAISE(ROLLBACK, 'Nutzer gesperrt')
     WHERE (SELECT 1 FROM nutzer WHERE id = NEW.nutzer_id AND konto_guthaben = 0);
 END;
