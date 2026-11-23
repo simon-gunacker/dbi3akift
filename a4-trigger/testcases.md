@@ -15,6 +15,7 @@ Logs werden immer in Table system_log festgehalten.
 5. Insert legt eine neue Ausleihe mit den Werten aus var_ids an. Wenn eine Dauer > 0 übergeben wird und der Medien-Typ 'ebook' ist wird das Rückgabedatum auf Dauer-Tage von heute gesetzt
 6. Trigger sperrprüfung_ausleihe prüft, ob der Nutzer gesperrt ist und löst einen ROLLBACK aus wenn ja.
 7. Trigger log_ausleihe logt nach dem Insert erfolgreiche Ausleihe.
+8. Wenn gewünscht kann ein mahnungs-Update als eigene Transaktion nach jedem ausleihen laufen gelassen werden, da die Sperrungs-Logik separat von der Ausleih-Logik laufen soll.
 
 ## Anforderung 2:
 **Verwendete sql-Statements:** mahnung.sql

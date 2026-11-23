@@ -77,7 +77,7 @@ END;
 
 CREATE TRIGGER IF NOT EXISTS sperrung_nutzer
 AFTER UPDATE ON nutzer
-WHEN NEW.konto_guthaben = 0 AND 1 = (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND DATE('now') > a.rueckgabedatum) AND OLD.konto_guthaben < betrag)
+WHEN NEW.konto_guthaben = 0 AND EXISTS (SELECT 1 FROM mahnung WHERE ausleihe_id IN (SELECT a.id FROM ausleihe a WHERE a.nutzer_id = NEW.id AND DATE('now') > a.rueckgabedatum) AND OLD.konto_guthaben < betrag)
 BEGIN
     UPDATE ausleihe
     SET status = 'gesperrt'

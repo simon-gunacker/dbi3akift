@@ -11,6 +11,5 @@ BEGIN TRANSACTION;
             END as rueckgabedatum
         FROM var_ids
         WHERE (SELECT 1 FROM nutzer WHERE id = kunde_id) AND (SELECT 1 FROM medium WHERE id = medium_id);
-
 COMMIT;
 
