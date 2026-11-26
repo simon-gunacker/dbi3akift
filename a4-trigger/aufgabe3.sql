@@ -34,25 +34,18 @@ END;
 -- Test von Aufgabe 3
 -- Erwartet wir einmal das sich die Daten die fehlen eingetragen werden 
 
--- Anna borgt sich ein e-book für 4 Tage
+-- Anna borgt sich ein e-book für 5 Tage
 INSERT INTO ebook_ausleihe (nutzername, titel, dauer)
 VALUES ('Anna Muster', 'Digitale Welten', 5);
-SELECT * FROM ausleihe;       
 
--- id  nutzer_id  medium_id  startdatum  rueckgabedatum  status 
--- --  ---------  ---------  ----------  --------------  -------
--- 1   2          2          2026-11-21  2026-12-05      gemahnt
--- 2   1          3          2026-11-21  2026-11-26      aktiv  
+-- Erwartet: neue Ausleihe mit nutzer_id 1, medium_id 3,
+-- startdatum heute und rueckgabedatum heute + 5 Tage
+SELECT * FROM ausleihe;
 
-SELECT * FROM ebook_ausleihe; 
--- nutzername   titel            dauer
--- -----------  ---------------  -----
--- Anna Muster  Digitale Welten  5  
+-- Erwartet: Anna Muster | Digitale Welten | 5
+SELECT * FROM ebook_ausleihe;
 
 -- und wenn zB der Titel falsch ist dann sol es einen Error geben
--- "Kein E-Book mit diesem Titel gefunden"
-
+-- Erwartet: Fehler "Kein E-Book mit diesem Titel gefunden"
 INSERT INTO ebook_ausleihe (nutzername, titel, dauer)
 VALUES ('Anna Muster', 'Der Zauberberg', 7);
-
---sqlite3.IntegrityError: Kein E-Book mit diesem Titel gefunden
