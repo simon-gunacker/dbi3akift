@@ -20,42 +20,27 @@ END;
 -- Test:
 -- Wir fügen einen ausleihe hinzu die wir dann Updaten
 -- weil sie Zurückgebracht wurde
--- Bestand vor dem instert:
--- SELECT * FROM medium;
--- id  titel                            typ    bestand
--- --  -------------------------------  -----  -------
--- 1   Der Zauberberg                   buch   2      
--- 2   Programmieren lernen mit Python  buch   0      
--- 3   Digitale Welten                  ebook  9997 
+
+-- Bestand vor dem insert
+SELECT * FROM medium;
 
 INSERT INTO ausleihe (nutzer_id, medium_id, startdatum, rueckgabedatum)
 VALUES (1, 3, '2026-10-05', '2026-10-16');
 
--- Hier sollte man sehen in medium das der Bestand runtergehen wegen Aufagbe 1
--- SELECT * FROM medium;
--- id  titel                            typ    bestand
--- --  -------------------------------  -----  -------
--- 1   Der Zauberberg                   buch   2      
--- 2   Programmieren lernen mit Python  buch   0      
--- 3   Digitale Welten                  ebook  9996 
+-- Erwartet: Bestand von Digitale Welten ist um 1 kleiner (wegen Aufgabe 1)
+SELECT * FROM medium;
 
--- sieht mann dan auch im system_log
---SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
-
--- id  aktion    info                         datum              
--- --  --------  ---------------------------  -------------------
--- 8   AUSLEIHE  Anna Muster-Digitale Welten  2026-11-22 13:44:35
+-- Erwartet: neuester Log-Eintrag ist AUSLEIHE
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
 
 UPDATE ausleihe SET status = 'beendet'
 WHERE id = (SELECT MAX(id) FROM ausleihe);
 
--- Jetzt sollten man sehen das der Bestand sich wieder erhöht
---SELECT * FROM medium;
--- id  titel                            typ    bestand
--- --  -------------------------------  -----  -------
--- 1   Der Zauberberg                   buch   2      
--- 2   Programmieren lernen mit Python  buch   0      
--- 3   Digitale Welten                  ebook  9998   
+-- Erwartet: Bestand von Digitale Welten ist wieder um 1 größer
+SELECT * FROM medium;
+
+-- Erwartet: neuester Log-Eintrag ist RÜCKGABE
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
 
 -- Medium löschen
 CREATE TRIGGER loeschen_medienen
@@ -68,30 +53,21 @@ END;
 
 -- Test:
 -- Wir fügen eine neues Medium ein und löschen dann das wieder
-
 INSERT INTO medium (titel, typ, bestand)
 VALUES ('ACOTAR', 'buch', 1);
 
--- Jetzt soltte mann es mit SELECT * FROM medium sehen;
--- id  titel                            typ    bestand
--- --  -------------------------------  -----  -------
--- 1   Der Zauberberg                   buch   2      
--- 2   Programmieren lernen mit Python  buch   0      
--- 3   Digitale Welten                  ebook  9998   
--- 4   ACOTAR                           buch   1 
+-- Erwartet: ACOTAR ist als neues Medium da
+SELECT * FROM medium;
 
 --Jetzt löschen wir es
-DELETE FROM medium WHERE id = 4;
--- id  titel                            typ    bestand
--- --  -------------------------------  -----  -------
--- 1   Der Zauberberg                   buch   2      
--- 2   Programmieren lernen mit Python  buch   0      
--- 3   Digitale Welten                  ebook  9998  
+DELETE FROM medium WHERE id = (SELECT id FROM medium WHERE titel = 'ACOTAR');
 
--- und im system_log sollte ein neue eintrag sein 
--- mit MAX(id) bekomm ich den neuersten eintrag
--- SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+-- Erwartet: ACOTAR ist wieder weg
+SELECT * FROM medium;
 
--- id  aktion           info    datum              
--- --  ---------------  ------  -------------------
--- 11  MEDIUM_GELÖSCHT  ACOTAR  2026-11-22 13:54:57
+-- Erwartet: neuester Log-Eintrag ist MEDIUM_GELÖSCHT mit ACOTAR
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+
+-- Gesamtübersicht für die Auswertung: alle Einträge im Log
+SELECT * FROM system_log;
+SELECT aktion, COUNT(*) AS anzahl FROM system_log GROUP BY aktion;
