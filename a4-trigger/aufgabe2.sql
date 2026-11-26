@@ -2,6 +2,7 @@
 -- Lass vorher Aufgabe 1 laufen!
 -- Dafür habe ich im Tabellen Schema den CHECK beim konto_guthaben entfernt
 -- das Guthaben könnte sonst nie negativ werden
+-- Annahme ein externen Skript checkt die Rückgabendaten und gändert den Status der Ausleihe um 
 CREATE TRIGGER mahnung_verfassen
 AFTER UPDATE OF status ON ausleihe
 FOR EACH ROW
@@ -38,30 +39,23 @@ END;
 -- Annahme heute ist der 6.12 also das Rückgabedatum ist hüberschritten 
 -- somit update ich die ausleihe auf gemahnt um
 
+-- Erwartet: Anna hat 10 €, Ben hat 5 €
+SELECT * FROM nutzer;
+
 UPDATE ausleihe SET status = 'gemahnt' WHERE id = 1;
+
 -- jetzt soll sich das guthaben von der person die bei der Ausleihe das Datum überschritten hat 
 -- ändern, es soll sich um die Mahngebür von 10€ veringern
+-- Erwartet: Ben hat jetzt -5 €, Anna bleibt bei 10 €
+SELECT * FROM nutzer;
+
 -- zusätzlich soll ein neuer Eintrag in bei den Mahnung entstehen die sich auf diese Ausleihe bezieht
+-- Erwartet: eine Mahnung mit ausleihe_id 1 und betrag 10
+SELECT * FROM mahnung;
 
-
--- Ergebniss:
-
--- SELECT * FROM nutzer;
--- 1|Anna Muster|10
--- 2|Ben Beispiel|-5
-
---davor hatte Ben noch 5.00 als Kontostnadn
-
--- SELECT * FROM mahnung;
--- id  ausleihe_id  betrag  datum     
--- --  -----------  ------  ----------
--- 1   1            10      2026-11-21
-
-
--- Ben sollte auch nichts mehr Ausleihen dürfen mit der Nachricht "Guthaben negativ! Keine neuen Ausleihen möglich"
-
+-- Ben sollte auch nichts mehr Ausleihen dürfen
+-- Erwartet: Fehler "Guthaben negativ! Keine neuen Ausleihen möglich"
 INSERT INTO ausleihe (nutzer_id, medium_id) VALUES (2, 3);
 
--- sqlite3.IntegrityError: Guthaben negativ! Keine neuen Ausleihen möglich
-
-
+-- Erwartet: keine neue Ausleihe von Ben
+SELECT * FROM ausleihe;
