@@ -30,13 +30,21 @@ END;
 
 
 -- Test zu Aufgabe 1
-INSERT INTO ausleihe (nutzer_id, medium_id) 
-VALUES (2, 2); -- 2 ist das Python Buch davon ist nur eines im Bestand momentan soll den Bestand auf 0 bringen 
 
-INSERT INTO ausleihe (nutzer_id, medium_id) 
-VALUES (1, 2); -- jetzt will sich Anna(id=1) auch das buch ausborgen 
--- Es soll jetzt wenn diese Insert ausgeführt wird die Nachricht 
--- "Bestand zu nierdrig um Buch auszuleihen" kommen
+-- Erwartet: Bestand laut Testdaten (Zauberberg 3, Python 1, Digitale Welten 9999)
+SELECT * FROM medium;
 
--- Tatsächliches Ergebnis
--- sqlite3.IntegrityError: Bestand zu nierdrig um Buch auszuleihen
+-- 2 ist das Python Buch davon ist nur eines im Bestand momentan soll den Bestand auf 0 bringen
+INSERT INTO ausleihe (nutzer_id, medium_id) 
+VALUES (2, 2);
+
+-- Erwartet: Python Buch hat jetzt Bestand 0, die anderen bleiben gleich
+SELECT * FROM medium;
+
+-- jetzt will sich Anna(id=1) auch das buch ausborgen 
+-- Erwartet: Fehler "Bestand zu nierdrig um Buch auszuleihen"
+INSERT INTO ausleihe (nutzer_id, medium_id) 
+VALUES (1, 2);
+
+-- Erwartet: nur Bens Ausleihe ist in der Tabelle, Annas wurde nicht eingefügt
+SELECT * FROM ausleihe;
