@@ -1,30 +1,34 @@
 -- Aufgabe 6
--- Hier zu hab ich im shema.sql einen CHECK in der mahnung tabelle auf betrag gemacht 
--- betrag DECIMAL(10,2) CHECK (betrag > 0)
+-- Hier zu hab ich im shema.sql einen CHECK in der mahnung tabelle auf betrag gemacht
+-- betrag DECIMAL(10,2) CHECK (betrag > 0) aber wir machen das mit einen Trigger
+-- -> CHECK und NOT NULL wieder aus shema.sql entfernt, sonst würden sie vor dem Trigger greifen
 
--- Somit kann beim anlegen nichts passieren und mann muss eine wert über 0 nehmen
+CREATE TRIGGER pruefe_mahnbetrag
+BEFORE INSERT ON mahnung
+FOR EACH ROW
+-- 0 €, negative Beträge und fehlende Beträge (NULL) werden blockiert
+WHEN NEW.betrag <= 0 OR NEW.betrag IS NULL
+BEGIN
+    SELECT RAISE (ABORT, 'Bitte gib ein Mahnngsbetrag ein das über 0€ ist');
+END;
 
--- TEST:
--- Wir versuchen mal einen neue Mahnung selbst anzulegen, da wir aber im Trigger 
--- der in Aufgabe 2 ist schon einen fixen Betrag anlegt sobald wir eine Ausleihe updaten
--- wäre der Check im enteffekt nicht nötig
--- Aber damit wir das hier auch abdecken legen wir einfach eine selbst an
 
-INSERT INTO mahnung (ausleihe_id, betrag) VALUES(2, 0);
+-- Test:
 
--- sqlite3.IntegrityError: CHECK constraint failed: betrag > 0
--- dieser fehler kommt sofort und fügt nichts in mahnung ein 
+-- Erwartet: die aktuellen Mahnungen vor den Tests
+SELECT * FROM mahnung;
 
--- Was passiert wenn wir dashier machen 
-INSERT INTO mahnung (ausleihe_id) VALUES (2);
+-- 1) 0 € -> Erwartet: Fehler 'Bitte gib ein Mahnngsbetrag ein das über 0€ ist'
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, 0);
 
--- Jetzt fügt er es ein mit NULL
--- id  ausleihe_id  betrag  datum     
--- --  -----------  ------  ----------
--- 1   1            10      2026-11-22
--- 3   2                    2026-11-22
+-- 2) negativer Betrag -> Erwartet: gleicher Fehler
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, -5);
 
--- Wir ändern das nochmal im shema.sql ab 
--- zu betrag DECIMAL(10,2) NOT NULL CHECK (betrag > 0),
--- Wir bekommen jetzt:
---Runtime error: NOT NULL constraint failed: mahnung.betrag (19)
+-- 3) kein Betrag (NULL) -> Erwartet: gleicher Fehler
+INSERT INTO mahnung (ausleihe_id) VALUES (1);
+
+-- 4) gültiger Betrag -> Erwartet: wird ohne Fehler eingefügt
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, 5);
+
+-- Erwartet: nur die 5 € Mahnung ist neu, keine der ungültigen
+SELECT * FROM mahnung;
