@@ -1,0 +1,472 @@
+CREATE TABLE nutzer (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    konto_guthaben DECIMAL(10,2) DEFAULT 0
+);
+
+CREATE TABLE medium (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titel TEXT NOT NULL,
+    typ TEXT CHECK (typ IN ('buch', 'ebook')),
+    bestand INTEGER DEFAULT 0
+);
+
+CREATE TABLE ausleihe (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nutzer_id INTEGER,
+    medium_id INTEGER,
+    startdatum DATE DEFAULT (DATE('now')),
+    rueckgabedatum DATE DEFAULT (DATE('now', '+14 day')),
+    status TEXT DEFAULT 'aktiv',  -- aktiv, beendet, gemahnt, gesperrt
+    FOREIGN KEY (nutzer_id) REFERENCES nutzer(id),
+    FOREIGN KEY (medium_id) REFERENCES medium(id)
+);
+
+CREATE TABLE mahnung (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ausleihe_id INTEGER,
+    betrag DECIMAL(10,2) NOT NULL CHECK (betrag > 0),
+    datum DATE DEFAULT (DATE('now')),
+    FOREIGN KEY (ausleihe_id) REFERENCES ausleihe(id)
+);
+
+CREATE TABLE system_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    aktion TEXT,
+    info TEXT,
+    datum DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO nutzer (name, konto_guthaben) VALUES 
+('Anna Muster', 10.00),
+('Ben Beispiel', 5.00);
+
+INSERT INTO medium (titel, typ, bestand) VALUES
+('Der Zauberberg', 'buch', 3),
+('Programmieren lernen mit Python', 'buch', 1),
+('Digitale Welten', 'ebook', 9999);
+
+-- Aufgabe 1
+-- nach shema.sql und test_data.sql ausführen 
+CREATE TRIGGER verfuegbarkeit_ausleihen
+BEFORE INSERT ON ausleihe
+FOR EACH ROW
+BEGIN
+    SELECT RAISE (ABORT, 'Bestand zu nierdrig um Buch auszuleihen')
+    WHERE (
+        SELECT bestand 
+        FROM medium 
+        WHERE id = NEW.medium_id ) <= 0;
+END;
+
+CREATE TRIGGER bestands_verringerung
+AFTER INSERT ON ausleihe
+FOR EACH ROW
+BEGIN
+    UPDATE medium SET bestand = bestand - 1
+    WHERE id = NEW.medium_id;
+
+    --Aufgabe 5
+    INSERT INTO system_log (aktion, info)
+    VALUES ('AUSLEIHE', (SELECT name
+                                FROM nutzer
+                                WHERE id = NEW.nutzer_id) || '-' || 
+                                (SELECT titel
+                                FROM medium
+                                WHERE id = NEW.medium_id));
+END;
+
+
+-- Test zu Aufgabe 1
+
+-- Erwartet: Bestand laut Testdaten (Zauberberg 3, Python 1, Digitale Welten 9999)
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   1      
+3   Digitale Welten                  ebook  9999   
+
+-- 2 ist das Python Buch davon ist nur eines im Bestand momentan soll den Bestand auf 0 bringen
+INSERT INTO ausleihe (nutzer_id, medium_id) 
+VALUES (2, 2);
+
+-- Erwartet: Python Buch hat jetzt Bestand 0, die anderen bleiben gleich
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9999   
+
+-- jetzt will sich Anna(id=1) auch das buch ausborgen 
+-- Erwartet: Fehler "Bestand zu nierdrig um Buch auszuleihen"
+Runtime error near line 94: Bestand zu nierdrig um Buch auszuleihen (19)
+INSERT INTO ausleihe (nutzer_id, medium_id) 
+VALUES (1, 2);
+
+-- Erwartet: nur Bens Ausleihe ist in der Tabelle, Annas wurde nicht eingefügt
+SELECT * FROM ausleihe;
+id  nutzer_id  medium_id  startdatum  rueckgabedatum  status
+--  ---------  ---------  ----------  --------------  ------
+1   2          2          2026-11-26  2026-12-10      aktiv 
+-- Aufgabe 2
+-- Lass vorher Aufgabe 1 laufen!
+-- Dafür habe ich im Tabellen Schema den CHECK beim konto_guthaben entfernt
+-- das Guthaben könnte sonst nie negativ werden
+-- Annahme ein externen Skript checkt die Rückgabendaten und gändert den Status der Ausleihe um 
+CREATE TRIGGER mahnung_verfassen
+AFTER UPDATE OF status ON ausleihe
+FOR EACH ROW
+WHEN NEW.status = 'gemahnt'
+BEGIN
+    -- abziehen der Mahngebühren des Guthabens des Nutzers
+    UPDATE nutzer
+    SET konto_guthaben = konto_guthaben - 10
+    WHERE id = NEW.nutzer_id;
+
+    -- aufzeichnung der Mahnung
+    INSERT INTO mahnung (ausleihe_id, betrag)
+    VALUES (NEW.id, 10);
+
+    -- Aufgabe 5 
+    INSERT INTO system_log (aktion, info)
+    VALUES ('MAHNUNG', (SELECT name 
+                            FROM nutzer 
+                            WHERE id = NEW.nutzer_id) || ' - Ausleihe ' || NEW.id);
+END;
+
+-- wenn das Guthaben neagtiv wird soll dieser Trigger beim vesuch etwas erneut zum ausleihen
+CREATE TRIGGER sperre_negatives_guthaben
+BEFORE INSERT ON ausleihe
+FOR EACH ROW
+WHEN (SELECT konto_guthaben FROM nutzer
+    WHERE id = NEW.nutzer_id) < 0
+BEGIN
+    SELECT RAISE (ABORT, 'Guthaben negativ! Keine neuen Ausleihen möglich');
+END;
+
+-- Test zu Aufgabe 2
+-- von Aufgabe 1 haben ich noch in der Ausleihe einen Eintrag 
+-- Annahme heute ist der 6.12 also das Rückgabedatum ist hüberschritten 
+-- somit update ich die ausleihe auf gemahnt um
+
+-- Erwartet: Anna hat 10 €, Ben hat 5 €
+SELECT * FROM nutzer;
+id  name          konto_guthaben
+--  ------------  --------------
+1   Anna Muster   10            
+2   Ben Beispiel  5             
+
+UPDATE ausleihe SET status = 'gemahnt' WHERE id = 1;
+
+-- jetzt soll sich das guthaben von der person die bei der Ausleihe das Datum überschritten hat 
+-- ändern, es soll sich um die Mahngebür von 10€ veringern
+-- Erwartet: Ben hat jetzt -5 €, Anna bleibt bei 10 €
+SELECT * FROM nutzer;
+id  name          konto_guthaben
+--  ------------  --------------
+1   Anna Muster   10            
+2   Ben Beispiel  -5            
+
+-- zusätzlich soll ein neuer Eintrag in bei den Mahnung entstehen die sich auf diese Ausleihe bezieht
+-- Erwartet: eine Mahnung mit ausleihe_id 1 und betrag 10
+SELECT * FROM mahnung;
+id  ausleihe_id  betrag  datum     
+--  -----------  ------  ----------
+1   1            10      2026-11-26
+
+-- Ben sollte auch nichts mehr Ausleihen dürfen
+-- Erwartet: Fehler "Guthaben negativ! Keine neuen Ausleihen möglich"
+Runtime error near line 156: Guthaben negativ! Keine neuen Ausleihen möglich (19)
+INSERT INTO ausleihe (nutzer_id, medium_id) VALUES (2, 3);
+
+-- Erwartet: keine neue Ausleihe von Ben
+SELECT * FROM ausleihe;
+id  nutzer_id  medium_id  startdatum  rueckgabedatum  status 
+--  ---------  ---------  ----------  --------------  -------
+1   2          2          2026-11-26  2026-12-10      gemahnt
+--Aufgabe 3
+
+CREATE VIEW ebook_ausleihe AS
+SELECT n.name  AS nutzername, m.titel AS titel,
+    CAST(julianday(a.rueckgabedatum) - julianday(a.startdatum) AS INTEGER) AS dauer
+FROM ausleihe a
+JOIN nutzer n ON n.id = a.nutzer_id
+JOIN medium m ON m.id = a.medium_id
+WHERE m.typ = 'ebook';
+
+CREATE TRIGGER ebook_ausleihe_einfuegen
+INSTEAD OF INSERT ON ebook_ausleihe 
+FOR EACH ROW
+BEGIN
+    -- nur ebooks sind erlaubt
+    SELECT RAISE (ABORT, 'Kein E-Book mit diesem Titel gefunden')
+    WHERE NOT EXISTS (SELECT 1 FROM medium
+                    WHERE titel = NEW.titel AND typ = 'ebook');
+    
+    -- der Nutzer muss existieren 
+    SELECT RAISE (ABORT, 'Nutzer nicht gefunden')
+    WHERE NOT EXISTS (SELECT 1 FROM nutzer WHERE name = NEW.nutzername);
+    
+    --ausfüllen der fehlenden Daten
+    INSERT INTO ausleihe (nutzer_id, medium_id, rueckgabedatum)
+    VALUES (
+        (SELECT id FROM nutzer WHERE name = NEW.nutzername),
+        (SELECT id FROM medium WHERE titel = NEW.titel AND typ = 'ebook'),
+        DATE('now', '+' || NEW.dauer || ' day')
+    );
+
+END;
+
+-- Test von Aufgabe 3
+-- Erwartet wir einmal das sich die Daten die fehlen eingetragen werden 
+
+-- Anna borgt sich ein e-book für 5 Tage
+INSERT INTO ebook_ausleihe (nutzername, titel, dauer)
+VALUES ('Anna Muster', 'Digitale Welten', 5);
+
+-- Erwartet: neue Ausleihe mit nutzer_id 1, medium_id 3,
+-- startdatum heute und rueckgabedatum heute + 5 Tage
+SELECT * FROM ausleihe;
+id  nutzer_id  medium_id  startdatum  rueckgabedatum  status 
+--  ---------  ---------  ----------  --------------  -------
+1   2          2          2026-11-26  2026-12-10      gemahnt
+2   1          3          2026-11-26  2026-12-01      aktiv  
+
+-- Erwartet: Anna Muster | Digitale Welten | 5
+SELECT * FROM ebook_ausleihe;
+nutzername   titel            dauer
+-----------  ---------------  -----
+Anna Muster  Digitale Welten  5    
+
+-- und wenn zB der Titel falsch ist dann sol es einen Error geben
+-- Erwartet: Fehler "Kein E-Book mit diesem Titel gefunden"
+Runtime error near line 209: Kein E-Book mit diesem Titel gefunden (19)
+INSERT INTO ebook_ausleihe (nutzername, titel, dauer)
+VALUES ('Anna Muster', 'Der Zauberberg', 7);
+-- Aufgabe 4
+-- Es wird nichts gelöscht! Mann sollte Daten aus einer Datenbank nicht löschen
+-- Nutzer wird nur geupdated
+-- Nutzer bezogenen Daten werden umgeändert
+
+CREATE TRIGGER loeschen_user
+BEFORE DELETE ON nutzer
+FOR EACH ROW
+BEGIN
+    -- Nutzer wir nicht gelöscht sondern nur geupdated, Name wir unkenntlich
+    -- Kontoguthaben wir auf 0 gesetzt
+    -- Annamhe der Kunde hat schon alles zurück gebraucht nach seinem Austretten
+
+    UPDATE nutzer SET name = 'Gelöschter Nutzer', konto_guthaben = 0 WHERE id = OLD.id;
+
+    -- Eintrag ins systemlog von den Daten
+    INSERT INTO system_log (aktion, info)
+    VALUES ('NUTZER_AUSGETRETTEN', OLD.name);
+
+    -- Raise IGNORE muss am schluss hin sonst hört der Trigger hier gleich auf
+    -- IGNORE überspringt den eigentlichen DELETE aber übernimmt die änderungen darüber
+    SELECT RAISE (IGNORE);
+END;
+
+
+-- Test:
+
+-- Wir legen einen Kunden an den wir dann löschen können
+-- Er sollte jetzt die ID 3 bekommen
+INSERT INTO nutzer (name, konto_guthaben) VALUES ('Nicole Mason', 15.00);
+
+-- Erwartet wird jetzt Nicole Mason mit der id 3 und 15 €
+SELECT * FROM nutzer;
+id  name          konto_guthaben
+--  ------------  --------------
+1   Anna Muster   10            
+2   Ben Beispiel  -5            
+3   Nicole Mason  15            
+
+-- Jetzt versuchen wir Nicole zu löschen.
+-- Erwartet: keine error message, der DELETE läuft "silently"
+-- aber Nicole wird nicht gelöscht, sonder sie wird anoymisiert
+DELETE FROM nutzer WHERE id = 3;
+
+-- Erwartet wird id 3 exestiert immer noch als 'Gelöschter Nutzer' with 0 €
+SELECT * FROM nutzer;
+id  name               konto_guthaben
+--  -----------------  --------------
+1   Anna Muster        10            
+2   Ben Beispiel       -5            
+3   Gelöschter Nutzer  0             
+
+-- Erwartet: neuer sys_log Eintrag ist NUTZER_AUSGETRETTEN mit dem alten Namen 'Nicole Mason'
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+id  aktion               info          datum              
+--  -------------------  ------------  -------------------
+4   NUTZER_AUSGETRETTEN  Nicole Mason  2026-11-26 15:54:27
+-- Aufgabe 5
+-- Ausleihen wurde in Aufgabe 1 geregelt siehe dort Kommentar
+-- Mahnung wurde in Aufgabe 2 geregelt sie dort Kommentar
+-- Löschung wurde n Aufgabe 4 erledigt siehet bestehendes Insert in system_log
+
+-- Rückgabe
+CREATE TRIGGER rueckgabe_mediene
+AFTER UPDATE OF status ON ausleihe
+FOR EACH ROW
+WHEN NEW.status = 'beendet'
+BEGIN
+    UPDATE medium SET bestand = bestand + 1 WHERE id = NEW.medium_id;
+
+    INSERT INTO system_log (aktion, info) 
+    VALUES ('RÜCKGABE', (SELECT titel
+                        FROM medium
+                        WHERE id = NEW.medium_id));
+END;
+
+-- Test:
+-- Wir fügen einen ausleihe hinzu die wir dann Updaten
+-- weil sie Zurückgebracht wurde
+
+-- Bestand vor dem insert
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9998   
+
+INSERT INTO ausleihe (nutzer_id, medium_id, startdatum, rueckgabedatum)
+VALUES (1, 3, '2026-10-05', '2026-10-16');
+
+-- Erwartet: Bestand von Digitale Welten ist um 1 kleiner (wegen Aufgabe 1)
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9997   
+
+-- Erwartet: neuester Log-Eintrag ist AUSLEIHE
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+id  aktion    info                         datum              
+--  --------  ---------------------------  -------------------
+5   AUSLEIHE  Anna Muster-Digitale Welten  2026-11-26 15:54:27
+
+UPDATE ausleihe SET status = 'beendet'
+WHERE id = (SELECT MAX(id) FROM ausleihe);
+
+-- Erwartet: Bestand von Digitale Welten ist wieder um 1 größer
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9998   
+
+-- Erwartet: neuester Log-Eintrag ist RÜCKGABE
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+id  aktion    info             datum              
+--  --------  ---------------  -------------------
+6   RÜCKGABE  Digitale Welten  2026-11-26 15:54:27
+
+-- Medium löschen
+CREATE TRIGGER loeschen_medienen
+AFTER DELETE ON medium
+FOR EACH ROW
+BEGIN
+    INSERT INTO system_log (aktion, info)
+    VALUES ('MEDIUM_GELÖSCHT', OLD.titel);
+END;
+
+-- Test:
+-- Wir fügen eine neues Medium ein und löschen dann das wieder
+INSERT INTO medium (titel, typ, bestand)
+VALUES ('ACOTAR', 'buch', 1);
+
+-- Erwartet: ACOTAR ist als neues Medium da
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9998   
+4   ACOTAR                           buch   1      
+
+--Jetzt löschen wir es
+DELETE FROM medium WHERE id = (SELECT id FROM medium WHERE titel = 'ACOTAR');
+
+-- Erwartet: ACOTAR ist wieder weg
+SELECT * FROM medium;
+id  titel                            typ    bestand
+--  -------------------------------  -----  -------
+1   Der Zauberberg                   buch   3      
+2   Programmieren lernen mit Python  buch   0      
+3   Digitale Welten                  ebook  9998   
+
+-- Erwartet: neuester Log-Eintrag ist MEDIUM_GELÖSCHT mit ACOTAR
+SELECT * FROM system_log WHERE id = (SELECT MAX(id) FROM system_log);
+id  aktion           info    datum              
+--  ---------------  ------  -------------------
+7   MEDIUM_GELÖSCHT  ACOTAR  2026-11-26 15:54:27
+
+-- Gesamtübersicht für die Auswertung: alle Einträge im Log
+SELECT * FROM system_log;
+id  aktion               info                                          datum              
+--  -------------------  --------------------------------------------  -------------------
+1   AUSLEIHE             Ben Beispiel-Programmieren lernen mit Python  2026-11-26 15:54:27
+2   MAHNUNG              Ben Beispiel - Ausleihe 1                     2026-11-26 15:54:27
+3   AUSLEIHE             Anna Muster-Digitale Welten                   2026-11-26 15:54:27
+4   NUTZER_AUSGETRETTEN  Nicole Mason                                  2026-11-26 15:54:27
+5   AUSLEIHE             Anna Muster-Digitale Welten                   2026-11-26 15:54:27
+6   RÜCKGABE             Digitale Welten                               2026-11-26 15:54:27
+7   MEDIUM_GELÖSCHT      ACOTAR                                        2026-11-26 15:54:27
+SELECT aktion, COUNT(*) AS anzahl FROM system_log GROUP BY aktion;
+aktion               anzahl
+-------------------  ------
+AUSLEIHE             3     
+MAHNUNG              1     
+MEDIUM_GELÖSCHT      1     
+NUTZER_AUSGETRETTEN  1     
+RÜCKGABE             1     
+-- Aufgabe 6
+-- Hier zu hab ich im shema.sql einen CHECK in der mahnung tabelle auf betrag gemacht
+-- betrag DECIMAL(10,2) CHECK (betrag > 0) aber wir machen das mit einen Trigger
+-- -> CHECK und NOT NULL wieder aus shema.sql entfernt, sonst würden sie vor dem Trigger greifen
+
+CREATE TRIGGER pruefe_mahnbetrag
+BEFORE INSERT ON mahnung
+FOR EACH ROW
+-- 0 €, negative Beträge und fehlende Beträge (NULL) werden blockiert
+WHEN NEW.betrag <= 0 OR NEW.betrag IS NULL
+BEGIN
+    SELECT RAISE (ABORT, 'Bitte gib ein Mahnngsbetrag ein das über 0€ ist');
+END;
+
+
+-- Test:
+
+-- Erwartet: die aktuellen Mahnungen vor den Tests
+SELECT * FROM mahnung;
+id  ausleihe_id  betrag  datum     
+--  -----------  ------  ----------
+1   1            10      2026-11-26
+
+-- 1) 0 € -> Erwartet: Fehler 'Bitte gib ein Mahnngsbetrag ein das über 0€ ist'
+Runtime error near line 349: Bitte gib ein Mahnngsbetrag ein das über 0€ ist (19)
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, 0);
+
+-- 2) negativer Betrag -> Erwartet: gleicher Fehler
+Runtime error near line 352: Bitte gib ein Mahnngsbetrag ein das über 0€ ist (19)
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, -5);
+
+-- 3) kein Betrag (NULL) -> Erwartet: gleicher Fehler
+Runtime error near line 355: Bitte gib ein Mahnngsbetrag ein das über 0€ ist (19)
+INSERT INTO mahnung (ausleihe_id) VALUES (1);
+
+-- 4) gültiger Betrag -> Erwartet: wird ohne Fehler eingefügt
+INSERT INTO mahnung (ausleihe_id, betrag) VALUES (1, 5);
+
+-- Erwartet: nur die 5 € Mahnung ist neu, keine der ungültigen
+SELECT * FROM mahnung;
+id  ausleihe_id  betrag  datum     
+--  -----------  ------  ----------
+1   1            10      2026-11-26
+2   1            5       2026-11-26
