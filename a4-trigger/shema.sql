@@ -8,7 +8,7 @@ CREATE TABLE medium (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     titel TEXT NOT NULL,
     typ TEXT CHECK (typ IN ('buch', 'ebook')),
-    bestand INTEGER DEFAULT 0 CHECK (bestand >= 0)
+    bestand INTEGER DEFAULT 0,
 );
 
 CREATE TABLE ausleihe (
