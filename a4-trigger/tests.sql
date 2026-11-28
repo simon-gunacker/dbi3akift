@@ -51,3 +51,11 @@ VALUES (2, 1, DATE('now', '-30 day'), DATE('now', '-16 day'));
 UPDATE ausleihe SET status = 'gemahnt' WHERE id = 4;
 SELECT * FROM mahnung;
 SELECT id, name, konto_guthaben FROM nutzer WHERE id = 2;
+
+.print '--- 2.5 Ben (-5€), will "Digitale Welt" ausliehen, gesperrt, Fehler! ---'
+INSERT INTO ausleihe (nutzer_id, medium_id) VALUES (2, 3);
+SELECT COUNT(*) AS anzahl_ausleihen FROM ausleihe;
+
+.print '--- 2.6 Anna (0€), leiht "Digitale Welt" aus - erlaubt ---'
+INSERT INTO ausleihe (nutzer_id, medium_id) VALUES (1, 3);
+SELECT COUNT(*) AS anzahl_ausleihen FROM ausleihe;

@@ -76,5 +76,12 @@ BEGIN
                                            FROM mahnung
                                            WHERE id = last_insert_rowid())
     WHERE id = NEW.nutzer_id;
-
 */
+
+-- Nutzer hat unter 0 EUR Guthaben, wird gesperrt
+CREATE TRIGGER trigger_konto_guthaben_kleiner_null
+BEFORE INSERT ON ausleihe
+WHEN COALESCE ((SELECT konto_guthaben FROM nutzer WHERE id = NEW.nutzer_id), 0) < 0
+BEGIN
+    SELECT RAISE(ABORT, 'Ausleihen nicht möglich: Guthaben negativ, Konto gesperrt');
+END;
